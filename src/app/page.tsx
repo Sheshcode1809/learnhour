@@ -374,16 +374,16 @@ export default function HomePage() {
                   <span className="bg-forest-100 px-2 py-0.5 rounded">8 Hours Total</span>
                 </div>
                 <h3 className="text-base font-bold text-charcoal-900">
-                  System Design for Beginners
+                  Neural Networks from Scratch
                 </h3>
                 <p className="text-xs text-charcoal-500 mt-1 line-clamp-2">
-                  Horizontal scaling, caching, sharding, message queues, and microservices split into 8 days.
+                  Build deep learning neural networks from scratch in Python with forward propagation, activation functions, and backprop.
                 </p>
               </div>
               <div className="mt-5 pt-3 border-t border-sand-border flex items-center justify-between">
                 <span className="text-xs text-charcoal-500">14 lessons</span>
                 <Link
-                  href="/courses/new"
+                  href="/courses/neural-networks"
                   className="px-3.5 py-1.5 rounded-xl bg-forest-600 hover:bg-forest-700 text-white font-bold text-xs"
                 >
                   Start Course →
@@ -395,20 +395,20 @@ export default function HomePage() {
             <div className="bg-white border border-sand-border rounded-3xl p-5 shadow-xs flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between text-xs font-bold text-forest-700 mb-2">
-                  <span>MIT OpenCourseWare</span>
+                  <span>freeCodeCamp</span>
                   <span className="bg-forest-100 px-2 py-0.5 rounded">12 Hours Total</span>
                 </div>
                 <h3 className="text-base font-bold text-charcoal-900">
-                  Introduction to Computer Science
+                  System Design Interview Masterclass
                 </h3>
                 <p className="text-xs text-charcoal-500 mt-1 line-clamp-2">
-                  Computational thinking, algorithms, data structures, and algorithmic complexity.
+                  Horizontal scaling, caching, sharding, message queues, and microservices split into structured daily 60m blocks.
                 </p>
               </div>
               <div className="mt-5 pt-3 border-t border-sand-border flex items-center justify-between">
-                <span className="text-xs text-charcoal-500">22 lessons</span>
+                <span className="text-xs text-charcoal-500">20 lessons</span>
                 <Link
-                  href="/courses/new"
+                  href="/courses/system-design"
                   className="px-3.5 py-1.5 rounded-xl bg-forest-600 hover:bg-forest-700 text-white font-bold text-xs"
                 >
                   Start Course →

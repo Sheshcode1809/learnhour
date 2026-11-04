@@ -5,6 +5,7 @@ import { Course, LearningSession, UserPreferences, ActiveTimerState, CourseLesso
 import { repository } from '@/lib/storage/repository';
 import { calculateStreaks, getWeeklyActivity } from '@/lib/calculations/streaks';
 import { generateLessonsForCourse } from '@/lib/calculations/dayPlanner';
+import { PRESET_COURSES } from '@/lib/youtube';
 
 interface LearningContextType {
   courses: Course[];
@@ -17,6 +18,7 @@ interface LearningContextType {
   
   // Course actions
   addCourse: (courseData: {
+    id?: string;
     title: string;
     provider?: string;
     course_url: string;
@@ -26,7 +28,11 @@ interface LearningContextType {
     total_minutes: number;
     daily_pace_minutes?: number;
     lessons?: CourseLesson[];
+    quizzes?: Course['quizzes'];
+    flashcards?: Course['flashcards'];
+    notes?: Course['notes'];
   }) => Course;
+  enrollPreset: (presetKey: string) => Course | null;
   updateCourse: (course: Course) => void;
   deleteCourse: (id: string) => void;
   toggleLessonCompletion: (courseId: string, lessonId: string) => void;
@@ -257,6 +263,7 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
 
   // Course operations
   const addCourse = useCallback((courseData: {
+    id?: string;
     title: string;
     provider?: string;
     course_url: string;
@@ -266,11 +273,14 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
     total_minutes: number;
     daily_pace_minutes?: number;
     lessons?: CourseLesson[];
+    quizzes?: Course['quizzes'];
+    flashcards?: Course['flashcards'];
+    notes?: Course['notes'];
   }): Course => {
-    const id = `course-${Date.now()}`;
+    const id = courseData.id || `course-${Date.now()}`;
     const dailyPace = courseData.daily_pace_minutes || 60;
     const generatedLessons = courseData.lessons && courseData.lessons.length > 0
-      ? courseData.lessons
+      ? courseData.lessons.map((l) => ({ ...l, course_id: id }))
       : generateLessonsForCourse(id, courseData.total_minutes, courseData.title, dailyPace);
 
     const newCourse: Course = {
@@ -287,6 +297,9 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
       daily_pace_minutes: dailyPace,
       status: 'active',
       lessons: generatedLessons,
+      quizzes: courseData.quizzes,
+      flashcards: courseData.flashcards,
+      notes: courseData.notes,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
@@ -297,6 +310,31 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
     repository.setLastActiveCourseId(id);
     return newCourse;
   }, [preferences.user_id]);
+
+  const enrollPreset = useCallback((presetKey: string): Course | null => {
+    const preset = PRESET_COURSES.find((p) => p.key === presetKey);
+    if (!preset) return null;
+    const videoId = preset.url.includes('v=') ? preset.url.split('v=')[1].slice(0, 11) : 'kL2gQWjmLc0';
+    return addCourse({
+      id: preset.key,
+      title: preset.title,
+      provider: preset.provider,
+      course_url: preset.url,
+      embed_url: `https://www.youtube.com/embed/${videoId}?enablejsapi=1`,
+      thumbnail_url: preset.thumbnail_url,
+      description: preset.description,
+      total_minutes: preset.total_minutes,
+      daily_pace_minutes: preset.daily_pace_minutes,
+      lessons: preset.lessons.map((l) => ({
+        ...l,
+        course_id: preset.key,
+        is_completed: false,
+      })),
+      quizzes: preset.quizzes,
+      flashcards: preset.flashcards?.map((f) => ({ ...f, course_id: preset.key })),
+      notes: preset.notes?.map((n) => ({ ...n, course_id: preset.key })),
+    });
+  }, [addCourse]);
 
   const updateCourse = useCallback((course: Course) => {
     repository.saveCourse(course);
@@ -448,6 +486,7 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
         lastActiveCourse,
         isLoading,
         addCourse,
+        enrollPreset,
         updateCourse,
         deleteCourse,
         toggleLessonCompletion,

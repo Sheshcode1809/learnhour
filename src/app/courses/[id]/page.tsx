@@ -7,7 +7,7 @@ import { useLearning } from '@/context/LearningContext';
 import { groupLessonsByDay } from '@/lib/calculations/dayPlanner';
 import { calculateCourseProgress } from '@/lib/calculations/progress';
 import { repository } from '@/lib/storage/repository';
-import { isAllowlistedEmbedUrl } from '@/lib/youtube';
+import { isAllowlistedEmbedUrl, PRESET_COURSES } from '@/lib/youtube';
 import {
   ArrowLeft,
   CheckCircle2,
@@ -21,6 +21,10 @@ import {
   Clock,
   Check,
   ShieldAlert,
+  Sparkles,
+  LayoutDashboard,
+  PlusCircle,
+  BookOpen,
 } from 'lucide-react';
 import { QuizModal } from '@/components/course-player/QuizModal';
 import { NotesModal } from '@/components/course-player/NotesModal';
@@ -34,6 +38,7 @@ export default function CoursePlayerPage() {
 
   const {
     courses,
+    enrollPreset,
     toggleLessonCompletion,
     startTimer,
     setLastActiveCourseId,
@@ -41,6 +46,7 @@ export default function CoursePlayerPage() {
   } = useLearning();
 
   const course = courses.find((c) => c.id === courseId);
+  const matchedPreset = PRESET_COURSES.find((p) => p.key === courseId);
 
   // Modals state
   const [activeModal, setActiveModal] = useState<'quiz' | 'notes' | 'flashcards' | 'dayplan' | null>(null);
@@ -93,16 +99,82 @@ export default function CoursePlayerPage() {
   }
 
   if (!course) {
+    if (matchedPreset) {
+      return (
+        <div className="p-8 sm:p-12 text-center flex flex-col items-center max-w-lg mx-auto">
+          <div className="w-12 h-12 rounded-2xl bg-forest-100 text-forest-700 flex items-center justify-center mb-4">
+            <Sparkles className="w-6 h-6" />
+          </div>
+          <span className="text-[11px] font-bold uppercase tracking-wider text-forest-800 bg-sand-200 px-3 py-1 rounded-full mb-3">
+            Featured Masterclass
+          </span>
+          <h2 className="text-xl sm:text-2xl font-extrabold text-charcoal-900 tracking-tight">
+            {matchedPreset.title}
+          </h2>
+          <p className="text-xs text-charcoal-600 mt-2 leading-relaxed">
+            {matchedPreset.description}
+          </p>
+          <div className="mt-4 flex items-center gap-3 text-xs text-charcoal-500 font-medium">
+            <span>By {matchedPreset.provider}</span>
+            <span>•</span>
+            <span>{Math.round(matchedPreset.total_minutes / 60)} Hours Total</span>
+            <span>•</span>
+            <span>{matchedPreset.lessons.length} structured lessons</span>
+          </div>
+
+          <div className="mt-6 flex flex-col sm:flex-row items-center gap-3 w-full">
+            <button
+              onClick={() => {
+                enrollPreset(matchedPreset.key);
+              }}
+              className="w-full flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-forest-600 hover:bg-forest-700 active:bg-forest-800 text-white font-bold text-xs shadow-sm transition-all"
+            >
+              <Play className="w-4 h-4 fill-current" />
+              <span>Enroll & Start Learning</span>
+            </button>
+            <Link
+              href="/courses"
+              className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-white hover:bg-cream-200 border border-sand-border text-charcoal-700 font-bold text-xs shadow-2xs transition-colors"
+            >
+              Browse Courses
+            </Link>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="p-12 text-center flex flex-col items-center max-w-md mx-auto">
-        <h2 className="text-xl font-bold text-charcoal-800">Course not found</h2>
-        <p className="text-xs text-charcoal-500 mt-1">This course does not exist or may have been deleted.</p>
-        <Link
-          href="/courses"
-          className="mt-4 px-5 py-2.5 rounded-xl bg-forest-600 hover:bg-forest-700 text-white font-semibold text-xs shadow-sm transition-all"
-        >
-          Back to Courses
-        </Link>
+        <div className="w-12 h-12 rounded-2xl bg-sand-200 text-charcoal-500 flex items-center justify-center mb-4">
+          <BookOpen className="w-6 h-6" />
+        </div>
+        <h2 className="text-xl font-bold text-charcoal-900">Course not found</h2>
+        <p className="text-xs text-charcoal-500 mt-1">
+          This course ID does not exist or may have been deleted from your library.
+        </p>
+        <div className="mt-6 flex flex-col sm:flex-row items-center gap-2.5 w-full">
+          <Link
+            href="/courses"
+            className="w-full sm:w-auto flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-forest-600 hover:bg-forest-700 text-white font-semibold text-xs shadow-sm transition-all"
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>Browse Courses</span>
+          </Link>
+          <Link
+            href="/dashboard"
+            className="w-full sm:w-auto flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-white hover:bg-cream-200 border border-sand-border text-charcoal-700 font-semibold text-xs shadow-2xs transition-all"
+          >
+            <LayoutDashboard className="w-3.5 h-3.5" />
+            <span>Dashboard</span>
+          </Link>
+          <Link
+            href="/courses/new"
+            className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-white hover:bg-cream-200 border border-sand-border text-charcoal-700 font-semibold text-xs shadow-2xs transition-all"
+            title="Create Course"
+          >
+            <PlusCircle className="w-3.5 h-3.5" />
+          </Link>
+        </div>
       </div>
     );
   }
