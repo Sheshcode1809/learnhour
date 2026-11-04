@@ -177,7 +177,7 @@ export default function SessionsPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 flex flex-col gap-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-sand-border">
         <div>
@@ -362,8 +362,30 @@ export default function SessionsPage() {
             </table>
           </div>
         ) : (
-          <div className="text-center py-8 text-xs text-charcoal-400">
-            No study sessions logged yet. Complete a timer session or add a manual session.
+          <div className="text-center py-12 px-4 flex flex-col items-center justify-center max-w-sm mx-auto">
+            <div className="w-12 h-12 rounded-2xl bg-cream-200 text-charcoal-500 flex items-center justify-center mb-3">
+              <Clock className="w-6 h-6 text-forest-600" />
+            </div>
+            <h4 className="text-sm font-bold text-charcoal-900 mb-1">No study sessions logged yet</h4>
+            <p className="text-xs text-charcoal-500 leading-relaxed mb-4">
+              Focus time completed with the stopwatch above or added manually will appear in this history table.
+            </p>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={handleOpenManualModal}
+                className="px-4 py-2 rounded-xl bg-forest-600 hover:bg-forest-700 text-white font-bold text-xs shadow-xs transition-all"
+              >
+                Log manual session
+              </button>
+              <button
+                type="button"
+                onClick={() => startTimer(selectedCourseForTimer || undefined)}
+                className="px-4 py-2 rounded-xl bg-white hover:bg-cream-100 border border-sand-border text-charcoal-800 font-bold text-xs shadow-2xs transition-all"
+              >
+                Start study timer
+              </button>
+            </div>
           </div>
         )}
       </div>

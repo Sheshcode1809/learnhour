@@ -15,17 +15,19 @@ export default function NewCoursePage() {
       <div className="px-4 lg:px-8 py-4 border-b border-sand-border bg-cream-50 flex items-center justify-between">
         <Link
           href="/courses"
-          className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-charcoal-600 hover:text-charcoal-900"
+          className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-charcoal-600 hover:text-charcoal-900 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to courses</span>
         </Link>
-        <button
-          onClick={() => setShowManual(!showManual)}
-          className="text-xs font-semibold text-forest-700 hover:text-forest-800 underline"
-        >
-          {showManual ? '← Switch to Quick Paste' : 'Switch to Manual Form →'}
-        </button>
+        {showManual && (
+          <button
+            onClick={() => setShowManual(false)}
+            className="text-xs font-semibold text-forest-700 hover:text-forest-800 underline"
+          >
+            ← Switch to Quick Paste
+          </button>
+        )}
       </div>
 
       <div className="flex-1 pb-16">

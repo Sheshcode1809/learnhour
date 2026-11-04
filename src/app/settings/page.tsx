@@ -174,18 +174,24 @@ export default function SettingsPage() {
               )}
             </div>
           </div>
+        </div>
 
-          <div className="flex items-center justify-end gap-3 pt-2">
+        {/* Global Form Save Bar */}
+        <div className="bg-white border border-sand-border rounded-2xl p-4 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-xs text-charcoal-500 font-medium text-center sm:text-left">
+            One save applies your daily study target, profile name, and streak timezone simultaneously.
+          </p>
+          <div className="flex items-center gap-3 shrink-0">
             {savedMessage && (
-              <span className="text-xs text-forest-700 font-bold flex items-center gap-1 animate-in fade-in">
-                <Check className="w-3.5 h-3.5" /> Preferences saved!
+              <span className="text-xs text-forest-700 font-bold flex items-center gap-1 animate-in fade-in bg-forest-50 border border-forest-200 px-3 py-1.5 rounded-xl">
+                <Check className="w-3.5 h-3.5 text-forest-600" /> Preferences saved!
               </span>
             )}
             <button
               type="submit"
-              className="px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-forest-600 hover:bg-forest-700 text-white shadow-sm transition-all"
+              className="px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-forest-600 hover:bg-forest-700 active:bg-forest-800 text-white shadow-sm transition-all"
             >
-              Save Preferences
+              Save All Preferences
             </button>
           </div>
         </div>

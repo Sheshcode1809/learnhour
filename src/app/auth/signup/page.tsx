@@ -78,15 +78,15 @@ export default function SignupPage() {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4">
         <div className="bg-white border border-sand-border py-8 px-6 sm:px-8 rounded-3xl shadow-sm flex flex-col gap-5">
           {/* Google Sign In */}
-          <GoogleButton onClick={handleGoogleSignUp} disabled={isLoading} label="Sign up with Google" />
+          <GoogleButton onClick={handleGoogleSignUp} disabled={isLoading} label="Sign up with Google (Demo)" />
 
           {/* Divider */}
-          <div className="relative flex items-center justify-center my-1">
-            <div className="border-t border-sand-border w-full" />
-            <span className="bg-white px-3 text-[11px] font-semibold text-charcoal-400 uppercase tracking-wider">
+          <div className="relative flex items-center justify-center my-1 w-full">
+            <div className="flex-1 border-t border-sand-border" />
+            <span className="shrink-0 px-3 text-xs font-semibold text-charcoal-400 uppercase tracking-wider whitespace-nowrap">
               Or sign up with email
             </span>
-            <div className="border-t border-sand-border w-full" />
+            <div className="flex-1 border-t border-sand-border" />
           </div>
 
           {/* Email / Password Form */}

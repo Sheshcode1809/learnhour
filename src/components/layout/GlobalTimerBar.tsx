@@ -2,12 +2,14 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Play, Pause, Square, RotateCcw, Clock, BookOpen, Check, X } from 'lucide-react';
 import { useLearning } from '@/context/LearningContext';
 import { formatSeconds } from '@/lib/calculations/progress';
 import confetti from 'canvas-confetti';
 
 export function GlobalTimerBar() {
+  const pathname = usePathname();
   const {
     activeTimer,
     elapsedSeconds,
@@ -18,6 +20,7 @@ export function GlobalTimerBar() {
     finishTimer,
     courses,
     stats,
+    preferences,
   } = useLearning();
 
   const [isFinishing, setIsFinishing] = useState(false);
@@ -33,7 +36,8 @@ export function GlobalTimerBar() {
     setSessionNotes('');
 
     // Trigger celebratory confetti if completing or exceeding daily goal!
-    if (stats.todayMinutes + Math.floor(elapsedSeconds / 60) >= 60) {
+    const goal = preferences.daily_goal_minutes || 60;
+    if (stats.todayMinutes + Math.floor(elapsedSeconds / 60) >= goal) {
       try {
         confetti({
           particleCount: 80,
@@ -47,13 +51,19 @@ export function GlobalTimerBar() {
     }
   };
 
+  // On the dedicated Sessions page, avoid showing a second Quick Timer launcher
+  if (pathname === '/sessions' && !isTimerVisible && !isFinishing) {
+    return null;
+  }
+
   if (!isTimerVisible && !isFinishing) {
     return (
-      <div className="fixed bottom-5 right-5 z-30">
+      <div className="fixed bottom-6 right-6 z-30 pointer-events-auto">
         <button
           onClick={() => startTimer()}
           title="Start Study Timer"
-          className="flex items-center gap-2 bg-forest-600 hover:bg-forest-700 text-white py-2.5 px-4 rounded-full shadow-lg shadow-forest-800/20 text-xs font-semibold transition-transform hover:scale-105 active:scale-95"
+          aria-label="Start Quick Timer"
+          className="flex items-center gap-2 bg-forest-600 hover:bg-forest-700 text-white py-2.5 px-4 rounded-full shadow-lg shadow-forest-800/20 text-xs font-semibold transition-transform hover:scale-105 active:scale-95 border border-forest-500/30"
         >
           <Play className="w-3.5 h-3.5 fill-current" />
           <span>Quick Timer</span>

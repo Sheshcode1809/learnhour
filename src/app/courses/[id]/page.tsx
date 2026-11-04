@@ -204,17 +204,41 @@ export default function CoursePlayerPage() {
         {/* Left Column: Video Player & Lesson Details */}
         <div className="lg:col-span-8 flex flex-col gap-4">
           {/* Responsive Video Frame or Safe Link */}
-          <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black shadow-lg border border-charcoal-800">
+          <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-charcoal-900 shadow-lg border border-charcoal-800">
+            {/* Intentional branded fallback backdrop (never an empty black box) */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-gradient-to-br from-charcoal-900 via-charcoal-800 to-black text-cream-100 z-0 select-none">
+              <div className="w-12 h-12 rounded-2xl bg-white/10 text-white flex items-center justify-center mb-3">
+                <Play className="w-5 h-5 fill-current ml-0.5 text-forest-400" />
+              </div>
+              <h3 className="text-sm font-bold max-w-md line-clamp-1">
+                {currentLesson?.title || course.title}
+              </h3>
+              <p className="text-xs text-charcoal-400 mt-1">
+                {course.provider} • Day {currentLesson?.day_number || 1}
+              </p>
+              {course.course_url && (
+                <a
+                  href={course.course_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-cream-100 text-xs font-semibold border border-white/15 transition-colors"
+                >
+                  <span>Open source video on {course.provider}</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              )}
+            </div>
+
             {isEmbedAllowlisted ? (
               <iframe
                 src={videoSrc}
                 title={currentLesson?.title || course.title}
-                className="w-full h-full border-0"
+                className="relative z-10 w-full h-full border-0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
               />
             ) : (
-              <div className="w-full h-full bg-charcoal-900 text-cream-100 p-8 flex flex-col items-center justify-center text-center">
+              <div className="relative z-10 w-full h-full bg-charcoal-900 text-cream-100 p-8 flex flex-col items-center justify-center text-center">
                 <ShieldAlert className="w-10 h-10 text-amber-400 mb-2" />
                 <h3 className="text-sm font-bold">External Course Link</h3>
                 <p className="text-xs text-cream-300 max-w-sm mt-1">
@@ -247,16 +271,31 @@ export default function CoursePlayerPage() {
                 </h2>
               </div>
 
-              {/* Auto-advance Toggle with clear truthful label (Requirement 7) */}
-              <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-charcoal-600 font-medium shrink-0">
-                <span>Auto-advance on completion</span>
-                <input
-                  type="checkbox"
-                  checked={autoAdvance}
-                  onChange={(e) => setAutoAdvance(e.target.checked)}
-                  className="rounded text-forest-600 focus:ring-forest-600 w-4 h-4 cursor-pointer"
-                />
-              </label>
+              {/* Lesson Completion Action & Auto-advance Toggle */}
+              <div className="flex items-center gap-3 shrink-0">
+                <button
+                  type="button"
+                  onClick={handleToggleCurrentCompleted}
+                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+                    currentLesson?.is_completed
+                      ? 'bg-forest-600 text-white shadow-xs'
+                      : 'bg-sand-100 hover:bg-forest-50 text-charcoal-800 border border-sand-border'
+                  }`}
+                >
+                  <Check className="w-3.5 h-3.5 stroke-[3]" />
+                  <span>{currentLesson?.is_completed ? 'Completed ✓' : 'Mark as completed'}</span>
+                </button>
+
+                <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-charcoal-600 font-medium shrink-0">
+                  <span>Auto-advance</span>
+                  <input
+                    type="checkbox"
+                    checked={autoAdvance}
+                    onChange={(e) => setAutoAdvance(e.target.checked)}
+                    className="rounded text-forest-600 focus:ring-forest-600 w-4 h-4 cursor-pointer"
+                  />
+                </label>
+              </div>
             </div>
 
             {/* Provider Info & Action CTA */}

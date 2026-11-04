@@ -83,29 +83,29 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-12 pb-20 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto flex flex-col items-center text-center">
+      <section className="relative pt-8 pb-12 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto flex flex-col items-center text-center">
         {/* Pill Badge */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sand-200 border border-sand-border text-xs font-semibold text-charcoal-700 mb-6 shadow-2xs">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sand-200 border border-sand-border text-xs font-semibold text-charcoal-700 mb-5 shadow-2xs">
           <Sparkles className="w-3.5 h-3.5 text-forest-600" />
           <span>Stop saving 10-hour tutorials you never finish</span>
         </div>
 
         {/* Headline */}
-        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-charcoal-900 tracking-tight max-w-4xl leading-[1.12]">
+        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-charcoal-900 tracking-tight max-w-4xl leading-[1.14]">
           Paste a long video.{' '}
-          <span className="font-serif italic text-forest-600 font-normal">
+          <span className="font-serif italic text-forest-600 font-normal inline-block whitespace-normal sm:whitespace-nowrap">
             Get a 1-hour/day course.
           </span>
         </h1>
 
         {/* Subtitle */}
-        <p className="mt-5 text-sm sm:text-base md:text-lg text-charcoal-600 max-w-2xl leading-relaxed">
-          Courseit turns long 8-, 10-, and 12-hour YouTube lectures and playlists into bite-sized daily lessons.
+        <p className="mt-4 text-sm sm:text-base md:text-lg text-charcoal-600 max-w-2xl leading-relaxed">
+          Courseit turns long 8-, 10-, and 12-hour YouTube lectures into structured daily study plans.
           Track your daily 60-minute habit, keep your streak alive, and test your retention with interactive quizzes.
         </p>
 
         {/* Primary CTA Buttons */}
-        <div className="mt-8 flex flex-col sm:flex-row items-center gap-3.5 w-full max-w-md">
+        <div className="mt-7 flex flex-col sm:flex-row items-center gap-3.5 w-full max-w-md">
           <Link
             href="/courses/new"
             className="w-full sm:w-auto flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-2xl bg-forest-600 hover:bg-forest-700 active:bg-forest-800 text-white font-bold text-sm shadow-md shadow-forest-800/15 transition-all hover:scale-102"
@@ -123,20 +123,31 @@ export default function LandingPage() {
           </Link>
         </div>
 
+        {/* Featured Course Action in First Viewport */}
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs text-charcoal-600">
+          <span>Explore right now:</span>
+          <Link
+            href="/courses/python-2026"
+            className="font-bold text-forest-700 bg-sand-200/80 hover:bg-cream-200 border border-sand-border px-3 py-1 rounded-full transition-colors inline-flex items-center gap-1"
+          >
+            <span>Python 2026 Masterclass (10 Days, 60m/day) →</span>
+          </Link>
+        </div>
+
         {/* Quick Google Sign In Pill */}
-        <div className="mt-4 flex items-center gap-2 text-xs text-charcoal-500">
-          <span>Or get started instantly:</span>
+        <div className="mt-3 flex items-center gap-2 text-xs text-charcoal-500">
+          <span>Or sign in with demo:</span>
           <button
             onClick={handleGoogleCTA}
             className="font-bold text-forest-700 hover:underline flex items-center gap-1"
           >
-            <span>Continue with Google →</span>
+            <span>Continue with Google (Demo) →</span>
           </button>
         </div>
 
         {/* Scenic Nature Illustration Banner */}
-        <div className="w-full mt-12 relative max-w-5xl">
-          <ScenicBanner height="h-56 sm:h-72 md:h-80" />
+        <div className="w-full mt-8 relative max-w-5xl">
+          <ScenicBanner height="h-48 sm:h-64 md:h-72" />
           <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10 pointer-events-none">
             <span className="text-[11px] font-bold uppercase tracking-wider text-forest-800 bg-white/90 backdrop-blur-xs px-3 py-1 rounded-full shadow-xs mb-2">
               Habit Rule
@@ -149,7 +160,7 @@ export default function LandingPage() {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="py-16 bg-cream-50/80 border-y border-sand-border px-4 sm:px-6 lg:px-8">
+      <section id="how-it-works" className="py-12 bg-cream-50/80 border-y border-sand-border px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto flex flex-col items-center text-center">
           <span className="text-xs font-bold uppercase tracking-wider text-forest-700 bg-forest-100 px-3 py-1 rounded-full">
             Workflow
@@ -161,7 +172,7 @@ export default function LandingPage() {
             From an overwhelming 10-hour tutorial to consistent daily mastery in 3 simple steps.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 text-left w-full">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10 text-left w-full">
             {/* Step 1 */}
             <div className="bg-white border border-sand-border rounded-3xl p-6 shadow-xs flex flex-col justify-between">
               <div>
@@ -172,7 +183,7 @@ export default function LandingPage() {
                   Paste Any Long Video
                 </h3>
                 <p className="text-xs text-charcoal-600 leading-relaxed">
-                  Paste any YouTube link, talk, or multi-hour playlist. Courseit inspects the duration and automatically generates curriculum chapters.
+                  Paste any YouTube tutorial or pick a curated masterclass. Courseit structures the material into verified daily modules with timestamps and focus sessions.
                 </p>
               </div>
               <div className="mt-6 pt-4 border-t border-sand-border/70 flex items-center gap-2 text-xs font-semibold text-forest-700">

@@ -80,6 +80,34 @@ Do not represent the current localStorage identity as secure sign-in. Since no a
 
 **Working tree note:** `src/app/auth/login/page.tsx`, `src/app/auth/signup/page.tsx`, `src/components/auth/GoogleButton.tsx`, and `src/context/AuthContext.tsx` already have uncommitted edits. Inspect and preserve those edits; do not reset or overwrite them.
 
+## Screenshot-based UI/UX changes
+
+Reviewed `screenshots/01-landing-page.png` through `screenshots/09-settings.png`. The warm cream, forest-green, and terracotta palette is consistent across the landing page and app. Keep that visual direction and focus on the following visible issues.
+
+### P0 — Fix visible blockers
+
+- **Login and signup separators:** In `02-login-page.png` and `03-signup-page.png`, “OR CONTINUE WITH EMAIL” wraps into a narrow vertical stack. Give the separator label intrinsic width (`whitespace-nowrap`, `shrink-0`) and let the horizontal rules flex around it. Keep the separator on one line at desktop and mobile widths.
+- **Course media fallbacks:** All three course cards in `05-courses-library.png` show blank thumbnail areas, and the player frame in `06-course-player.png` is entirely black. Add image `onError` handling and an intentional branded fallback (course initial/artwork, title, and source). Add a player loading/error state with a visible “Open source video” action; never leave a large empty black box when an embed cannot load.
+- **Floating timer overlap:** In `04-dashboard.png`, the fixed “Quick Timer” control overlaps the lower-right course card. Reserve space for fixed controls or position the timer where it cannot cover interactive content; respect mobile safe areas. On `08-sessions-history.png`, avoid showing a second Quick Timer launcher when the full timer controls are already visible.
+- **Landing headline wrap:** In `01-landing-page.png`, the hero breaks “1-hour/day” after “1-”. Adjust the heading width/line breaks so “1-hour/day course” stays together and the two-line heading reads naturally.
+
+### P1 — Reduce friction and improve clarity
+
+- **Landing page:** The page is very long. Tighten excess vertical gaps between the hero, workflow, feature grid, featured courses, and final CTA while keeping clear section separation. Bring the quick course-builder CTA and one featured course action into the first viewport. The headline and sections must describe actual supported ingestion; remove claims that arbitrary playlists are inspected or chapters generated automatically unless that capability exists.
+- **New course:** `07-new-course.png` has two manual-entry switches (top navigation and inside the hero). Keep one clear manual path. Make the selected curated course state obvious and explain what happens after “Build my course.” Include short helper text that unknown video duration/title may need manual confirmation.
+- **Dashboard:** Preserve the clear goal/streak/activity hierarchy in `04-dashboard.png`. Keep the main “Continue Learning” action visually primary, and ensure it still fits above the fold without the timer covering the in-progress cards. Give truncated recent course names a title/tooltip so users can identify them.
+- **Course library:** In `05-courses-library.png`, the three cards occupy only the top portion of the viewport, leaving a large blank lower area. Keep the grid compact, but use the space for a real empty state, course-adding guidance, or nothing; do not add decorative filler or fake statistics. Make thumbnails useful even when remote images fail.
+- **Course player:** In `06-course-player.png`, keep course title, current lesson, progress, and lesson navigation easy to scan. Add a clear player error/loading state and keep completion controls visually associated with the active lesson. On mobile, stack the lesson list and tools below the player without forcing horizontal scrolling.
+- **Sessions:** In `08-sessions-history.png`, make the empty-history state more actionable with “Log a session” and “Start timer” actions. Once history exists, retain the date/course/duration hierarchy and make edit/delete actions easy to discover without crowding the table.
+- **Settings:** In `09-settings.png`, the save button appears inside the profile card even though the form also contains the daily target. Make it clear that one save applies all preference fields, or autosave each setting with per-field feedback. Keep validation messages beside the target/timezone fields and confirmation feedback visible after save.
+- **Small text and controls:** Across the screenshots, supporting copy and labels are often very small. Use a readable 12px minimum for ordinary helper text and table labels where layout allows; reserve smaller text for brief metadata. Keep focus rings, contrast, and tap targets clear.
+- **Authentication clarity:** In `02-login-page.png` and `03-signup-page.png`, Google sign-in and password-reset affordances look production-ready. Label them as demo-only or hide unavailable actions until backed by real auth; do not make “Forgot password?” a dead `#` link.
+
+### P2 — Responsive and accessibility pass
+
+- The supplied screenshots are desktop views. Review the landing page, dashboard, library, player, new-course flow, sessions, settings, login, and signup at 360px and 390px widths as well as tablet. Check for clipped headings, horizontal scroll, timer obstruction, and dialogs extending beyond the viewport.
+- Verify keyboard focus and operation for navigation, course menus, dialogs, tabs, timer controls, and form errors. Add accessible names to icon-only controls, and use visible labels for fields rather than relying on placeholders.
+
 ## Acceptance checks
 
 - Delete every course, refresh, and confirm the empty library stays empty; explicit reset restores demo data.
@@ -90,6 +118,8 @@ Do not represent the current localStorage identity as secure sign-in. Since no a
 - Manual sessions can be backdated and edited; dates, streaks, and course progress update after edits and deletions.
 - Refresh a course-detail URL directly: show loading until local data is ready, then show the course or a genuine not-found state. Returning to a course restores the last lesson.
 - Verify key flows at 360px and desktop width, and ensure dialogs/controls have labels, keyboard access, and visible focus.
+- Compare implementation against the screenshots: auth separators stay horizontal; course thumbnails and video embeds have useful fallbacks; the global timer never obscures a card or duplicates the Sessions page timer; landing headline wrapping is intentional.
+- Review the named routes at 360px, 390px, tablet, and desktop widths; confirm readable body copy, no horizontal overflow, accessible focus states, and tappable controls.
 
 ## Implementation guardrails
 

@@ -25,6 +25,7 @@ interface CourseCardProps {
 export function CourseCard({ course, onEdit, onDelete }: CourseCardProps) {
   const { updateCourse, startTimer } = useLearning();
   const [showMenu, setShowMenu] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   const progress = calculateCourseProgress(course.total_minutes, course.completed_minutes);
 
@@ -40,20 +41,29 @@ export function CourseCard({ course, onEdit, onDelete }: CourseCardProps) {
       <div>
         {/* Course Thumbnail & Badges */}
         <div className="relative aspect-video w-full bg-cream-200 overflow-hidden">
-          {course.thumbnail_url ? (
+          {course.thumbnail_url && !imgError ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={course.thumbnail_url}
               alt={course.title}
+              onError={() => setImgError(true)}
               className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-cream-300 text-charcoal-500 font-medium text-xs">
-              No Preview
+            <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-cream-100 via-sand-100 to-cream-200 p-4 text-center select-none">
+              <div className="w-11 h-11 rounded-2xl bg-forest-600 text-white flex items-center justify-center font-black text-sm mb-1.5 shadow-sm">
+                {course.title.slice(0, 2).toUpperCase()}
+              </div>
+              <p className="text-xs font-bold text-charcoal-800 line-clamp-1 max-w-[90%]">
+                {course.title}
+              </p>
+              <span className="text-[11px] font-semibold text-charcoal-500 mt-0.5">
+                {course.provider || 'Courseit'}
+              </span>
             </div>
           )}
 
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80 pointer-events-none" />
 
           {/* Provider Badge */}
           <div className="absolute top-3 left-3">

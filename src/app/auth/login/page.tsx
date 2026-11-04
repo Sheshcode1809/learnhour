@@ -14,6 +14,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showDemoInfo, setShowDemoInfo] = useState(false);
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -69,15 +70,15 @@ export default function LoginPage() {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4">
         <div className="bg-white border border-sand-border py-8 px-6 sm:px-8 rounded-3xl shadow-sm flex flex-col gap-5">
           {/* Google Sign In */}
-          <GoogleButton onClick={handleGoogleSignIn} disabled={isLoading} label="Continue with Google" />
+          <GoogleButton onClick={handleGoogleSignIn} disabled={isLoading} label="Continue with Google (Demo)" />
 
           {/* Divider */}
-          <div className="relative flex items-center justify-center my-1">
-            <div className="border-t border-sand-border w-full" />
-            <span className="bg-white px-3 text-[11px] font-semibold text-charcoal-400 uppercase tracking-wider">
+          <div className="relative flex items-center justify-center my-1 w-full">
+            <div className="flex-1 border-t border-sand-border" />
+            <span className="shrink-0 px-3 text-xs font-semibold text-charcoal-400 uppercase tracking-wider whitespace-nowrap">
               Or continue with email
             </span>
-            <div className="border-t border-sand-border w-full" />
+            <div className="flex-1 border-t border-sand-border" />
           </div>
 
           {/* Email / Password Form */}
@@ -104,9 +105,13 @@ export default function LoginPage() {
                 <label className="block text-xs font-semibold text-charcoal-700">
                   Password
                 </label>
-                <a href="#" className="text-[11px] font-semibold text-forest-700 hover:underline">
+                <button
+                  type="button"
+                  onClick={() => setShowDemoInfo((prev) => !prev)}
+                  className="text-xs font-semibold text-forest-700 hover:underline"
+                >
                   Forgot password?
-                </a>
+                </button>
               </div>
               <div className="relative">
                 <Lock className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-charcoal-400" />
@@ -127,6 +132,12 @@ export default function LoginPage() {
                 </button>
               </div>
             </div>
+
+            {showDemoInfo && (
+              <div className="p-3 rounded-xl bg-forest-50 border border-forest-200 text-xs text-forest-800 leading-relaxed">
+                <strong className="font-bold">Demo Mode:</strong> Account data is stored locally in your browser. Any email and password will sign you in, or click <em>Explore as Guest</em> below.
+              </div>
+            )}
 
             {error && (
               <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 font-medium">

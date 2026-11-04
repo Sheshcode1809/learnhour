@@ -243,17 +243,17 @@ export function QuickPasteHero({ onToggleManual }: { onToggleManual?: () => void
                 </div>
 
                 {error && (
-                  <div className="flex items-center justify-center gap-1.5 text-xs text-rose-600 font-medium mt-1">
+                  <div className="flex items-center justify-center gap-1.5 text-xs text-rose-600 font-medium mt-2">
                     <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                     <span>{error}</span>
                   </div>
                 )}
+
+                <div className="mt-2.5 text-xs text-charcoal-500 text-left bg-cream-50 p-2.5 rounded-xl border border-sand-border/70 leading-relaxed">
+                  <strong>What happens next:</strong> Clicking &ldquo;Build my course&rdquo; organizes this material into structured 60-minute daily study days. If pasting an unrecognized YouTube video, you will be prompted to confirm the title and total duration.
+                </div>
               </form>
             )}
-
-            <div className="mt-3 text-[11px] font-semibold text-charcoal-400 tracking-wider uppercase">
-              Curated masterclasses open instantly.
-            </div>
 
             {/* Presets Grid */}
             <div className="w-full mt-6 pt-5 border-t border-sand-border">
@@ -265,7 +265,7 @@ export function QuickPasteHero({ onToggleManual }: { onToggleManual?: () => void
                     onClick={onToggleManual}
                     className="text-xs text-forest-700 hover:underline font-semibold"
                   >
-                    Enter manual details →
+                    Create custom course manually →
                   </button>
                 )}
               </div>
@@ -280,7 +280,7 @@ export function QuickPasteHero({ onToggleManual }: { onToggleManual?: () => void
                       onClick={() => handleSelectPreset(preset.url)}
                       className={`p-3 rounded-xl border transition-all flex flex-col justify-between ${
                         isSelected
-                          ? 'border-forest-600 bg-forest-50/60 ring-1 ring-forest-600'
+                          ? 'border-forest-600 bg-forest-50/80 ring-2 ring-forest-600/30 shadow-xs'
                           : 'border-sand-border bg-white hover:bg-cream-100 hover:border-sand-300'
                       }`}
                     >
@@ -289,7 +289,11 @@ export function QuickPasteHero({ onToggleManual }: { onToggleManual?: () => void
                           <span className="text-[10px] font-bold text-forest-700 bg-forest-100/70 px-1.5 py-0.5 rounded">
                             {Math.round(preset.total_minutes / 60)}h long
                           </span>
-                          {isSelected && <Check className="w-3.5 h-3.5 text-forest-600" />}
+                          {isSelected ? (
+                            <span className="text-[10px] font-bold text-white bg-forest-600 px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                              <Check className="w-3 h-3" /> Selected
+                            </span>
+                          ) : null}
                         </div>
                         <div className="text-xs font-bold text-charcoal-900 line-clamp-1">
                           {preset.title}

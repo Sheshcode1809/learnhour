@@ -65,7 +65,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
+      <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-28 flex flex-col gap-6">
         {/* Scenic Illustration Banner with Habit Prompt */}
         <div className="relative">
           <ScenicBanner height="h-44 sm:h-52" />
@@ -248,6 +248,7 @@ export default function DashboardPage() {
                 </span>
                 <Link
                   href={`/courses/${primaryCourse.id}`}
+                  title={primaryCourse.title}
                   className="text-base sm:text-lg font-bold text-charcoal-900 hover:text-forest-700 line-clamp-1"
                 >
                   {primaryCourse.title}
@@ -309,7 +310,7 @@ export default function DashboardPage() {
                         <span className="font-semibold text-forest-700">{course.provider}</span>
                         <span>{prog.formattedRemaining} left</span>
                       </div>
-                      <h3 className="text-sm font-bold text-charcoal-900 group-hover:text-forest-700 line-clamp-1">
+                      <h3 className="text-sm font-bold text-charcoal-900 group-hover:text-forest-700 line-clamp-1" title={course.title}>
                         {course.title}
                       </h3>
                     </div>
