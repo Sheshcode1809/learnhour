@@ -1,11 +1,13 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useLearning } from '@/context/LearningContext';
 import { groupLessonsByDay } from '@/lib/calculations/dayPlanner';
-import { calculateCourseProgress, formatDuration } from '@/lib/calculations/progress';
+import { calculateCourseProgress } from '@/lib/calculations/progress';
+import { repository } from '@/lib/storage/repository';
+import { isAllowlistedEmbedUrl } from '@/lib/youtube';
 import {
   ArrowLeft,
   CheckCircle2,
@@ -17,8 +19,8 @@ import {
   Layers,
   Calendar,
   Clock,
-  Sparkles,
   Check,
+  ShieldAlert,
 } from 'lucide-react';
 import { QuizModal } from '@/components/course-player/QuizModal';
 import { NotesModal } from '@/components/course-player/NotesModal';
@@ -34,9 +36,8 @@ export default function CoursePlayerPage() {
     courses,
     toggleLessonCompletion,
     startTimer,
-    activeTimer,
     setLastActiveCourseId,
-    updateCourse,
+    isLoading,
   } = useLearning();
 
   const course = courses.find((c) => c.id === courseId);
@@ -45,7 +46,18 @@ export default function CoursePlayerPage() {
   const [activeModal, setActiveModal] = useState<'quiz' | 'notes' | 'flashcards' | 'dayplan' | null>(null);
   const [selectedDay, setSelectedDay] = useState<number>(1);
   const [activeLessonId, setActiveLessonId] = useState<string>('');
-  const [autoplayNext, setAutoplayNext] = useState<boolean>(true);
+  const [autoAdvance, setAutoAdvance] = useState<boolean>(true);
+
+  // Restore persisted last-selected lesson
+  useEffect(() => {
+    if (courseId) {
+      setLastActiveCourseId(courseId);
+      const savedLessonId = repository.getLastSelectedLessonId(courseId);
+      if (savedLessonId) {
+        setActiveLessonId(savedLessonId);
+      }
+    }
+  }, [courseId, setLastActiveCourseId]);
 
   // Group lessons by Day 1, Day 2, Day 3
   const dayGroups = useMemo(() => {
@@ -63,28 +75,31 @@ export default function CoursePlayerPage() {
     return course.lessons.find((l) => !l.is_completed) || course.lessons[0];
   }, [course, activeLessonId]);
 
-  // Ensure selected day matches active lesson on first load
-  React.useEffect(() => {
+  // Ensure selected day matches active lesson on first load or change
+  useEffect(() => {
     if (currentLesson && currentLesson.day_number !== selectedDay) {
       setSelectedDay(currentLesson.day_number);
     }
   }, [currentLesson?.id]);
 
-  // Record this as the last active course
-  React.useEffect(() => {
-    if (courseId) {
-      setLastActiveCourseId(courseId);
-    }
-  }, [courseId, setLastActiveCourseId]);
+  // Handle Loading & Not Found states truthfully (Requirement 8)
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
+        <div className="w-9 h-9 border-3 border-forest-600 border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs text-charcoal-500 font-medium">Loading course data...</p>
+      </div>
+    );
+  }
 
   if (!course) {
     return (
-      <div className="p-12 text-center flex flex-col items-center">
+      <div className="p-12 text-center flex flex-col items-center max-w-md mx-auto">
         <h2 className="text-xl font-bold text-charcoal-800">Course not found</h2>
-        <p className="text-xs text-charcoal-500 mt-1">This course may have been deleted.</p>
+        <p className="text-xs text-charcoal-500 mt-1">This course does not exist or may have been deleted.</p>
         <Link
           href="/courses"
-          className="mt-4 px-4 py-2 rounded-xl bg-forest-600 text-white font-semibold text-xs"
+          className="mt-4 px-5 py-2.5 rounded-xl bg-forest-600 hover:bg-forest-700 text-white font-semibold text-xs shadow-sm transition-all"
         >
           Back to Courses
         </Link>
@@ -97,18 +112,20 @@ export default function CoursePlayerPage() {
 
   const handleLessonSelect = (lessonId: string) => {
     setActiveLessonId(lessonId);
+    repository.setLastSelectedLessonId(course.id, lessonId);
   };
 
   const handleToggleCurrentCompleted = () => {
     if (currentLesson) {
       toggleLessonCompletion(course.id, currentLesson.id);
 
-      // If autoplay next is enabled and not completed yet, move to next lesson!
-      if (!currentLesson.is_completed && autoplayNext) {
+      // If auto-advance is enabled and marking complete, move to next lesson!
+      if (!currentLesson.is_completed && autoAdvance) {
         const nextIdx = course.lessons.findIndex((l) => l.id === currentLesson.id) + 1;
         if (nextIdx < course.lessons.length) {
           const nextLesson = course.lessons[nextIdx];
           setActiveLessonId(nextLesson.id);
+          repository.setLastSelectedLessonId(course.id, nextLesson.id);
           setSelectedDay(nextLesson.day_number);
         }
       }
@@ -123,7 +140,8 @@ export default function CoursePlayerPage() {
     }
   };
 
-  // Video embed source with start offset
+  // Video embed source with start offset (Requirement 5: allowlisted embed checking)
+  const isEmbedAllowlisted = isAllowlistedEmbedUrl(course.embed_url);
   const videoStartSec = currentLesson?.video_start_seconds || 0;
   const videoSrc = course.embed_url.includes('?')
     ? `${course.embed_url}&start=${videoStartSec}&autoplay=1`
@@ -183,17 +201,38 @@ export default function CoursePlayerPage() {
 
       {/* Main 2-Column Content */}
       <div className="flex-1 max-w-[1600px] w-full mx-auto px-4 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column: Video Player & Lesson Details (7 or 8 cols on desktop) */}
+        {/* Left Column: Video Player & Lesson Details */}
         <div className="lg:col-span-8 flex flex-col gap-4">
-          {/* Responsive Video Frame */}
+          {/* Responsive Video Frame or Safe Link */}
           <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black shadow-lg border border-charcoal-800">
-            <iframe
-              src={videoSrc}
-              title={currentLesson?.title || course.title}
-              className="w-full h-full border-0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-            />
+            {isEmbedAllowlisted ? (
+              <iframe
+                src={videoSrc}
+                title={currentLesson?.title || course.title}
+                className="w-full h-full border-0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            ) : (
+              <div className="w-full h-full bg-charcoal-900 text-cream-100 p-8 flex flex-col items-center justify-center text-center">
+                <ShieldAlert className="w-10 h-10 text-amber-400 mb-2" />
+                <h3 className="text-sm font-bold">External Course Link</h3>
+                <p className="text-xs text-cream-300 max-w-sm mt-1">
+                  This course is hosted on an external provider. For your security, open it directly in a new browser tab.
+                </p>
+                {course.course_url && (
+                  <a
+                    href={course.course_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-4 flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-forest-600 hover:bg-forest-700 text-white text-xs font-bold transition-all"
+                  >
+                    <span>Open Lesson on {course.provider}</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Under Video Controls & Metadata */}
@@ -208,13 +247,13 @@ export default function CoursePlayerPage() {
                 </h2>
               </div>
 
-              {/* Autoplay Next Toggle */}
+              {/* Auto-advance Toggle with clear truthful label (Requirement 7) */}
               <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-charcoal-600 font-medium shrink-0">
-                <span>Autoplay next lesson</span>
+                <span>Auto-advance on completion</span>
                 <input
                   type="checkbox"
-                  checked={autoplayNext}
-                  onChange={(e) => setAutoplayNext(e.target.checked)}
+                  checked={autoAdvance}
+                  onChange={(e) => setAutoAdvance(e.target.checked)}
                   className="rounded text-forest-600 focus:ring-forest-600 w-4 h-4 cursor-pointer"
                 />
               </label>
@@ -231,7 +270,7 @@ export default function CoursePlayerPage() {
                     rel="noreferrer"
                     className="flex items-center gap-1 text-forest-700 hover:underline font-semibold ml-2"
                   >
-                    <span>Open YouTube</span>
+                    <span>Open External Source</span>
                     <ExternalLink className="w-3 h-3" />
                   </a>
                 )}
@@ -255,7 +294,7 @@ export default function CoursePlayerPage() {
           </div>
         </div>
 
-        {/* Right Column: Day Tabs, Lessons List & Study Tools (4 cols on desktop) */}
+        {/* Right Column: Day Tabs, Lessons List & Study Tools */}
         <div className="lg:col-span-4 flex flex-col gap-4">
           <div className="bg-white border border-sand-border rounded-2xl p-4 shadow-xs flex flex-col">
             {/* Header */}
@@ -354,7 +393,7 @@ export default function CoursePlayerPage() {
               )}
             </div>
 
-            {/* Study Tools Section (Matches frame 014 from video!) */}
+            {/* Study Tools Section */}
             <div className="pt-3 border-t border-sand-border">
               <span className="text-[11px] font-bold text-charcoal-400 uppercase tracking-wider block mb-2">
                 Study tools
@@ -391,7 +430,9 @@ export default function CoursePlayerPage() {
                   </div>
                   <div className="mt-2">
                     <div className="text-xs font-bold text-charcoal-900">My notes</div>
-                    <div className="text-[10px] text-charcoal-500">Pinned to moments</div>
+                    <div className="text-[10px] text-charcoal-500">
+                      {course.notes?.length || 0} saved
+                    </div>
                   </div>
                 </button>
 
@@ -444,8 +485,9 @@ export default function CoursePlayerPage() {
       {activeModal === 'notes' && (
         <NotesModal
           courseId={course.id}
+          lessonId={currentLesson?.id}
+          lessonTitle={currentLesson?.title}
           notes={course.notes}
-          currentPlaybackSeconds={currentLesson?.video_start_seconds || 0}
           onClose={() => setActiveModal(null)}
         />
       )}
@@ -471,4 +513,3 @@ export default function CoursePlayerPage() {
     </div>
   );
 }
-

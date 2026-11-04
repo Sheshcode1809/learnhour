@@ -16,36 +16,41 @@ Learners save long tutorials (8, 10, 12+ hours) and courses but struggle to trac
 
 ## 5. Core Features & User Journeys
 1. **Effortless Course Ingestion & Creation**:
-   - Paste a YouTube video or playlist URL ("Paste a long video. Get a course.").
+   - Paste a YouTube video or preset URL ("Paste a long video. Get a course.").
+   - Curated presets (e.g. 10-hour Python masterclass) auto-populate lessons, video timestamps, and descriptions.
+   - Custom YouTube URLs extract verified video IDs and allowlisted embed links, prompting the user for honest confirmation of course title and total duration (no silent fallbacks to unrelated sample videos or fake scraping).
    - Or create custom/manual courses with title, provider, duration, and description.
-   - Intelligent day-wise curriculum generator that divides multi-hour courses into daily bite-sized (~60m) learning days (Day 1, Day 2, Day 3, etc.).
+   - Intelligent day-wise curriculum generator divides multi-hour courses into daily bite-sized (~60m) learning days (Day 1, Day 2, Day 3, etc.).
 2. **Interactive Course Learning Player**:
-   - Embedded video player with autoplay toggle, lesson navigation, and completion toggle.
-   - Day-wise split tabs (`Day 1`, `Day 2`, `Day 3`...).
+   - Embedded video player with allowlisted domain verification (trusted YouTube embed targets) and external fallback link for untrusted URLs.
+   - Day-wise split tabs (`Day 1`, `Day 2`, `Day 3`...) with automatic restoration of the user's `last_selected_lesson_id` per course.
+   - Auto-advance on completion toggle that transitions to the next lesson once the active lesson is marked complete.
    - Interactive study tools:
      - **Quiz**: Interactive multiple-choice review quizzes per course/day with immediate feedback.
-     - **Notes**: Pinned notes with timestamps and markdown support.
+     - **Notes**: Lesson-linked notes with explicit lesson title labeling and editable playback minute markers.
      - **Flashcards**: Key concepts and terms for quick spaced repetition.
 3. **Session Timer & Learning Progress**:
-   - Floating and in-page study timer (start, pause, resume, finish).
-   - Manual session logging with duration, notes, and course association.
-   - Real-time updates to daily goal progress (e.g. 60 minutes default) and course percentage.
+   - Floating and in-page study timer (start, pause, resume, finish) with lossless segment accumulation and idempotent timer start guards.
+   - Manual session logging with duration, backdated study date/time, and course association.
+   - Full session history management: view, edit (date, duration, course, notes), and delete sessions with positive duration validation (>0 seconds).
+   - Real-time updates to daily goal progress (configured via preferences) and derived course percentage.
 4. **Dashboard & Habit Tracking**:
-   - Greeting, current date, and daily learning target (completed vs remaining minutes).
-   - Current streak and best streak calculations based on completed daily goals.
+   - Greeting, current date, and daily learning target (completed vs remaining minutes) formatted in user's configured IANA timezone.
+   - Current streak and best streak calculations aggregating second-level session data per local date before minute flooring, strictly excluding future-dated sessions.
    - Weekly learning summary breakdown.
-   - "Continue learning" quick-resume action for the most recently active course.
-   - Course library with progress bars and status filters.
+   - "Continue learning" quick-resume action navigating back to the last active course and restoring the last active lesson.
+   - Course library with progress bars, status filters, and persistent empty state handling (empty libraries remain empty upon reload).
 5. **Settings & Data Management**:
    - Configurable daily study goal (default: 60 minutes).
-   - Timezone configuration.
-   - Data export / backup and reset options.
-   - Local-first persistence with seamless Supabase cloud sync ready.
+   - Validated IANA timezone selection (with fallback to system timezone).
+   - Data export / backup and explicit demo data reset options.
+   - Local-first persistence in browser localStorage with clear demo authentication branding.
 
 ## 6. Success criteria
-- A new user can add a course (via URL or manual entry) in under 30 seconds.
+- A new user can add a course (via verified preset, YouTube URL with manual confirmation, or custom entry) in under 30 seconds.
 - Day-wise plan accurately breaks long courses into structured daily modules.
-- Daily study timer and manual sessions accurately increment course progress and streak counters.
-- Interactive course player supports YouTube video embeds, lesson completion, quizzes, and notes.
+- Daily study timer and manual sessions accurately increment course progress via a single derived calculation rule that prevents double-counting or progress drift.
+- Deleting all courses persists an empty library across reloads without unwanted sample course reseeding.
+- Interactive course player supports YouTube video embeds, lesson completion, quizzes, notes, and restores the last viewed lesson.
 - Responsive design functions cleanly on mobile (360px) and desktop (1440px+).
 - Clean offline-first data persistence with zero data loss on page refresh.

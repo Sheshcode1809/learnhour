@@ -55,6 +55,7 @@ export interface Course {
   quizzes?: QuizQuestion[];
   notes?: CourseNote[];
   flashcards?: Flashcard[];
+  last_selected_lesson_id?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -76,8 +77,9 @@ export interface ActiveTimerState {
   is_running: boolean;
   course_id: string | null;
   lesson_id: string | null;
-  started_at: number | null; // epoch timestamp in ms
+  started_at: number | null; // epoch timestamp in ms of current active segment
   accumulated_seconds: number;
+  session_start_epoch?: number | null; // epoch ms when the session initially began
 }
 
 export interface UserPreferences {
@@ -96,4 +98,3 @@ export interface DayPlanGroup {
   lessons: CourseLesson[];
   is_completed: boolean;
 }
-

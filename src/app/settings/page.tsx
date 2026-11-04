@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useLearning } from '@/context/LearningContext';
+import { isValidTimezone } from '@/lib/calculations/streaks';
 import {
   Settings,
   Target,
@@ -11,6 +12,7 @@ import {
   Cloud,
   Check,
   AlertTriangle,
+  AlertCircle,
 } from 'lucide-react';
 
 export default function SettingsPage() {
@@ -19,16 +21,25 @@ export default function SettingsPage() {
   const [name, setName] = useState(preferences.name);
   const [dailyGoal, setDailyGoal] = useState(preferences.daily_goal_minutes.toString());
   const [timezone, setTimezone] = useState(preferences.timezone);
+  const [timezoneError, setTimezoneError] = useState('');
   const [savedMessage, setSavedMessage] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+    setTimezoneError('');
+
+    const trimmedTz = timezone.trim();
+    if (!isValidTimezone(trimmedTz)) {
+      setTimezoneError(`"${trimmedTz}" is not a recognized IANA timezone. Examples: Asia/Kolkata, America/New_York, Europe/London, UTC.`);
+      return;
+    }
+
     const parsedGoal = parseInt(dailyGoal, 10);
     updatePreferences({
       name: name.trim() || 'Learner',
       daily_goal_minutes: isNaN(parsedGoal) || parsedGoal <= 0 ? 60 : parsedGoal,
-      timezone: timezone.trim() || 'Asia/Kolkata',
+      timezone: trimmedTz,
     });
     setSavedMessage(true);
     setTimeout(() => setSavedMessage(false), 2500);
@@ -51,6 +62,7 @@ export default function SettingsPage() {
     setName('Abhishek Singh');
     setDailyGoal('60');
     setTimezone('Asia/Kolkata');
+    setTimezoneError('');
   };
 
   return (
@@ -122,7 +134,7 @@ export default function SettingsPage() {
             <div>
               <h2 className="text-sm font-bold text-charcoal-900">Profile & Timezone</h2>
               <p className="text-[11px] text-charcoal-500">
-                Used for streak calculation boundaries and greeting.
+                Used for streak calculation boundaries and session timestamp formatting.
               </p>
             </div>
           </div>
@@ -142,15 +154,24 @@ export default function SettingsPage() {
 
             <div>
               <label className="block text-xs font-semibold text-charcoal-700 mb-1">
-                Timezone (IANA format)
+                Timezone (IANA format) *
               </label>
               <input
                 type="text"
                 value={timezone}
-                onChange={(e) => setTimezone(e.target.value)}
+                onChange={(e) => {
+                  setTimezone(e.target.value);
+                  if (timezoneError) setTimezoneError('');
+                }}
                 placeholder="e.g. Asia/Kolkata or America/New_York"
                 className="w-full text-xs sm:text-sm bg-cream-50 border border-sand-border rounded-xl px-3.5 py-2.5 text-charcoal-900 focus:outline-none focus:ring-2 focus:ring-forest-600 font-medium"
               />
+              {timezoneError && (
+                <p className="text-xs text-rose-600 mt-1 flex items-center gap-1 font-medium">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                  <span>{timezoneError}</span>
+                </p>
+              )}
             </div>
           </div>
 
@@ -177,9 +198,9 @@ export default function SettingsPage() {
             <Cloud className="w-4 h-4" />
           </div>
           <div>
-            <h2 className="text-sm font-bold text-charcoal-900">Storage & Cloud Sync</h2>
+            <h2 className="text-sm font-bold text-charcoal-900">Storage Architecture</h2>
             <p className="text-[11px] text-charcoal-500">
-              Local-first zero configuration repository active.
+              Local-first repository active.
             </p>
           </div>
         </div>
@@ -190,10 +211,10 @@ export default function SettingsPage() {
             <span className="font-bold text-charcoal-900">Local-First Storage Active</span>
           </div>
           <p>
-            Your courses, lessons, and learning sessions are saved safely in your browser&apos;s persistent local storage. They persist across reloads and device sleep.
+            Your courses, lessons, and learning sessions are saved safely in your browser&apos;s persistent local storage. They persist across reloads and device restarts.
           </p>
           <p className="text-[11px] text-charcoal-500 pt-1">
-            Supabase migrations are located at <code className="bg-cream-200 px-1 py-0.5 rounded font-mono">supabase/migrations/001_initial_schema.sql</code> with Row-Level Security (RLS) configured for multi-device sync.
+            PostgreSQL starter migrations are located at <code className="bg-cream-200 px-1 py-0.5 rounded font-mono">supabase/migrations/001_initial_schema.sql</code> for future cloud deployment; currently running locally without remote credentials.
           </p>
         </div>
       </div>
@@ -240,7 +261,7 @@ export default function SettingsPage() {
             </div>
             <h3 className="text-base font-bold text-charcoal-900">Reset All Data?</h3>
             <p className="text-xs text-charcoal-600 mt-1">
-              This will reset your courses, sessions, and daily goals back to the default sample masterclasses from the reference video.
+              This will restore sample masterclasses and reset existing records.
             </p>
             <div className="flex items-center justify-end gap-2 mt-6">
               <button
@@ -265,4 +286,3 @@ export default function SettingsPage() {
     </div>
   );
 }
-

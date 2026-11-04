@@ -1,3 +1,5 @@
+import { Course, LearningSession } from '@/types';
+
 export function formatDuration(totalMinutes: number): string {
   if (isNaN(totalMinutes) || totalMinutes <= 0) return '0m';
   const hours = Math.floor(totalMinutes / 60);
@@ -45,3 +47,51 @@ export function calculateCourseProgress(totalMinutes: number, completedMinutes: 
   };
 }
 
+/**
+ * Single source of truth calculation for course completed minutes.
+ * Rule from AntiGravity changes.md:
+ * Count, per lesson, the greater of its completed lesson duration and its linked session time,
+ * capped at the lesson duration; add course-linked session time with no lesson separately;
+ * cap final progress at total_minutes.
+ */
+export function deriveCourseCompletedMinutes(course: Course, sessions: LearningSession[]): number {
+  if (!course) return 0;
+  const courseSessions = (sessions || []).filter(
+    (s) => s.course_id === course.id && s.duration_seconds && s.duration_seconds > 0
+  );
+
+  // Accumulate per-lesson session seconds
+  const lessonSecondsMap = new Map<string, number>();
+  let generalSeconds = 0;
+
+  for (const session of courseSessions) {
+    if (session.lesson_id) {
+      lessonSecondsMap.set(
+        session.lesson_id,
+        (lessonSecondsMap.get(session.lesson_id) || 0) + session.duration_seconds
+      );
+    } else {
+      generalSeconds += session.duration_seconds;
+    }
+  }
+
+  let totalLessonMinutes = 0;
+  for (const lesson of course.lessons || []) {
+    const lessonDuration = lesson.duration_minutes || 0;
+    const sessionSecs = lessonSecondsMap.get(lesson.id) || 0;
+    const sessionMins = Math.floor(sessionSecs / 60);
+
+    // If marked complete, count the full lesson duration.
+    // If not marked complete, count linked session time capped at lesson duration.
+    const countedMins = lesson.is_completed
+      ? lessonDuration
+      : Math.min(lessonDuration, sessionMins);
+
+    totalLessonMinutes += countedMins;
+  }
+
+  const generalMinutes = Math.floor(generalSeconds / 60);
+  const totalCompleted = totalLessonMinutes + generalMinutes;
+
+  return Math.min(course.total_minutes, Math.max(0, totalCompleted));
+}

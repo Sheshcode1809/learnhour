@@ -42,6 +42,7 @@ interface LearningContextType {
     started_at?: string;
     ended_at?: string;
   }) => LearningSession;
+  updateSession: (session: LearningSession) => void;
   deleteSession: (id: string) => void;
 
   // Timer actions
@@ -80,27 +81,31 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
 
   // Initial client hydration from storage
   useEffect(() => {
-    const loadedCourses = repository.getCourses();
-    const loadedSessions = repository.getSessions();
-    const loadedPrefs = repository.getPreferences();
-    const loadedTimer = repository.getActiveTimer();
-    const loadedLastActive = repository.getLastActiveCourseId();
+    try {
+      const loadedCourses = repository.getCourses();
+      const loadedSessions = repository.getSessions();
+      const loadedPrefs = repository.getPreferences();
+      const loadedTimer = repository.getActiveTimer();
+      const loadedLastActive = repository.getLastActiveCourseId();
 
-    setCourses(loadedCourses);
-    setSessions(loadedSessions);
-    setPreferences(loadedPrefs);
-    setActiveTimer(loadedTimer);
-    setLastActiveId(loadedLastActive);
+      setCourses(loadedCourses);
+      setSessions(loadedSessions);
+      setPreferences(loadedPrefs);
+      setActiveTimer(loadedTimer);
+      setLastActiveId(loadedLastActive);
 
-    // Compute initial elapsed seconds if timer was running
-    if (loadedTimer.is_running && loadedTimer.started_at) {
-      const liveRunning = Math.floor((Date.now() - loadedTimer.started_at) / 1000);
-      setElapsedSeconds(loadedTimer.accumulated_seconds + Math.max(0, liveRunning));
-    } else {
-      setElapsedSeconds(loadedTimer.accumulated_seconds || 0);
+      // Compute initial elapsed seconds if timer was running
+      if (loadedTimer.is_running && loadedTimer.started_at) {
+        const liveRunning = Math.floor((Date.now() - loadedTimer.started_at) / 1000);
+        setElapsedSeconds(loadedTimer.accumulated_seconds + Math.max(0, liveRunning));
+      } else {
+        setElapsedSeconds(loadedTimer.accumulated_seconds || 0);
+      }
+    } catch (e) {
+      console.error('Failed to initialize local data', e);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   }, []);
 
   // Timer ticker loop
@@ -133,12 +138,37 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
       repository.setLastActiveCourseId(targetCourseId);
     }
 
+    // Idempotent check when already running
+    if (activeTimer.is_running) {
+      const targetLessonId = lessonId !== undefined ? lessonId : activeTimer.lesson_id;
+      if (activeTimer.course_id === targetCourseId && activeTimer.lesson_id === targetLessonId) {
+        return; // already running with exact target, do not reset
+      }
+      // If switching target while running, flush current live segment into accumulated_seconds
+      const liveSegment = activeTimer.started_at ? Math.max(0, Math.floor((now - activeTimer.started_at) / 1000)) : 0;
+      const nextAccumulated = activeTimer.accumulated_seconds + liveSegment;
+      const nextState: ActiveTimerState = {
+        is_running: true,
+        course_id: targetCourseId || null,
+        lesson_id: targetLessonId || null,
+        started_at: now,
+        accumulated_seconds: nextAccumulated,
+        session_start_epoch: activeTimer.session_start_epoch || (now - nextAccumulated * 1000),
+      };
+      setElapsedSeconds(nextAccumulated);
+      updateTimerState(nextState);
+      return;
+    }
+
+    // Starting from paused / stopped
+    const currentAccumulated = activeTimer.accumulated_seconds > 0 ? activeTimer.accumulated_seconds : elapsedSeconds;
     const nextState: ActiveTimerState = {
       is_running: true,
       course_id: targetCourseId || null,
       lesson_id: lessonId || activeTimer.lesson_id || null,
       started_at: now,
-      accumulated_seconds: activeTimer.is_running ? activeTimer.accumulated_seconds : elapsedSeconds,
+      accumulated_seconds: currentAccumulated,
+      session_start_epoch: activeTimer.session_start_epoch || (now - currentAccumulated * 1000),
     };
     updateTimerState(nextState);
   }, [activeTimer, elapsedSeconds, lastActiveId, updateTimerState]);
@@ -166,6 +196,7 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
       ...activeTimer,
       is_running: true,
       started_at: now,
+      session_start_epoch: activeTimer.session_start_epoch || (now - activeTimer.accumulated_seconds * 1000),
     };
     updateTimerState(nextState);
   }, [activeTimer, updateTimerState]);
@@ -177,23 +208,30 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
       lesson_id: null,
       started_at: null,
       accumulated_seconds: 0,
+      session_start_epoch: null,
     };
     setElapsedSeconds(0);
     updateTimerState(nextState);
   }, [updateTimerState]);
 
-  // Finish timer and record session
+  // Finish timer and record session losslessly
   const finishTimer = useCallback((notes?: string) => {
-    const finalSeconds = elapsedSeconds;
+    const now = Date.now();
+    const liveSegment = activeTimer.is_running && activeTimer.started_at
+      ? Math.max(0, Math.floor((now - activeTimer.started_at) / 1000))
+      : 0;
+    const finalSeconds = activeTimer.accumulated_seconds + liveSegment;
+
     if (finalSeconds < 5) {
       // Ignore accidental micro-clicks under 5 seconds
       resetTimer();
       return;
     }
 
-    const now = new Date();
-    const startedAt = new Date(now.getTime() - finalSeconds * 1000).toISOString();
-    const endedAt = now.toISOString();
+    const sessionStart = activeTimer.session_start_epoch
+      ? new Date(activeTimer.session_start_epoch).toISOString()
+      : new Date(now - finalSeconds * 1000).toISOString();
+    const sessionEnd = new Date(now).toISOString();
 
     const course = activeTimer.course_id ? repository.getCourseById(activeTimer.course_id) : null;
 
@@ -203,11 +241,11 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
       course_id: activeTimer.course_id,
       lesson_id: activeTimer.lesson_id,
       course_title: course?.title || 'General Study',
-      started_at: startedAt,
-      ended_at: endedAt,
+      started_at: sessionStart,
+      ended_at: sessionEnd,
       duration_seconds: finalSeconds,
       notes: notes || undefined,
-      created_at: endedAt,
+      created_at: sessionEnd,
     };
 
     repository.addSession(newSession);
@@ -215,7 +253,7 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
     setCourses(repository.getCourses());
 
     resetTimer();
-  }, [elapsedSeconds, activeTimer.course_id, activeTimer.lesson_id, preferences.user_id, resetTimer]);
+  }, [activeTimer, preferences.user_id, resetTimer]);
 
   // Course operations
   const addCourse = useCallback((courseData: {
@@ -313,6 +351,10 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
     started_at?: string;
     ended_at?: string;
   }) => {
+    if (!sessionData.duration_seconds || sessionData.duration_seconds <= 0) {
+      throw new Error('Session duration must be greater than zero.');
+    }
+
     const now = new Date();
     const duration = sessionData.duration_seconds;
     const startedAt = sessionData.started_at || new Date(now.getTime() - duration * 1000).toISOString();
@@ -338,6 +380,12 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
     setCourses(repository.getCourses());
     return session;
   }, [preferences.user_id]);
+
+  const updateSession = useCallback((session: LearningSession) => {
+    repository.updateSession(session);
+    setSessions(repository.getSessions());
+    setCourses(repository.getCourses());
+  }, []);
 
   const deleteSession = useCallback((id: string) => {
     repository.deleteSession(id);
@@ -374,7 +422,7 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
     return courses.find((c) => c.id === lastActiveId) || courses[0] || null;
   }, [courses, lastActiveId]);
 
-  // Streak & Goal Metrics
+  // Streak & Goal Metrics (computed with safe timezone and without future sessions)
   const stats = useMemo(() => {
     const streakData = calculateStreaks(sessions, preferences.daily_goal_minutes, preferences.timezone);
     const weeklyActivity = getWeeklyActivity(sessions, preferences.daily_goal_minutes, preferences.timezone);
@@ -406,6 +454,7 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
         addCourseNote,
         setLastActiveCourseId: setLastActiveCourseIdCallback,
         addSession,
+        updateSession,
         deleteSession,
         startTimer,
         pauseTimer,
@@ -430,4 +479,3 @@ export function useLearning() {
   }
   return context;
 }
-

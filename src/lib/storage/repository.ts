@@ -1,5 +1,6 @@
-import { Course, LearningSession, UserPreferences, ActiveTimerState, CourseNote } from '@/types';
+import { Course, CourseStatus, LearningSession, UserPreferences, ActiveTimerState, CourseNote } from '@/types';
 import { INITIAL_COURSES, INITIAL_PREFERENCES, generateSeedSessions } from './mockData';
+import { deriveCourseCompletedMinutes } from '../calculations/progress';
 
 const STORAGE_KEYS = {
   COURSES: 'courseit_courses_v1',
@@ -7,6 +8,7 @@ const STORAGE_KEYS = {
   PREFERENCES: 'courseit_preferences_v1',
   ACTIVE_TIMER: 'courseit_active_timer_v1',
   ACTIVE_COURSE_ID: 'courseit_last_active_course_id_v1',
+  LAST_LESSON_PREFIX: 'courseit_last_lesson_',
 };
 
 class LocalCourseRepository {
@@ -19,7 +21,9 @@ class LocalCourseRepository {
     if (!this.isBrowser()) return INITIAL_PREFERENCES;
     try {
       const data = localStorage.getItem(STORAGE_KEYS.PREFERENCES);
-      if (data) return JSON.parse(data);
+      if (data !== null) {
+        return JSON.parse(data);
+      }
       this.savePreferences(INITIAL_PREFERENCES);
       return INITIAL_PREFERENCES;
     } catch {
@@ -41,10 +45,12 @@ class LocalCourseRepository {
     if (!this.isBrowser()) return INITIAL_COURSES;
     try {
       const data = localStorage.getItem(STORAGE_KEYS.COURSES);
-      if (data) {
+      // Distinguish intentionally saved empty array [] from uninitialized storage (null)
+      if (data !== null) {
         const parsed = JSON.parse(data);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed)) return parsed;
       }
+      // First install: seed default masterclasses
       this.saveCourses(INITIAL_COURSES);
       return INITIAL_COURSES;
     } catch {
@@ -68,24 +74,38 @@ class LocalCourseRepository {
 
   saveCourse(course: Course): Course {
     const courses = this.getCourses();
+    const sessions = this.getSessions();
+    const derivedMins = deriveCourseCompletedMinutes(course, sessions);
+    const updatedCourse: Course = {
+      ...course,
+      completed_minutes: derivedMins,
+      status: course.status === 'archived' ? 'archived' : derivedMins >= course.total_minutes ? 'completed' : 'active',
+      updated_at: new Date().toISOString(),
+    };
+
     const index = courses.findIndex((c) => c.id === course.id);
-    let updated: Course[];
+    let updatedList: Course[];
 
     if (index >= 0) {
-      updated = [...courses];
-      updated[index] = { ...course, updated_at: new Date().toISOString() };
+      updatedList = [...courses];
+      updatedList[index] = updatedCourse;
     } else {
-      updated = [course, ...courses];
+      updatedList = [updatedCourse, ...courses];
     }
 
-    this.saveCourses(updated);
-    return course;
+    this.saveCourses(updatedList);
+    return updatedCourse;
   }
 
   deleteCourse(id: string): void {
     const courses = this.getCourses();
     const filtered = courses.filter((c) => c.id !== id);
     this.saveCourses(filtered);
+    if (this.isBrowser()) {
+      try {
+        localStorage.removeItem(`${STORAGE_KEYS.LAST_LESSON_PREFIX}${id}`);
+      } catch {}
+    }
   }
 
   toggleLessonCompletion(courseId: string, lessonId: string): Course | null {
@@ -104,15 +124,17 @@ class LocalCourseRepository {
       return lesson;
     });
 
-    const completedMinutes = updatedLessons
-      .filter((l) => l.is_completed)
-      .reduce((acc, l) => acc + (l.duration_minutes || 0), 0);
-
-    const updatedCourse: Course = {
+    const sessions = this.getSessions();
+    const tempCourse: Course = {
       ...course,
       lessons: updatedLessons,
-      completed_minutes: completedMinutes,
-      status: completedMinutes >= course.total_minutes ? 'completed' : 'active',
+    };
+    const derivedMins = deriveCourseCompletedMinutes(tempCourse, sessions);
+
+    const updatedCourse: Course = {
+      ...tempCourse,
+      completed_minutes: derivedMins,
+      status: course.status === 'archived' ? 'archived' : derivedMins >= course.total_minutes ? 'completed' : 'active',
       updated_at: new Date().toISOString(),
     };
 
@@ -135,12 +157,29 @@ class LocalCourseRepository {
     return updatedCourse;
   }
 
+  // Persist per-course last-selected lesson
+  setLastSelectedLessonId(courseId: string, lessonId: string): void {
+    if (!this.isBrowser() || !courseId || !lessonId) return;
+    try {
+      localStorage.setItem(`${STORAGE_KEYS.LAST_LESSON_PREFIX}${courseId}`, lessonId);
+    } catch {}
+  }
+
+  getLastSelectedLessonId(courseId: string): string | null {
+    if (!this.isBrowser() || !courseId) return null;
+    try {
+      return localStorage.getItem(`${STORAGE_KEYS.LAST_LESSON_PREFIX}${courseId}`);
+    } catch {
+      return null;
+    }
+  }
+
   // --- SESSIONS ---
   getSessions(): LearningSession[] {
     if (!this.isBrowser()) return generateSeedSessions();
     try {
       const data = localStorage.getItem(STORAGE_KEYS.SESSIONS);
-      if (data) {
+      if (data !== null) {
         const parsed = JSON.parse(data);
         if (Array.isArray(parsed)) return parsed;
       }
@@ -161,47 +200,64 @@ class LocalCourseRepository {
     }
   }
 
-  addSession(session: LearningSession): LearningSession {
-    const sessions = this.getSessions();
-    const updated = [session, ...sessions];
-    this.saveSessions(updated);
+  /**
+   * Recalculate derived progress for all courses using the single calculation path
+   */
+  private recalculateCoursesWithSessions(sessions: LearningSession[]): void {
+    const courses = this.getCourses();
+    const updatedCourses = courses.map((course) => {
+      const derived = deriveCourseCompletedMinutes(course, sessions);
+      const nextStatus: CourseStatus =
+        course.status === 'archived'
+          ? 'archived'
+          : derived >= course.total_minutes
+          ? 'completed'
+          : 'active';
+      return {
+        ...course,
+        completed_minutes: derived,
+        status: nextStatus,
+        updated_at: new Date().toISOString(),
+      };
+    });
+    this.saveCourses(updatedCourses);
+  }
 
-    // If linked to a course, also update course completed_minutes
-    if (session.course_id && session.duration_seconds > 0) {
-      const course = this.getCourseById(session.course_id);
-      if (course) {
-        const additionalMinutes = Math.floor(session.duration_seconds / 60);
-        const updatedCourse: Course = {
-          ...course,
-          completed_minutes: Math.min(course.total_minutes, course.completed_minutes + additionalMinutes),
-          updated_at: new Date().toISOString(),
-        };
-        this.saveCourse(updatedCourse);
-      }
+  addSession(session: LearningSession): LearningSession {
+    if (!session.duration_seconds || session.duration_seconds <= 0) {
+      throw new Error('Session duration must be greater than zero.');
     }
 
+    const sessions = this.getSessions();
+    const updatedSessions = [session, ...sessions];
+    this.saveSessions(updatedSessions);
+    this.recalculateCoursesWithSessions(updatedSessions);
+    return session;
+  }
+
+  updateSession(session: LearningSession): LearningSession {
+    if (!session.duration_seconds || session.duration_seconds <= 0) {
+      throw new Error('Session duration must be greater than zero.');
+    }
+
+    const sessions = this.getSessions();
+    const index = sessions.findIndex((s) => s.id === session.id);
+    if (index === -1) {
+      throw new Error('Session not found.');
+    }
+
+    const updatedSessions = [...sessions];
+    updatedSessions[index] = session;
+    this.saveSessions(updatedSessions);
+    this.recalculateCoursesWithSessions(updatedSessions);
     return session;
   }
 
   deleteSession(sessionId: string): void {
     const sessions = this.getSessions();
-    const toDelete = sessions.find((s) => s.id === sessionId);
     const filtered = sessions.filter((s) => s.id !== sessionId);
     this.saveSessions(filtered);
-
-    // If linked to a course, subtract minutes
-    if (toDelete && toDelete.course_id && toDelete.duration_seconds > 0) {
-      const course = this.getCourseById(toDelete.course_id);
-      if (course) {
-        const subtractedMinutes = Math.floor(toDelete.duration_seconds / 60);
-        const updatedCourse: Course = {
-          ...course,
-          completed_minutes: Math.max(0, course.completed_minutes - subtractedMinutes),
-          updated_at: new Date().toISOString(),
-        };
-        this.saveCourse(updatedCourse);
-      }
-    }
+    this.recalculateCoursesWithSessions(filtered);
   }
 
   // --- ACTIVE TIMER STATE ---
@@ -212,6 +268,7 @@ class LocalCourseRepository {
       lesson_id: null,
       started_at: null,
       accumulated_seconds: 0,
+      session_start_epoch: null,
     };
     if (!this.isBrowser()) return defaultTimer;
     try {
@@ -238,8 +295,10 @@ class LocalCourseRepository {
   }
 
   setLastActiveCourseId(courseId: string): void {
-    if (!this.isBrowser()) return;
-    localStorage.setItem(STORAGE_KEYS.ACTIVE_COURSE_ID, courseId);
+    if (!this.isBrowser() || !courseId) return;
+    try {
+      localStorage.setItem(STORAGE_KEYS.ACTIVE_COURSE_ID, courseId);
+    } catch {}
   }
 
   // --- BACKUP & RESET ---
@@ -259,11 +318,20 @@ class LocalCourseRepository {
 
   resetToDefaults(): void {
     if (!this.isBrowser()) return;
-    localStorage.removeItem(STORAGE_KEYS.COURSES);
-    localStorage.removeItem(STORAGE_KEYS.SESSIONS);
-    localStorage.removeItem(STORAGE_KEYS.PREFERENCES);
-    localStorage.removeItem(STORAGE_KEYS.ACTIVE_TIMER);
-    localStorage.removeItem(STORAGE_KEYS.ACTIVE_COURSE_ID);
+    try {
+      localStorage.removeItem(STORAGE_KEYS.COURSES);
+      localStorage.removeItem(STORAGE_KEYS.SESSIONS);
+      localStorage.removeItem(STORAGE_KEYS.PREFERENCES);
+      localStorage.removeItem(STORAGE_KEYS.ACTIVE_TIMER);
+      localStorage.removeItem(STORAGE_KEYS.ACTIVE_COURSE_ID);
+      // Clean per-course lesson keys
+      for (const key of Object.keys(localStorage)) {
+        if (key.startsWith(STORAGE_KEYS.LAST_LESSON_PREFIX)) {
+          localStorage.removeItem(key);
+        }
+      }
+    } catch {}
+
     this.savePreferences(INITIAL_PREFERENCES);
     this.saveCourses(INITIAL_COURSES);
     this.saveSessions(generateSeedSessions());
@@ -271,4 +339,3 @@ class LocalCourseRepository {
 }
 
 export const repository = new LocalCourseRepository();
-

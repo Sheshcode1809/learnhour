@@ -37,3 +37,4 @@ export function GoogleButton({ onClick, disabled, label = 'Continue with Google'
     </button>
   );
 }
+

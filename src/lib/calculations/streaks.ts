@@ -1,6 +1,28 @@
 import { LearningSession } from '@/types';
 
+export function isValidTimezone(timeZone: string): boolean {
+  if (!timeZone || typeof timeZone !== 'string') return false;
+  try {
+    Intl.DateTimeFormat(undefined, { timeZone });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function getSafeTimezone(timeZone?: string): string {
+  if (timeZone && isValidTimezone(timeZone)) {
+    return timeZone;
+  }
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+  } catch {
+    return 'UTC';
+  }
+}
+
 export function getLocalDateString(isoDateString: string, timeZone?: string): string {
+  const safeTz = getSafeTimezone(timeZone);
   try {
     const date = new Date(isoDateString);
     if (isNaN(date.getTime())) {
@@ -9,7 +31,7 @@ export function getLocalDateString(isoDateString: string, timeZone?: string): st
     }
 
     const formatter = new Intl.DateTimeFormat('en-CA', {
-      timeZone: timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone,
+      timeZone: safeTz,
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
@@ -18,6 +40,25 @@ export function getLocalDateString(isoDateString: string, timeZone?: string): st
   } catch {
     const d = new Date(isoDateString);
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+}
+
+export function formatDateTimeInTimezone(isoDateString: string, timeZone?: string): string {
+  const safeTz = getSafeTimezone(timeZone);
+  try {
+    const date = new Date(isoDateString);
+    if (isNaN(date.getTime())) return isoDateString;
+
+    return new Intl.DateTimeFormat('en-US', {
+      timeZone: safeTz,
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(date);
+  } catch {
+    return isoDateString;
   }
 }
 
@@ -32,14 +73,41 @@ export function getDayOffset(dateStr: string, offsetDays: number): string {
   return date.toISOString().slice(0, 10);
 }
 
-export function groupSessionsByDate(sessions: LearningSession[], timeZone?: string): Record<string, number> {
-  const dailyMinutes: Record<string, number> = {};
+/**
+ * Sum seconds per local date first, then convert to minutes.
+ * When excludeFuture is true, future-dated sessions are omitted from streak calculation.
+ */
+export function groupSessionsByDate(
+  sessions: LearningSession[],
+  timeZone?: string,
+  excludeFuture: boolean = false
+): Record<string, number> {
+  const dailySeconds: Record<string, number> = {};
+  const safeTz = getSafeTimezone(timeZone);
+  const now = new Date();
+  const todayStr = getTodayDateString(safeTz);
 
-  for (const session of sessions) {
+  for (const session of sessions || []) {
     if (!session.duration_seconds || session.duration_seconds <= 0) continue;
-    const dateStr = getLocalDateString(session.started_at, timeZone);
-    const minutes = Math.floor(session.duration_seconds / 60);
-    dailyMinutes[dateStr] = (dailyMinutes[dateStr] || 0) + minutes;
+
+    if (excludeFuture) {
+      const sessionDate = new Date(session.started_at);
+      if (!isNaN(sessionDate.getTime()) && sessionDate > now) {
+        continue;
+      }
+    }
+
+    const dateStr = getLocalDateString(session.started_at, safeTz);
+    if (excludeFuture && dateStr > todayStr) {
+      continue;
+    }
+
+    dailySeconds[dateStr] = (dailySeconds[dateStr] || 0) + session.duration_seconds;
+  }
+
+  const dailyMinutes: Record<string, number> = {};
+  for (const [date, totalSecs] of Object.entries(dailySeconds)) {
+    dailyMinutes[date] = Math.floor(totalSecs / 60);
   }
 
   return dailyMinutes;
@@ -51,8 +119,10 @@ export function calculateStreaks(
   timeZone?: string
 ) {
   const goal = Math.max(1, dailyGoalMinutes || 60);
-  const dailyTotals = groupSessionsByDate(sessions, timeZone);
-  const todayStr = getTodayDateString(timeZone);
+  const safeTz = getSafeTimezone(timeZone);
+  // Exclude future-dated sessions from streak calculations
+  const dailyTotals = groupSessionsByDate(sessions, safeTz, true);
+  const todayStr = getTodayDateString(safeTz);
 
   const todayMinutes = dailyTotals[todayStr] || 0;
   const todayGoalMet = todayMinutes >= goal;
@@ -72,9 +142,9 @@ export function calculateStreaks(
     }
   }
 
-  // Calculate best streak historically across all recorded dates
+  // Calculate best streak historically across all past and present recorded dates
   const sortedDates = Object.keys(dailyTotals)
-    .filter((d) => dailyTotals[d] >= goal)
+    .filter((d) => d <= todayStr && dailyTotals[d] >= goal)
     .sort();
 
   let bestStreak = 0;
@@ -115,8 +185,9 @@ export function getWeeklyActivity(
   timeZone?: string
 ) {
   const goal = Math.max(1, dailyGoalMinutes || 60);
-  const dailyTotals = groupSessionsByDate(sessions, timeZone);
-  const todayStr = getTodayDateString(timeZone);
+  const safeTz = getSafeTimezone(timeZone);
+  const dailyTotals = groupSessionsByDate(sessions, safeTz, false);
+  const todayStr = getTodayDateString(safeTz);
 
   const week = [];
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -139,4 +210,3 @@ export function getWeeklyActivity(
 
   return week;
 }
-

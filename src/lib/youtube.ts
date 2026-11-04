@@ -333,32 +333,63 @@ export function extractYouTubeVideoId(url: string): string | null {
   return null;
 }
 
-export function parseYouTubeUrlOrPreset(url: string): ParsedVideoInfo {
+export function isAllowlistedEmbedUrl(url: string): boolean {
+  if (!url) return false;
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.toLowerCase();
+    return (
+      host === 'www.youtube.com' ||
+      host === 'youtube.com' ||
+      host === 'youtu.be' ||
+      host === 'www.youtube-nocookie.com' ||
+      host === 'youtube-nocookie.com'
+    );
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Honest YouTube & preset parser.
+ * Never silently substitutes a fallback sample video ID for invalid/unrecognized links.
+ */
+export function parseYouTubeUrlOrPreset(url: string): ParsedVideoInfo | null {
+  if (!url) return null;
   const trimmed = url.trim();
 
-  // Check if matches one of our presets
+  // 1. Check if matches one of our curated preset masterclasses
   const matchedPreset = PRESET_COURSES.find(
     (p) => p.url.toLowerCase() === trimmed.toLowerCase() || trimmed.includes(p.key)
   );
 
-  const videoId = extractYouTubeVideoId(trimmed) || (matchedPreset ? extractYouTubeVideoId(matchedPreset.url) : 'kL2gQWjmLc0');
+  if (matchedPreset) {
+    const videoId = extractYouTubeVideoId(matchedPreset.url);
+    return {
+      videoId,
+      embedUrl: videoId ? `https://www.youtube.com/embed/${videoId}?enablejsapi=1` : '',
+      thumbnailUrl: matchedPreset.thumbnail_url,
+      suggestedTitle: matchedPreset.title,
+      suggestedDuration: matchedPreset.total_minutes,
+      suggestedProvider: matchedPreset.provider,
+      isPreset: true,
+    };
+  }
 
-  const embedUrl = videoId
-    ? `https://www.youtube.com/embed/${videoId}?enablejsapi=1`
-    : 'https://www.youtube.com/embed/kL2gQWjmLc0?enablejsapi=1';
+  // 2. Check if it's a valid YouTube URL
+  const videoId = extractYouTubeVideoId(trimmed);
+  if (videoId) {
+    return {
+      videoId,
+      embedUrl: `https://www.youtube.com/embed/${videoId}?enablejsapi=1`,
+      thumbnailUrl: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+      suggestedTitle: undefined, // Do not fake metadata
+      suggestedDuration: undefined, // Ask user to confirm
+      suggestedProvider: 'YouTube',
+      isPreset: false,
+    };
+  }
 
-  const thumbnailUrl = videoId
-    ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
-    : (matchedPreset?.thumbnail_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop&q=80');
-
-  return {
-    videoId,
-    embedUrl,
-    thumbnailUrl,
-    suggestedTitle: matchedPreset?.title,
-    suggestedDuration: matchedPreset?.total_minutes,
-    suggestedProvider: matchedPreset?.provider || 'YouTube',
-    isPreset: !!matchedPreset,
-  };
+  // Not a recognized YouTube link
+  return null;
 }
-

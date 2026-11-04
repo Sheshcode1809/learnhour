@@ -4,8 +4,9 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Course } from '@/types';
 import { useLearning } from '@/context/LearningContext';
-import { parseYouTubeUrlOrPreset } from '@/lib/youtube';
-import { Check, X, AlertCircle } from 'lucide-react';
+import { parseYouTubeUrlOrPreset, isAllowlistedEmbedUrl } from '@/lib/youtube';
+import { generateLessonsForCourse } from '@/lib/calculations/dayPlanner';
+import { Check, X, AlertCircle, AlertTriangle } from 'lucide-react';
 
 interface CourseFormProps {
   initialData?: Course;
@@ -26,13 +27,16 @@ export function CourseForm({ initialData, onSuccess, onCancel }: CourseFormProps
   const [description, setDescription] = useState(initialData?.description || '');
   const [status, setStatus] = useState(initialData?.status || 'active');
 
+  // Option to explicitly rebuild plan when editing duration
+  const [rebuildPlan, setRebuildPlan] = useState(false);
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleUrlBlur = () => {
     if (courseUrl && !thumbnailUrl) {
       const parsed = parseYouTubeUrlOrPreset(courseUrl);
-      if (parsed.thumbnailUrl) {
+      if (parsed?.thumbnailUrl) {
         setThumbnailUrl(parsed.thumbnailUrl);
       }
     }
@@ -62,19 +66,32 @@ export function CourseForm({ initialData, onSuccess, onCancel }: CourseFormProps
     const parsedPace = parseInt(dailyPaceMinutes, 10);
     const parsedVideo = parseYouTubeUrlOrPreset(courseUrl);
 
+    const safeEmbedUrl = parsedVideo?.embedUrl && isAllowlistedEmbedUrl(parsedVideo.embedUrl)
+      ? parsedVideo.embedUrl
+      : isAllowlistedEmbedUrl(courseUrl)
+      ? courseUrl
+      : '';
+
     try {
       if (initialData) {
+        // Preserve lessons unless user explicitly chose to rebuild plan
+        let updatedLessons = initialData.lessons;
+        if (rebuildPlan) {
+          updatedLessons = generateLessonsForCourse(initialData.id, parsedTotal, title.trim(), parsedPace);
+        }
+
         const updated: Course = {
           ...initialData,
           title: title.trim(),
           provider: provider.trim() || 'Custom',
           course_url: courseUrl.trim(),
-          embed_url: parsedVideo.embedUrl || courseUrl.trim(),
-          thumbnail_url: thumbnailUrl.trim() || parsedVideo.thumbnailUrl,
+          embed_url: safeEmbedUrl,
+          thumbnail_url: thumbnailUrl.trim() || parsedVideo?.thumbnailUrl,
           total_minutes: parsedTotal,
           daily_pace_minutes: parsedPace,
           description: description.trim(),
           status,
+          lessons: updatedLessons,
           updated_at: new Date().toISOString(),
         };
         updateCourse(updated);
@@ -84,8 +101,8 @@ export function CourseForm({ initialData, onSuccess, onCancel }: CourseFormProps
           title: title.trim(),
           provider: provider.trim() || 'Custom',
           course_url: courseUrl.trim(),
-          embed_url: parsedVideo.embedUrl,
-          thumbnail_url: thumbnailUrl.trim() || parsedVideo.thumbnailUrl,
+          embed_url: safeEmbedUrl,
+          thumbnail_url: thumbnailUrl.trim() || parsedVideo?.thumbnailUrl,
           total_minutes: parsedTotal,
           daily_pace_minutes: parsedPace,
           description: description.trim(),
@@ -101,6 +118,11 @@ export function CourseForm({ initialData, onSuccess, onCancel }: CourseFormProps
       setIsSubmitting(false);
     }
   };
+
+  const durationOrPaceChanged =
+    initialData &&
+    (parseInt(totalMinutes, 10) !== initialData.total_minutes ||
+      parseInt(dailyPaceMinutes, 10) !== initialData.daily_pace_minutes);
 
   return (
     <form onSubmit={handleSubmit} className="bg-white border border-sand-border rounded-2xl p-6 shadow-sm flex flex-col gap-4">
@@ -204,6 +226,25 @@ export function CourseForm({ initialData, onSuccess, onCancel }: CourseFormProps
         </div>
       </div>
 
+      {/* Rebuild plan warning if duration changed during edit */}
+      {durationOrPaceChanged && (
+        <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-start gap-2">
+          <AlertTriangle className="w-4 h-4 shrink-0 text-amber-600 mt-0.5" />
+          <div className="flex flex-col gap-1">
+            <span>You modified total duration or daily pace. Existing lesson progress is preserved by default.</span>
+            <label className="flex items-center gap-2 cursor-pointer font-bold text-charcoal-900 mt-1">
+              <input
+                type="checkbox"
+                checked={rebuildPlan}
+                onChange={(e) => setRebuildPlan(e.target.checked)}
+                className="rounded text-forest-600"
+              />
+              <span>Rebuild daily plan with new duration (resets existing lesson checkmarks)</span>
+            </label>
+          </div>
+        </div>
+      )}
+
       {/* Thumbnail URL */}
       <div>
         <label className="block text-xs font-semibold text-charcoal-700 mb-1">
@@ -273,4 +314,3 @@ export function CourseForm({ initialData, onSuccess, onCancel }: CourseFormProps
     </form>
   );
 }
-
