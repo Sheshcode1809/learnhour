@@ -73,3 +73,4 @@ Courseit operates using a secure, local-first architecture with optional Supabas
 | **Cross-Site Scripting (XSS)** | React JSX auto-escaping + strict iframe hostname allowlisting | **COMPLIANT** |
 | **Clickjacking** | `X-Frame-Options: SAMEORIGIN` | **COMPLIANT** |
 | **Information Disclosure** | `poweredByHeader: false` + sanitized production error boundaries | **COMPLIANT** |
+

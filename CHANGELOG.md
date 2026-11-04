@@ -34,3 +34,4 @@ All notable changes to the Courseit project are documented in this file.
 - Implemented persistent focus study timer with floating bar.
 - Implemented streak engine and 7-day weekly activity visualization.
 - Built day-wise curriculum planner, active recall quizzes, timestamped notes, and 3D flashcards.
+

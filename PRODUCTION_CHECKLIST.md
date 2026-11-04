@@ -84,3 +84,4 @@ This checklist audits functional, architectural, performance, and security readi
 | `npm test` | 19 of 19 tests passing | **PASS (19 tests passed)** |
 | `npm run build` | 14 of 14 static pages generated | **PASS (All 14 routes)** |
 | `node scripts/test-responsive.mjs` | Total overflow issues: 0 | **PASS (0 issues across 6 viewports)** |
+

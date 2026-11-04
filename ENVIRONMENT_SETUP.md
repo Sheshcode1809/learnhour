@@ -46,3 +46,4 @@ The application runs immediately in **local-first mode** without any external AP
    - *(Optional)* Key: `NEXT_PUBLIC_SUPABASE_URL`, Value: `https://<id>.supabase.co`
    - *(Optional)* Key: `NEXT_PUBLIC_SUPABASE_ANON_KEY`, Value: `<anon-key>`
 4. Trigger a new deployment for changes to take effect.
+
