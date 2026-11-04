@@ -61,9 +61,6 @@ export default function HomePage() {
           <Link href="/courses/new" className="hover:text-forest-700 transition-colors">
             Paste video
           </Link>
-          <Link href="/dashboard" className="hover:text-forest-700 transition-colors">
-            Dashboard
-          </Link>
         </nav>
 
         {/* Right Auth Actions */}
