@@ -23,7 +23,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <MobileHeader />
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col min-w-0 pb-28 lg:pb-12">
+      <main className="flex-1 flex flex-col min-w-0 max-w-full overflow-x-hidden pb-28 lg:pb-12">
         {children}
       </main>
 

@@ -86,7 +86,7 @@ export default function CoursePlayerPage() {
     if (currentLesson && currentLesson.day_number !== selectedDay) {
       setSelectedDay(currentLesson.day_number);
     }
-  }, [currentLesson?.id]);
+  }, [currentLesson, selectedDay]);
 
   // Handle Loading & Not Found states truthfully (Requirement 8)
   if (isLoading) {
@@ -272,9 +272,9 @@ export default function CoursePlayerPage() {
       </div>
 
       {/* Main 2-Column Content */}
-      <div className="flex-1 max-w-[1600px] w-full mx-auto px-4 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="flex-1 max-w-[1600px] w-full mx-auto px-4 sm:px-6 xl:px-8 py-6 grid grid-cols-1 xl:grid-cols-12 gap-6 min-w-0">
         {/* Left Column: Video Player & Lesson Details */}
-        <div className="lg:col-span-8 flex flex-col gap-4">
+        <div className="xl:col-span-8 flex flex-col gap-4 min-w-0">
           {/* Responsive Video Frame or Safe Link */}
           <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-charcoal-900 shadow-lg border border-charcoal-800">
             {/* Intentional branded fallback backdrop (never an empty black box) */}
@@ -406,7 +406,7 @@ export default function CoursePlayerPage() {
         </div>
 
         {/* Right Column: Day Tabs, Lessons List & Study Tools */}
-        <div className="lg:col-span-4 flex flex-col gap-4">
+        <div className="xl:col-span-4 flex flex-col gap-4 min-w-0">
           <div className="bg-white border border-sand-border rounded-2xl p-4 shadow-xs flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between pb-3 border-b border-sand-border">

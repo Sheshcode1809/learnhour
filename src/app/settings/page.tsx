@@ -59,14 +59,14 @@ export default function SettingsPage() {
   const handleReset = () => {
     resetAllData();
     setShowResetConfirm(false);
-    setName('Abhishek Singh');
+    setName('Learner');
     setDailyGoal('60');
     setTimezone('Asia/Kolkata');
     setTimezoneError('');
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
+    <div className="max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6 min-w-0">
       {/* Header */}
       <div className="pb-4 border-b border-sand-border">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-charcoal-900 tracking-tight">
@@ -99,13 +99,13 @@ export default function SettingsPage() {
                 key={mins}
                 type="button"
                 onClick={() => setDailyGoal(mins.toString())}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-bold transition-all ${
                   dailyGoal === mins.toString()
                     ? 'bg-forest-600 text-white shadow-xs'
                     : 'bg-cream-100 border border-sand-border text-charcoal-700 hover:bg-cream-200'
                 }`}
               >
-                {mins} mins / day {mins === 60 ? '(Default)' : ''}
+                {mins}m / day {mins === 60 ? '(Default)' : ''}
               </button>
             ))}
           </div>

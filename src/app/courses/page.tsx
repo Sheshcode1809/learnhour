@@ -60,7 +60,7 @@ export default function CoursesPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-28 flex flex-col gap-6">
+    <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-28 flex flex-col gap-6 min-w-0">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-sand-border">
         <div>
@@ -87,9 +87,9 @@ export default function CoursesPage() {
       </div>
 
       {/* Search & Tabs Toolbar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 min-w-0">
         {/* Filter Tabs */}
-        <div className="flex items-center gap-1.5 p-1 bg-cream-200/80 rounded-xl border border-sand-border overflow-x-auto text-xs font-medium">
+        <div className="flex items-center gap-1.5 p-1 bg-cream-200/80 rounded-xl border border-sand-border overflow-x-auto text-xs font-medium max-w-full min-w-0">
           <button
             onClick={() => setActiveTab('all')}
             className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${

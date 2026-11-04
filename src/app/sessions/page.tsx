@@ -177,7 +177,7 @@ export default function SessionsPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 flex flex-col gap-6">
+    <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 flex flex-col gap-6 min-w-0">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-sand-border">
         <div>
@@ -199,7 +199,7 @@ export default function SessionsPage() {
       </div>
 
       {/* Main Focus Timer Card */}
-      <div className="bg-white border border-sand-border rounded-3xl p-6 sm:p-8 shadow-xs flex flex-col items-center text-center max-w-xl mx-auto w-full">
+      <div className="bg-white border border-sand-border rounded-3xl p-6 sm:p-8 shadow-xs flex flex-col items-center text-center max-w-xl mx-auto w-full min-w-0">
         <div className="flex items-center gap-2 mb-2">
           <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
             activeTimer.is_running ? 'bg-forest-100 text-forest-700 animate-pulse' : 'bg-cream-200 text-charcoal-600'
@@ -237,7 +237,7 @@ export default function SessionsPage() {
         </div>
 
         {/* Timer Control Buttons */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-center gap-3 w-full">
           {activeTimer.is_running ? (
             <button
               onClick={pauseTimer}

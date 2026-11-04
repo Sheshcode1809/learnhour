@@ -135,8 +135,15 @@ create policy "Users can view their own sessions"
   on public.learning_sessions for select using (auth.uid() = user_id);
 create policy "Users can create their own sessions"
   on public.learning_sessions for insert with check (auth.uid() = user_id);
+create policy "Users can update their own sessions"
+  on public.learning_sessions for update using (auth.uid() = user_id);
 create policy "Users can delete their own sessions"
   on public.learning_sessions for delete using (auth.uid() = user_id);
+
+-- course_notes policies (join on parent course)
+create policy "Users can access notes of their courses"
+  on public.course_notes for all
+  using (exists (select 1 from public.courses c where c.id = course_notes.course_id and c.user_id = auth.uid()));
 
 -- active_timer_state policies
 create policy "Users can access their own timer state"

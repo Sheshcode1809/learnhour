@@ -3,7 +3,7 @@ import { PRESET_COURSES } from '../youtube';
 
 export const INITIAL_PREFERENCES: UserPreferences = {
   user_id: 'user-default-1',
-  name: 'Abhishek Singh',
+  name: 'Learner',
   daily_goal_minutes: 60,
   timezone: 'Asia/Kolkata',
   tier: 'Free beta',
