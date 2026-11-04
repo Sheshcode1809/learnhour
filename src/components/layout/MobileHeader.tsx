@@ -26,7 +26,7 @@ export function MobileHeader() {
   const { user } = useAuth();
 
   const navItems = [
-    { label: 'Today', href: '/', icon: Calendar },
+    { label: 'Today', href: '/dashboard', icon: Calendar },
     { label: 'My courses', href: '/courses', icon: BookOpen, badge: courses.length },
     { label: 'Sessions', href: '/sessions', icon: Timer },
     { label: 'Settings', href: '/settings', icon: Settings },
@@ -35,7 +35,7 @@ export function MobileHeader() {
   return (
     <header className="lg:hidden sticky top-0 z-40 bg-cream-50/95 backdrop-blur border-b border-sand-border px-4 py-3">
       <div className="flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/dashboard" className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-forest-600 flex items-center justify-center text-white">
             <GraduationCap className="w-4 h-4" />
           </div>
@@ -98,7 +98,7 @@ export function MobileHeader() {
             })}
 
             <Link
-              href="/landing"
+              href="/"
               onClick={() => setIsOpen(false)}
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-charcoal-600 hover:bg-cream-100"
             >

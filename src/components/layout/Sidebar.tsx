@@ -24,7 +24,7 @@ export function Sidebar() {
   const { user, logout } = useAuth();
 
   const navItems = [
-    { label: 'Today', href: '/', icon: Calendar },
+    { label: 'Today', href: '/dashboard', icon: Calendar },
     { label: 'My courses', href: '/courses', icon: BookOpen, badge: courses.length },
     { label: 'Sessions', href: '/sessions', icon: Timer },
     { label: 'Settings', href: '/settings', icon: Settings },
@@ -38,7 +38,7 @@ export function Sidebar() {
     <aside className="hidden lg:flex w-64 flex-col justify-between border-r border-sand-border bg-cream-50 h-screen sticky top-0 px-4 py-5 select-none overflow-y-auto">
       <div className="flex flex-col gap-6">
         {/* Brand / Logo */}
-        <Link href="/" className="flex items-center gap-2.5 px-2 group">
+        <Link href="/dashboard" className="flex items-center gap-2.5 px-2 group">
           <div className="w-9 h-9 rounded-xl bg-forest-600 flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-transform">
             <GraduationCap className="w-5 h-5" />
           </div>
@@ -144,7 +144,7 @@ export function Sidebar() {
         {/* Link to public Landing Page */}
         <div className="pt-2 border-t border-sand-border/60">
           <Link
-            href="/landing"
+            href="/"
             className="flex items-center gap-2.5 px-3 py-1.5 text-xs text-charcoal-500 hover:text-charcoal-800 hover:bg-cream-200/50 rounded-lg transition-colors"
           >
             <Globe className="w-3.5 h-3.5 text-forest-600" />

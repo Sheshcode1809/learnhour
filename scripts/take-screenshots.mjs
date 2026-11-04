@@ -10,10 +10,10 @@ if (!fs.existsSync(outputDir)) {
 }
 
 const pagesToCapture = [
-  { name: '01-landing-page.png', url: 'http://localhost:3000/landing' },
+  { name: '01-landing-page.png', url: 'http://localhost:3000/' },
   { name: '02-login-page.png', url: 'http://localhost:3000/auth/login' },
   { name: '03-signup-page.png', url: 'http://localhost:3000/auth/signup' },
-  { name: '04-dashboard.png', url: 'http://localhost:3000/' },
+  { name: '04-dashboard.png', url: 'http://localhost:3000/dashboard' },
   { name: '05-courses-library.png', url: 'http://localhost:3000/courses' },
   { name: '06-course-player.png', url: 'http://localhost:3000/courses/python-2026' },
   { name: '07-new-course.png', url: 'http://localhost:3000/courses/new' },

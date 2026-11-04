@@ -28,7 +28,7 @@ export default function LoginPage() {
 
     try {
       await loginWithEmail(email, password);
-      router.push('/');
+      router.push('/dashboard');
     } catch {
       setError('Failed to sign in. Please verify your credentials.');
     }
@@ -37,7 +37,7 @@ export default function LoginPage() {
   const handleGoogleSignIn = async () => {
     try {
       await loginWithGoogle();
-      router.push('/');
+      router.push('/dashboard');
     } catch {
       setError('Google Sign-In failed. Please try again.');
     }
@@ -45,14 +45,14 @@ export default function LoginPage() {
 
   const handleDemoAccess = async () => {
     await loginWithEmail('learner@courseit.dev', 'password123');
-    router.push('/');
+    router.push('/dashboard');
   };
 
   return (
     <div className="min-h-screen bg-cream-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       {/* Brand Header */}
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <Link href="/landing" className="inline-flex items-center gap-2.5 group">
+        <Link href="/" className="inline-flex items-center gap-2.5 group">
           <div className="w-10 h-10 rounded-2xl bg-forest-600 flex items-center justify-center text-white shadow-md shadow-forest-800/10 group-hover:scale-105 transition-transform">
             <GraduationCap className="w-6 h-6" />
           </div>

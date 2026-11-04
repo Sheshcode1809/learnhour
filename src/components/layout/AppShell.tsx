@@ -8,7 +8,7 @@ import { GlobalTimerBar } from './GlobalTimerBar';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAuthOrLanding = pathname.startsWith('/auth') || pathname.startsWith('/landing');
+  const isAuthOrLanding = pathname === '/' || pathname.startsWith('/auth') || pathname.startsWith('/landing');
 
   if (isAuthOrLanding) {
     return <main className="min-h-screen bg-cream-100">{children}</main>;

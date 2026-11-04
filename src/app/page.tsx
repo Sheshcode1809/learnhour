@@ -2,342 +2,473 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { useLearning } from '@/context/LearningContext';
-import { calculateCourseProgress, formatDuration } from '@/lib/calculations/progress';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 import { ScenicBanner } from '@/components/courses/ScenicBanner';
 import {
-  Flame,
-  Clock,
+  GraduationCap,
+  Sparkles,
   Play,
   ArrowRight,
+  Flame,
   CheckCircle2,
+  Clock,
+  HelpCircle,
+  FileText,
+  Layers,
   Calendar,
-  Sparkles,
-  BookOpen,
-  Plus,
+  ShieldCheck,
+  ChevronRight,
+  Video,
 } from 'lucide-react';
 
-export default function DashboardPage() {
-  const { courses, preferences, stats, lastActiveCourse, startTimer } = useLearning();
+export default function HomePage() {
+  const router = useRouter();
+  const { loginWithGoogle, isAuthenticated } = useAuth();
 
-  const now = new Date();
-  const dateFormatted = now.toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
-
-  const getGreeting = () => {
-    const hours = now.getHours();
-    if (hours < 12) return 'Good morning';
-    if (hours < 18) return 'Good afternoon';
-    return 'Good evening';
+  const handleGoogleCTA = async () => {
+    await loginWithGoogle();
+    router.push('/dashboard');
   };
 
-  const dailyGoal = preferences.daily_goal_minutes || 60;
-  const goalPercent = Math.min(100, Math.round((stats.todayMinutes / dailyGoal) * 100));
-
-  const activeCourses = courses.filter((c) => c.status === 'active');
-  const primaryCourse = lastActiveCourse || activeCourses[0];
-  const primaryProgress = primaryCourse
-    ? calculateCourseProgress(primaryCourse.total_minutes, primaryCourse.completed_minutes)
-    : null;
-
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Top Welcome Bar */}
-      <div className="px-4 sm:px-6 lg:px-8 py-5 border-b border-sand-border bg-cream-50/70 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <div>
-          <div className="text-xs text-charcoal-500 font-medium">{dateFormatted}</div>
-          <h1 className="text-xl sm:text-2xl font-black text-charcoal-900 tracking-tight">
-            {getGreeting()}, {preferences.name.split(' ')[0]}
-          </h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <Link
-            href="/courses/new"
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-forest-600 hover:bg-forest-700 text-white font-semibold text-xs shadow-sm transition-all"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>New course</span>
-          </Link>
-        </div>
-      </div>
-
-      <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-28 flex flex-col gap-6">
-        {/* Scenic Illustration Banner with Habit Prompt */}
-        <div className="relative">
-          <ScenicBanner height="h-44 sm:h-52" />
-          <div className="absolute inset-0 flex flex-col justify-end p-6 z-10 pointer-events-none">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-forest-800 bg-white/80 backdrop-blur-xs px-2.5 py-0.5 rounded-full w-max shadow-2xs mb-1.5">
-              Habit Rule
+    <div className="min-h-screen bg-cream-100 text-charcoal-800 flex flex-col selection:bg-forest-100 selection:text-forest-800">
+      {/* Top Navigation */}
+      <header className="sticky top-0 z-40 bg-cream-50/90 backdrop-blur-md border-b border-sand-border px-4 sm:px-8 py-3.5 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <div className="w-9 h-9 rounded-xl bg-forest-600 flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-transform">
+            <GraduationCap className="w-5 h-5" />
+          </div>
+          <div>
+            <span className="font-bold text-lg text-charcoal-900 tracking-tight">Courseit</span>
+            <span className="ml-1.5 text-[10px] font-bold bg-terracotta-100 text-terracotta-700 px-1.5 py-0.5 rounded-full">
+              1h/day
             </span>
-            <h2 className="text-xl sm:text-2xl font-black text-charcoal-900 drop-shadow-xs">
-              One focused hour a day. Steady mastery.
-            </h2>
           </div>
-        </div>
+        </Link>
 
-        {/* Highlight Stats Row */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
-          {/* Daily Goal Card (5 cols) */}
-          <div className="md:col-span-5 bg-white border border-sand-border rounded-3xl p-6 shadow-xs flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between pb-3 border-b border-sand-border/70">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-forest-50 text-forest-700 flex items-center justify-center">
-                    <Clock className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-bold text-charcoal-900">Today&apos;s Goal</h3>
-                    <p className="text-[11px] text-charcoal-500">Target: {dailyGoal} mins</p>
-                  </div>
-                </div>
-                {stats.todayGoalMet ? (
-                  <span className="text-[10px] font-bold text-forest-700 bg-forest-100 px-2.5 py-1 rounded-full flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3" /> Goal Met!
-                  </span>
-                ) : (
-                  <span className="text-[10px] font-bold text-charcoal-600 bg-cream-200 px-2.5 py-1 rounded-full">
-                    {stats.remainingMinutesToday}m remaining
-                  </span>
-                )}
-              </div>
+        {/* Center Nav Links (Desktop) */}
+        <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-charcoal-600">
+          <a href="#how-it-works" className="hover:text-forest-700 transition-colors">
+            How it works
+          </a>
+          <a href="#features" className="hover:text-forest-700 transition-colors">
+            Features
+          </a>
+          <a href="#masterclasses" className="hover:text-forest-700 transition-colors">
+            Popular courses
+          </a>
+          <Link href="/courses/new" className="hover:text-forest-700 transition-colors">
+            Paste video
+          </Link>
+          <Link href="/dashboard" className="hover:text-forest-700 transition-colors">
+            Dashboard
+          </Link>
+        </nav>
 
-              {/* Progress Numbers */}
-              <div className="mt-5 flex items-baseline gap-2">
-                <span className="text-4xl sm:text-5xl font-black text-charcoal-900 font-mono tracking-tight">
-                  {stats.todayMinutes}
-                </span>
-                <span className="text-sm font-semibold text-charcoal-400">/ {dailyGoal} mins</span>
-              </div>
-
-              {/* Progress Bar */}
-              <div className="w-full bg-cream-200 h-3 rounded-full overflow-hidden mt-3">
-                <div
-                  className={`h-full rounded-full transition-all duration-500 ${
-                    stats.todayGoalMet ? 'bg-forest-600' : 'bg-forest-500'
-                  }`}
-                  style={{ width: `${goalPercent}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="mt-5 pt-4 border-t border-sand-border/70 flex items-center justify-between">
-              <span className="text-xs text-charcoal-500 font-medium">
-                {stats.todayGoalMet ? 'Great work today!' : 'Keep going! A little every day.'}
-              </span>
-              <button
-                onClick={() => startTimer(primaryCourse?.id)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-forest-50 text-forest-800 hover:bg-forest-100 font-bold text-xs transition-colors"
-              >
-                <Play className="w-3 h-3 fill-current" />
-                <span>Start Timer</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Streak Card (3 cols) */}
-          <div className="md:col-span-3 bg-white border border-sand-border rounded-3xl p-6 shadow-xs flex flex-col justify-between">
-            <div className="flex items-center justify-between pb-3 border-b border-sand-border/70">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-terracotta-100 text-terracotta-600 flex items-center justify-center">
-                  <Flame className="w-4 h-4 fill-terracotta-500" />
-                </div>
-                <div>
-                  <h3 className="text-xs font-bold text-charcoal-900">Learning Streak</h3>
-                  <p className="text-[11px] text-charcoal-500">Consecutive days</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="my-4">
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-4xl sm:text-5xl font-black text-terracotta-600 font-mono">
-                  {stats.currentStreak}
-                </span>
-                <span className="text-sm font-bold text-charcoal-700">days</span>
-              </div>
-              <div className="text-xs text-charcoal-500 mt-1">
-                Best streak: <span className="font-bold text-charcoal-800">{stats.bestStreak} days</span>
-              </div>
-            </div>
-
-            <div className="pt-3 border-t border-sand-border/70 text-[11px] text-charcoal-600">
-              {stats.todayGoalMet
-                ? 'Streak safely preserved for today!'
-                : `Study ${stats.remainingMinutesToday}m more to maintain streak.`}
-            </div>
-          </div>
-
-          {/* Weekly 7-Day Activity Chart (4 cols) */}
-          <div className="md:col-span-4 bg-white border border-sand-border rounded-3xl p-6 shadow-xs flex flex-col justify-between">
-            <div className="flex items-center justify-between pb-3 border-b border-sand-border/70">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-forest-600" />
-                <h3 className="text-xs font-bold text-charcoal-900">Weekly Activity</h3>
-              </div>
-              <span className="text-[11px] font-semibold text-charcoal-500">Last 7 days</span>
-            </div>
-
-            {/* Bars */}
-            <div className="my-4 flex items-end justify-between gap-1.5 h-28 pt-4">
-              {stats.weeklyActivity.map((day) => {
-                const heightPercent = Math.min(100, Math.round((day.minutes / dailyGoal) * 100));
-
-                return (
-                  <div key={day.date} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end group">
-                    <span className="text-[10px] font-mono text-charcoal-400 group-hover:text-charcoal-800 transition-colors">
-                      {day.minutes > 0 ? `${day.minutes}m` : ''}
-                    </span>
-                    <div className="w-full bg-cream-200 rounded-lg overflow-hidden flex flex-col justify-end h-16">
-                      <div
-                        className={`w-full rounded-lg transition-all duration-300 ${
-                          day.goalMet
-                            ? 'bg-forest-600'
-                            : day.minutes > 0
-                            ? 'bg-forest-400'
-                            : 'bg-transparent'
-                        }`}
-                        style={{ height: `${Math.max(day.minutes > 0 ? 15 : 0, heightPercent)}%` }}
-                      />
-                    </div>
-                    <span className={`text-[10px] font-semibold ${day.isToday ? 'text-forest-700 font-bold' : 'text-charcoal-500'}`}>
-                      {day.dayName}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="pt-3 border-t border-sand-border/70 text-[11px] text-charcoal-500 flex justify-between">
-              <span>Goal: {dailyGoal}m/day</span>
-              <span className="text-forest-700 font-semibold">Green = Goal Met</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Continue Learning Card (Matches reference video!) */}
-        {primaryCourse && primaryProgress && (
-          <div className="bg-sand-100 border border-sand-border rounded-3xl p-6 shadow-xs flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex flex-col sm:flex-row items-center gap-5 w-full md:w-auto">
-              <div className="w-full sm:w-48 aspect-video rounded-2xl overflow-hidden bg-cream-200 shrink-0 border border-sand-border shadow-2xs relative">
-                {primaryCourse.thumbnail_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={primaryCourse.thumbnail_url}
-                    alt={primaryCourse.title}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-charcoal-400 text-xs font-semibold">
-                    Course Preview
-                  </div>
-                )}
-                <div className="absolute top-2 left-2">
-                  <span className="text-[10px] font-bold bg-charcoal-900/80 text-white px-2 py-0.5 rounded">
-                    {primaryCourse.provider}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-1.5 w-full">
-                <span className="text-[10px] font-bold text-forest-700 uppercase tracking-wider">
-                  Continue Learning
-                </span>
-                <Link
-                  href={`/courses/${primaryCourse.id}`}
-                  title={primaryCourse.title}
-                  className="text-base sm:text-lg font-bold text-charcoal-900 hover:text-forest-700 line-clamp-1"
-                >
-                  {primaryCourse.title}
-                </Link>
-
-                <div className="flex items-center gap-3 text-xs text-charcoal-600 mt-1">
-                  <span>{primaryProgress.percentage}% complete</span>
-                  <span>•</span>
-                  <span>{primaryProgress.formattedRemaining} remaining</span>
-                  <span>•</span>
-                  <span>{primaryCourse.lessons.length} lessons</span>
-                </div>
-
-                <div className="w-full max-w-md bg-cream-300/80 h-2 rounded-full overflow-hidden mt-1.5">
-                  <div
-                    className="bg-forest-600 h-full rounded-full transition-all"
-                    style={{ width: `${primaryProgress.percentage}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-
+        {/* Right Auth Actions */}
+        <div className="flex items-center gap-3">
+          {isAuthenticated ? (
             <Link
-              href={`/courses/${primaryCourse.id}`}
-              className="w-full md:w-auto shrink-0 flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-forest-600 hover:bg-forest-700 active:bg-forest-800 text-white font-bold text-xs sm:text-sm shadow-sm transition-all"
+              href="/dashboard"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-forest-600 hover:bg-forest-700 active:bg-forest-800 text-white font-semibold text-xs shadow-sm transition-all"
             >
-              <Play className="w-4 h-4 fill-current" />
-              <span>Resume Course</span>
-            </Link>
-          </div>
-        )}
-
-        {/* Active Courses Section */}
-        <div className="flex flex-col gap-4 mt-2">
-          <div className="flex items-center justify-between pb-2 border-b border-sand-border">
-            <h2 className="text-base font-bold text-charcoal-900">In-Progress Courses</h2>
-            <Link
-              href="/courses"
-              className="text-xs font-semibold text-forest-700 hover:text-forest-800 flex items-center gap-1"
-            >
-              <span>View all courses</span>
+              <span>Go to Dashboard</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
-          </div>
-
-          {activeCourses.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {activeCourses.slice(0, 3).map((course) => {
-                const prog = calculateCourseProgress(course.total_minutes, course.completed_minutes);
-
-                return (
-                  <Link
-                    key={course.id}
-                    href={`/courses/${course.id}`}
-                    className="bg-white border border-sand-border rounded-2xl p-4 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between group"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between text-[11px] text-charcoal-500 mb-1.5">
-                        <span className="font-semibold text-forest-700">{course.provider}</span>
-                        <span>{prog.formattedRemaining} left</span>
-                      </div>
-                      <h3 className="text-sm font-bold text-charcoal-900 group-hover:text-forest-700 line-clamp-1" title={course.title}>
-                        {course.title}
-                      </h3>
-                    </div>
-
-                    <div className="mt-4 pt-3 border-t border-sand-border/70 flex flex-col gap-1.5">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="font-bold text-charcoal-700">{prog.percentage}%</span>
-                        <span className="text-[11px] text-charcoal-400">~{course.daily_pace_minutes}m/day</span>
-                      </div>
-                      <div className="w-full bg-cream-200 h-2 rounded-full overflow-hidden">
-                        <div
-                          className="bg-forest-600 h-full rounded-full transition-all"
-                          style={{ width: `${prog.percentage}%` }}
-                        />
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
           ) : (
-            <div className="bg-white border border-sand-border rounded-2xl p-8 text-center text-xs text-charcoal-500">
-              No active courses yet. Click &quot;New course&quot; above to add your first course.
-            </div>
+            <>
+              <Link
+                href="/auth/login"
+                className="text-xs font-semibold text-charcoal-700 hover:text-charcoal-900 px-3 py-2 rounded-xl hover:bg-cream-200 transition-colors"
+              >
+                Sign in
+              </Link>
+              <Link
+                href="/auth/signup"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-forest-600 hover:bg-forest-700 active:bg-forest-800 text-white font-semibold text-xs shadow-sm transition-all"
+              >
+                <span>Get started free</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </>
           )}
         </div>
-      </div>
+      </header>
+
+      {/* Hero Section */}
+      <section className="relative pt-8 pb-12 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto flex flex-col items-center text-center">
+        {/* Pill Badge */}
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sand-200 border border-sand-border text-xs font-semibold text-charcoal-700 mb-5 shadow-2xs">
+          <Sparkles className="w-3.5 h-3.5 text-forest-600" />
+          <span>Stop saving 10-hour tutorials you never finish</span>
+        </div>
+
+        {/* Headline */}
+        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-charcoal-900 tracking-tight max-w-4xl leading-[1.14]">
+          Paste a long video.{' '}
+          <span className="font-serif italic text-forest-600 font-normal inline-block whitespace-normal sm:whitespace-nowrap">
+            Get a 1-hour/day course.
+          </span>
+        </h1>
+
+        {/* Subtitle */}
+        <p className="mt-4 text-sm sm:text-base md:text-lg text-charcoal-600 max-w-2xl leading-relaxed">
+          Courseit turns long 8-, 10-, and 12-hour YouTube lectures into structured daily study plans.
+          Track your daily 60-minute habit, keep your streak alive, and test your retention with interactive quizzes.
+        </p>
+
+        {/* Primary CTA Buttons */}
+        <div className="mt-7 flex flex-col sm:flex-row items-center gap-3.5 w-full max-w-md">
+          <Link
+            href="/courses/new"
+            className="w-full sm:w-auto flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-2xl bg-forest-600 hover:bg-forest-700 active:bg-forest-800 text-white font-bold text-sm shadow-md shadow-forest-800/15 transition-all hover:scale-102"
+          >
+            <Play className="w-4 h-4 fill-current" />
+            <span>Try Quick Course Builder</span>
+          </Link>
+
+          <Link
+            href="/dashboard"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 py-3 px-6 rounded-2xl bg-white hover:bg-cream-200 text-charcoal-800 border border-sand-border font-bold text-sm shadow-2xs transition-all"
+          >
+            <span>View Dashboard</span>
+            <ChevronRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        {/* Featured Course Action in First Viewport */}
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs text-charcoal-600">
+          <span>Explore right now:</span>
+          <Link
+            href="/courses/python-2026"
+            className="font-bold text-forest-700 bg-sand-200/80 hover:bg-cream-200 border border-sand-border px-3 py-1 rounded-full transition-colors inline-flex items-center gap-1"
+          >
+            <span>Python 2026 Masterclass (10 Days, 60m/day) →</span>
+          </Link>
+        </div>
+
+        {/* Quick Google Sign In Pill */}
+        <div className="mt-3 flex items-center gap-2 text-xs text-charcoal-500">
+          <span>Or sign in with demo:</span>
+          <button
+            onClick={handleGoogleCTA}
+            className="font-bold text-forest-700 hover:underline flex items-center gap-1"
+          >
+            <span>Continue with Google (Demo) →</span>
+          </button>
+        </div>
+
+        {/* Scenic Nature Illustration Banner */}
+        <div className="w-full mt-8 relative max-w-5xl">
+          <ScenicBanner height="h-48 sm:h-64 md:h-72" />
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10 pointer-events-none">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-forest-800 bg-white/90 backdrop-blur-xs px-3 py-1 rounded-full shadow-xs mb-2">
+              Habit Rule
+            </span>
+            <h3 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-charcoal-900 drop-shadow-xs">
+              One focused hour every single day beats sporadic binge learning.
+            </h3>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section id="how-it-works" className="py-12 bg-cream-50/80 border-y border-sand-border px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto flex flex-col items-center text-center">
+          <span className="text-xs font-bold uppercase tracking-wider text-forest-700 bg-forest-100 px-3 py-1 rounded-full">
+            Workflow
+          </span>
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-charcoal-900 tracking-tight mt-3">
+            How Courseit Works
+          </h2>
+          <p className="text-xs sm:text-sm text-charcoal-500 mt-2 max-w-lg">
+            From an overwhelming 10-hour tutorial to consistent daily mastery in 3 simple steps.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10 text-left w-full">
+            {/* Step 1 */}
+            <div className="bg-white border border-sand-border rounded-3xl p-6 shadow-xs flex flex-col justify-between">
+              <div>
+                <div className="w-10 h-10 rounded-2xl bg-forest-100 text-forest-700 flex items-center justify-center font-black text-sm mb-4">
+                  01
+                </div>
+                <h3 className="text-base font-bold text-charcoal-900 mb-1.5">
+                  Paste Any Long Video
+                </h3>
+                <p className="text-xs text-charcoal-600 leading-relaxed">
+                  Paste any YouTube tutorial or pick a curated masterclass. Courseit structures the material into verified daily modules with timestamps and focus sessions.
+                </p>
+              </div>
+              <div className="mt-6 pt-4 border-t border-sand-border/70 flex items-center gap-2 text-xs font-semibold text-forest-700">
+                <Video className="w-4 h-4" />
+                <span>Zero configuration needed</span>
+              </div>
+            </div>
+
+            {/* Step 2 */}
+            <div className="bg-white border border-sand-border rounded-3xl p-6 shadow-xs flex flex-col justify-between">
+              <div>
+                <div className="w-10 h-10 rounded-2xl bg-sand-200 text-charcoal-700 flex items-center justify-center font-black text-sm mb-4">
+                  02
+                </div>
+                <h3 className="text-base font-bold text-charcoal-900 mb-1.5">
+                  Get Day-by-Day Chunks
+                </h3>
+                <p className="text-xs text-charcoal-600 leading-relaxed">
+                  Instead of watching aimlessly, follow your structured plan: <span className="font-semibold text-charcoal-800">Day 1 (60m)</span>, <span className="font-semibold text-charcoal-800">Day 2 (60m)</span>, and <span className="font-semibold text-charcoal-800">Day 3 (60m)</span>.
+                </p>
+              </div>
+              <div className="mt-6 pt-4 border-t border-sand-border/70 flex items-center gap-2 text-xs font-semibold text-charcoal-700">
+                <Calendar className="w-4 h-4 text-forest-600" />
+                <span>Custom daily pace (30m, 60m, 90m)</span>
+              </div>
+            </div>
+
+            {/* Step 3 */}
+            <div className="bg-white border border-sand-border rounded-3xl p-6 shadow-xs flex flex-col justify-between">
+              <div>
+                <div className="w-10 h-10 rounded-2xl bg-terracotta-100 text-terracotta-600 flex items-center justify-center font-black text-sm mb-4">
+                  03
+                </div>
+                <h3 className="text-base font-bold text-charcoal-900 mb-1.5">
+                  Study & Retain with Quizzes
+                </h3>
+                <p className="text-xs text-charcoal-600 leading-relaxed">
+                  Learn with our interactive embedded player, track study sessions with the persistent focus timer, pin timestamped notes, and test retention with quizzes.
+                </p>
+              </div>
+              <div className="mt-6 pt-4 border-t border-sand-border/70 flex items-center gap-2 text-xs font-semibold text-terracotta-700">
+                <Flame className="w-4 h-4 fill-terracotta-500" />
+                <span>Build uninterrupted streaks</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Grid Section */}
+      <section id="features" className="py-14 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+        <div className="text-center max-w-2xl mx-auto mb-10">
+          <span className="text-xs font-bold uppercase tracking-wider text-forest-700 bg-forest-100 px-3 py-1 rounded-full">
+            Full Toolset
+          </span>
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-charcoal-900 tracking-tight mt-3">
+            Designed for Real Learning
+          </h2>
+          <p className="text-xs sm:text-sm text-charcoal-500 mt-2">
+            Everything you need to finish technical courses without distraction.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Feature 1 */}
+          <div className="bg-white border border-sand-border rounded-3xl p-6 shadow-2xs hover:shadow-xs transition-shadow">
+            <div className="w-10 h-10 rounded-2xl bg-forest-50 text-forest-700 flex items-center justify-center mb-4">
+              <Clock className="w-5 h-5" />
+            </div>
+            <h3 className="text-base font-bold text-charcoal-900 mb-2">Persistent Study Timer</h3>
+            <p className="text-xs text-charcoal-600 leading-relaxed">
+              Floating study stopwatch stays running even when switching pages or refreshing. Never lose a second of focus.
+            </p>
+          </div>
+
+          {/* Feature 2 */}
+          <div className="bg-white border border-sand-border rounded-3xl p-6 shadow-2xs hover:shadow-xs transition-shadow">
+            <div className="w-10 h-10 rounded-2xl bg-terracotta-50 text-terracotta-600 flex items-center justify-center mb-4">
+              <Flame className="w-5 h-5 fill-current" />
+            </div>
+            <h3 className="text-base font-bold text-charcoal-900 mb-2">Daily Streak Engine</h3>
+            <p className="text-xs text-charcoal-600 leading-relaxed">
+              Calculates current and best learning streak based on verified 60-minute completed study days.
+            </p>
+          </div>
+
+          {/* Feature 3 */}
+          <div className="bg-white border border-sand-border rounded-3xl p-6 shadow-2xs hover:shadow-xs transition-shadow">
+            <div className="w-10 h-10 rounded-2xl bg-forest-50 text-forest-700 flex items-center justify-center mb-4">
+              <HelpCircle className="w-5 h-5" />
+            </div>
+            <h3 className="text-base font-bold text-charcoal-900 mb-2">Active Recall Quizzes</h3>
+            <p className="text-xs text-charcoal-600 leading-relaxed">
+              Instant multiple-choice quizzes after lessons with instant answer explanations to solidify mental models.
+            </p>
+          </div>
+
+          {/* Feature 4 */}
+          <div className="bg-white border border-sand-border rounded-3xl p-6 shadow-2xs hover:shadow-xs transition-shadow">
+            <div className="w-10 h-10 rounded-2xl bg-sand-200 text-charcoal-700 flex items-center justify-center mb-4">
+              <FileText className="w-5 h-5" />
+            </div>
+            <h3 className="text-base font-bold text-charcoal-900 mb-2">Timestamped Notes</h3>
+            <p className="text-xs text-charcoal-600 leading-relaxed">
+              Pin takeaways, code snippets, and reflections directly to exact moments in video lectures.
+            </p>
+          </div>
+
+          {/* Feature 5 */}
+          <div className="bg-white border border-sand-border rounded-3xl p-6 shadow-2xs hover:shadow-xs transition-shadow">
+            <div className="w-10 h-10 rounded-2xl bg-forest-50 text-forest-700 flex items-center justify-center mb-4">
+              <Layers className="w-5 h-5" />
+            </div>
+            <h3 className="text-base font-bold text-charcoal-900 mb-2">Concept Flashcards</h3>
+            <p className="text-xs text-charcoal-600 leading-relaxed">
+              Interactive 3D flippable card decks for core engineering and programming vocabulary.
+            </p>
+          </div>
+
+          {/* Feature 6 */}
+          <div className="bg-white border border-sand-border rounded-3xl p-6 shadow-2xs hover:shadow-xs transition-shadow">
+            <div className="w-10 h-10 rounded-2xl bg-sand-200 text-charcoal-700 flex items-center justify-center mb-4">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <h3 className="text-base font-bold text-charcoal-900 mb-2">Offline Ready + Local First</h3>
+            <p className="text-xs text-charcoal-600 leading-relaxed">
+              Local-first storage works immediately offline with zero setup, with exportable JSON backups.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Popular Presets Section */}
+      <section id="masterclasses" className="py-12 bg-cream-50 border-t border-sand-border px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto flex flex-col items-center">
+          <span className="text-xs font-bold uppercase tracking-wider text-forest-700 bg-forest-100 px-3 py-1 rounded-full">
+            Featured Masterclasses
+          </span>
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-charcoal-900 tracking-tight mt-3 text-center">
+            Already partitioned & ready to study
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10 w-full">
+            {/* Course 1 */}
+            <div className="bg-white border border-sand-border rounded-3xl p-5 shadow-xs flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between text-xs font-bold text-forest-700 mb-2">
+                  <span>freeCodeCamp</span>
+                  <span className="bg-forest-100 px-2 py-0.5 rounded">10 Hours Total</span>
+                </div>
+                <h3 className="text-base font-bold text-charcoal-900">
+                  Learn Python – Interactive Course 2026
+                </h3>
+                <p className="text-xs text-charcoal-500 mt-1 line-clamp-2">
+                  Variables, control flow, functions, OOP, and mini projects partitioned into 10 daily 60m blocks.
+                </p>
+              </div>
+              <div className="mt-5 pt-3 border-t border-sand-border flex items-center justify-between">
+                <span className="text-xs text-charcoal-500">18 lessons</span>
+                <Link
+                  href="/courses/python-2026"
+                  className="px-3.5 py-1.5 rounded-xl bg-forest-600 hover:bg-forest-700 text-white font-bold text-xs"
+                >
+                  Start Course →
+                </Link>
+              </div>
+            </div>
+
+            {/* Course 2 */}
+            <div className="bg-white border border-sand-border rounded-3xl p-5 shadow-xs flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between text-xs font-bold text-forest-700 mb-2">
+                  <span>freeCodeCamp</span>
+                  <span className="bg-forest-100 px-2 py-0.5 rounded">8 Hours Total</span>
+                </div>
+                <h3 className="text-base font-bold text-charcoal-900">
+                  System Design for Beginners
+                </h3>
+                <p className="text-xs text-charcoal-500 mt-1 line-clamp-2">
+                  Horizontal scaling, caching, sharding, message queues, and microservices split into 8 days.
+                </p>
+              </div>
+              <div className="mt-5 pt-3 border-t border-sand-border flex items-center justify-between">
+                <span className="text-xs text-charcoal-500">14 lessons</span>
+                <Link
+                  href="/courses/new"
+                  className="px-3.5 py-1.5 rounded-xl bg-forest-600 hover:bg-forest-700 text-white font-bold text-xs"
+                >
+                  Start Course →
+                </Link>
+              </div>
+            </div>
+
+            {/* Course 3 */}
+            <div className="bg-white border border-sand-border rounded-3xl p-5 shadow-xs flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between text-xs font-bold text-forest-700 mb-2">
+                  <span>MIT OpenCourseWare</span>
+                  <span className="bg-forest-100 px-2 py-0.5 rounded">12 Hours Total</span>
+                </div>
+                <h3 className="text-base font-bold text-charcoal-900">
+                  Introduction to Computer Science
+                </h3>
+                <p className="text-xs text-charcoal-500 mt-1 line-clamp-2">
+                  Computational thinking, algorithms, data structures, and algorithmic complexity.
+                </p>
+              </div>
+              <div className="mt-5 pt-3 border-t border-sand-border flex items-center justify-between">
+                <span className="text-xs text-charcoal-500">22 lessons</span>
+                <Link
+                  href="/courses/new"
+                  className="px-3.5 py-1.5 rounded-xl bg-forest-600 hover:bg-forest-700 text-white font-bold text-xs"
+                >
+                  Start Course →
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Bottom CTA Banner */}
+      <section className="py-14 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-center">
+        <div className="bg-sand-100 border border-sand-border rounded-3xl p-8 sm:p-12 shadow-sm flex flex-col items-center">
+          <div className="w-12 h-12 rounded-2xl bg-forest-600 text-white flex items-center justify-center mb-4 shadow-sm">
+            <GraduationCap className="w-7 h-7" />
+          </div>
+          <h2 className="text-2xl sm:text-4xl font-black text-charcoal-900 tracking-tight">
+            Ready to conquer long courses?
+          </h2>
+          <p className="text-xs sm:text-sm text-charcoal-600 mt-2 max-w-md">
+            Join self-directed learners who study for 1 focused hour a day and actually complete their courses.
+          </p>
+
+          <div className="mt-7 flex flex-col sm:flex-row items-center gap-3 w-full max-w-sm">
+            <Link
+              href="/auth/signup"
+              className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-2xl bg-forest-600 hover:bg-forest-700 text-white font-bold text-sm shadow-sm"
+            >
+              <span>Create Free Account</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          <div className="mt-4">
+            <button
+              onClick={handleGoogleCTA}
+              className="text-xs font-semibold text-charcoal-600 hover:text-charcoal-900 underline"
+            >
+              Or sign in with Google in one click
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-sand-border bg-cream-50 py-8 px-4 sm:px-8 text-xs text-charcoal-500 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded-lg bg-forest-600 text-white flex items-center justify-center">
+            <GraduationCap className="w-3.5 h-3.5" />
+          </div>
+          <span className="font-bold text-charcoal-800">Courseit</span>
+          <span>— One focused hour a day.</span>
+        </div>
+
+        <div className="flex items-center gap-4 text-xs font-medium">
+          <Link href="/auth/login" className="hover:text-charcoal-900">Sign in</Link>
+          <Link href="/auth/signup" className="hover:text-charcoal-900">Sign up</Link>
+          <Link href="/dashboard" className="hover:text-charcoal-900">Dashboard</Link>
+        </div>
+      </footer>
     </div>
   );
 }
