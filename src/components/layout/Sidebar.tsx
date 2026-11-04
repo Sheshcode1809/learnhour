@@ -12,13 +12,16 @@ import {
   Settings,
   Flame,
   CheckCircle2,
-  ExternalLink,
+  Globe,
+  LogOut,
 } from 'lucide-react';
 import { useLearning } from '@/context/LearningContext';
+import { useAuth } from '@/context/AuthContext';
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { courses, preferences, stats } = useLearning();
+  const { courses, stats } = useLearning();
+  const { user, logout } = useAuth();
 
   const navItems = [
     { label: 'Today', href: '/', icon: Calendar },
@@ -28,6 +31,8 @@ export function Sidebar() {
   ];
 
   const recentCourses = courses.slice(0, 4);
+  const displayName = user?.name || 'Learner';
+  const displayEmail = user?.email || 'learner@courseit.dev';
 
   return (
     <aside className="hidden lg:flex w-64 flex-col justify-between border-r border-sand-border bg-cream-50 h-screen sticky top-0 px-4 py-5 select-none overflow-y-auto">
@@ -135,29 +140,51 @@ export function Sidebar() {
             </div>
           </div>
         )}
+
+        {/* Link to public Landing Page */}
+        <div className="pt-2 border-t border-sand-border/60">
+          <Link
+            href="/landing"
+            className="flex items-center gap-2.5 px-3 py-1.5 text-xs text-charcoal-500 hover:text-charcoal-800 hover:bg-cream-200/50 rounded-lg transition-colors"
+          >
+            <Globe className="w-3.5 h-3.5 text-forest-600" />
+            <span>Landing Page</span>
+          </Link>
+        </div>
       </div>
 
       {/* User Profile Footer */}
       <div className="pt-4 border-t border-sand-border flex items-center justify-between px-2">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-full bg-forest-700 text-white font-semibold text-xs flex items-center justify-center">
-            {preferences.name
-              .split(' ')
-              .map((n) => n[0])
-              .join('')
-              .slice(0, 2)
-              .toUpperCase()}
-          </div>
-          <div className="flex flex-col">
-            <span className="text-xs font-semibold text-charcoal-800">{preferences.name}</span>
-            <span className="text-[10px] text-charcoal-500 font-medium">{preferences.tier}</span>
+        <div className="flex items-center gap-2.5 min-w-0">
+          {user?.avatar_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={user.avatar_url}
+              alt={displayName}
+              className="w-8 h-8 rounded-full object-cover shrink-0 border border-sand-border"
+            />
+          ) : (
+            <div className="w-8 h-8 rounded-full bg-forest-700 text-white font-semibold text-xs flex items-center justify-center shrink-0">
+              {displayName
+                .split(' ')
+                .map((n) => n[0])
+                .join('')
+                .slice(0, 2)
+                .toUpperCase()}
+            </div>
+          )}
+          <div className="flex flex-col min-w-0">
+            <span className="text-xs font-semibold text-charcoal-800 truncate">{displayName}</span>
+            <span className="text-[10px] text-charcoal-500 font-medium truncate">{displayEmail}</span>
           </div>
         </div>
-        <Link href="/settings" title="Settings" className="text-charcoal-400 hover:text-charcoal-700 p-1">
-          <Settings className="w-4 h-4" />
-        </Link>
+
+        <div className="flex items-center gap-1">
+          <Link href="/auth/login" title="Switch account / Sign in" className="text-charcoal-400 hover:text-charcoal-700 p-1">
+            <LogOut className="w-3.5 h-3.5" />
+          </Link>
+        </div>
       </div>
     </aside>
   );
 }
-

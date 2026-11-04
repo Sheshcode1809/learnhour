@@ -13,13 +13,17 @@ import {
   Settings,
   Plus,
   Flame,
+  Globe,
+  LogOut,
 } from 'lucide-react';
 import { useLearning } from '@/context/LearningContext';
+import { useAuth } from '@/context/AuthContext';
 
 export function MobileHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
-  const { courses, preferences, stats } = useLearning();
+  const { courses, stats } = useLearning();
+  const { user } = useAuth();
 
   const navItems = [
     { label: 'Today', href: '/', icon: Calendar },
@@ -92,15 +96,30 @@ export function MobileHeader() {
                 </Link>
               );
             })}
+
+            <Link
+              href="/landing"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-charcoal-600 hover:bg-cream-100"
+            >
+              <Globe className="w-4 h-4 text-forest-600" />
+              <span>Public Landing Page</span>
+            </Link>
           </nav>
 
-          <div className="pt-2 border-t border-sand-border text-xs text-charcoal-500 flex justify-between px-1">
-            <span>Signed in as {preferences.name}</span>
-            <span>{preferences.tier}</span>
+          <div className="pt-2 border-t border-sand-border text-xs text-charcoal-500 flex items-center justify-between px-1">
+            <span className="font-semibold text-charcoal-800">{user?.name || 'Learner'}</span>
+            <Link
+              href="/auth/login"
+              onClick={() => setIsOpen(false)}
+              className="text-forest-700 hover:underline flex items-center gap-1 font-semibold"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Sign in</span>
+            </Link>
           </div>
         </div>
       )}
     </header>
   );
 }
-

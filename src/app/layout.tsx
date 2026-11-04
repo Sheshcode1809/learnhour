@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { AuthProvider } from '@/context/AuthContext';
 import { LearningProvider } from '@/context/LearningContext';
 import { AppShell } from '@/components/layout/AppShell';
 
@@ -16,11 +17,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased selection:bg-forest-100 selection:text-forest-800">
-        <LearningProvider>
-          <AppShell>{children}</AppShell>
-        </LearningProvider>
+        <AuthProvider>
+          <LearningProvider>
+            <AppShell>{children}</AppShell>
+          </LearningProvider>
+        </AuthProvider>
       </body>
     </html>
   );
 }
-
