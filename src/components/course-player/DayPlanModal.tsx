@@ -166,3 +166,4 @@ export function DayPlanModal({ course, onClose, onStartLearning }: DayPlanModalP
     </div>
   );
 }
+

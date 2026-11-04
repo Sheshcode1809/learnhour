@@ -96,3 +96,4 @@ export interface DayPlanGroup {
   lessons: CourseLesson[];
   is_completed: boolean;
 }
+

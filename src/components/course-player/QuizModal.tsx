@@ -243,3 +243,4 @@ export function QuizModal({ quizzes = [], courseTitle, onClose }: QuizModalProps
     </div>
   );
 }
+

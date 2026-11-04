@@ -78,3 +78,4 @@ export function ScenicBanner({ height = 'h-48 md:h-64' }: { height?: string }) {
     </div>
   );
 }
+

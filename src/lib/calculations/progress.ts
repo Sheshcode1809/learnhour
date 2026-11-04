@@ -44,3 +44,4 @@ export function calculateCourseProgress(totalMinutes: number, completedMinutes: 
     isCompleted: percentage >= 100,
   };
 }
+

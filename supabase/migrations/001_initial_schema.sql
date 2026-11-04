@@ -141,3 +141,4 @@ create policy "Users can delete their own sessions"
 -- active_timer_state policies
 create policy "Users can access their own timer state"
   on public.active_timer_state for all using (auth.uid() = user_id);
+

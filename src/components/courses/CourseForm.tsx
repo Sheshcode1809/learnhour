@@ -273,3 +273,4 @@ export function CourseForm({ initialData, onSuccess, onCancel }: CourseFormProps
     </form>
   );
 }
+

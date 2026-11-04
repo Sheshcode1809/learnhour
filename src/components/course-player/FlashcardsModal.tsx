@@ -129,3 +129,4 @@ export function FlashcardsModal({ flashcards = [], courseTitle, onClose }: Flash
     </div>
   );
 }
+

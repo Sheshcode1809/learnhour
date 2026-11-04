@@ -27,7 +27,7 @@ export const PRESET_COURSES = [
         day_number: 1,
         order_index: 1,
         video_start_seconds: 0,
-        is_completed: true,
+        is_completed: false,
       },
       {
         id: 'py-l2',
@@ -36,7 +36,7 @@ export const PRESET_COURSES = [
         day_number: 1,
         order_index: 2,
         video_start_seconds: 900,
-        is_completed: true,
+        is_completed: false,
       },
       {
         id: 'py-l3',
@@ -361,3 +361,4 @@ export function parseYouTubeUrlOrPreset(url: string): ParsedVideoInfo {
     isPreset: !!matchedPreset,
   };
 }
+

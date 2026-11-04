@@ -184,3 +184,4 @@ export function CourseCard({ course, onEdit, onDelete }: CourseCardProps) {
     </div>
   );
 }
+

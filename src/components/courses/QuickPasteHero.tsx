@@ -203,3 +203,4 @@ export function QuickPasteHero({ onToggleManual }: { onToggleManual?: () => void
     </div>
   );
 }
+

@@ -160,3 +160,4 @@ export function NotesModal({ courseId, notes = [], currentPlaybackSeconds = 0, o
     </div>
   );
 }
+
