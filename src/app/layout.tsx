@@ -1,8 +1,21 @@
 import type { Metadata } from 'next';
+import { Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/context/AuthContext';
 import { LearningProvider } from '@/context/LearningContext';
 import { AppShell } from '@/components/layout/AppShell';
+
+const sansFont = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+});
+
+const monoFont = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://courseit.vercel.app'),
@@ -47,8 +60,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="antialiased selection:bg-forest-100 selection:text-forest-800">
+    <html lang="en" className={`${sansFont.variable} ${monoFont.variable}`}>
+      <body className="antialiased selection:bg-forest-100 selection:text-forest-800 font-sans">
         <AuthProvider>
           <LearningProvider>
             <AppShell>{children}</AppShell>

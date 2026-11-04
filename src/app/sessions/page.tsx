@@ -19,6 +19,9 @@ import {
   X,
   AlertCircle,
   Calendar,
+  BookOpen,
+  Sparkles,
+  Filter,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -112,7 +115,6 @@ export default function SessionsPage() {
       notes: manualNotes.trim() || undefined,
     });
 
-    // Confetti based on configured daily goal (Requirement 6)
     const dailyTarget = preferences.daily_goal_minutes || 60;
     if (stats.todayMinutes + minutes >= dailyTarget) {
       try {
@@ -178,89 +180,111 @@ export default function SessionsPage() {
 
   return (
     <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 flex flex-col gap-6 min-w-0">
-      {/* Header */}
+      {/* Page Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-sand-border">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-charcoal-900 tracking-tight">
-            Learning Sessions
-          </h1>
-          <p className="text-xs sm:text-sm text-charcoal-500 mt-1">
-            Focus with the study timer or log offline learning sessions to keep your streak alive. Timezone: <span className="font-semibold text-charcoal-700">{preferences.timezone}</span>.
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-charcoal-900 tracking-tight">
+              Focus & Study Sessions
+            </h1>
+            <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-cream-200/80 text-charcoal-700 border border-sand-border">
+              <Clock className="w-3 h-3 text-forest-700" />
+              {preferences.timezone}
+            </span>
+          </div>
+          <p className="text-xs sm:text-sm text-charcoal-600 mt-1 max-w-2xl leading-relaxed">
+            Eliminate distractions with our focus timer, or log your offline study sessions to maintain your daily streak and progress toward your goals.
           </p>
         </div>
 
         <button
           onClick={handleOpenManualModal}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-forest-600 hover:bg-forest-700 text-white font-semibold text-xs sm:text-sm shadow-sm transition-all"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-forest-600 hover:bg-forest-700 active:scale-98 text-white font-semibold text-xs sm:text-sm shadow-sm hover:shadow transition-all duration-200"
         >
           <Plus className="w-4 h-4 stroke-[2.5]" />
-          <span>Log manual session</span>
+          <span>Log Manual Session</span>
         </button>
       </div>
 
-      {/* Main Focus Timer Card */}
-      <div className="bg-white border border-sand-border rounded-3xl p-6 sm:p-8 shadow-xs flex flex-col items-center text-center max-w-xl mx-auto w-full min-w-0">
-        <div className="flex items-center gap-2 mb-2">
-          <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
-            activeTimer.is_running ? 'bg-forest-100 text-forest-700 animate-pulse' : 'bg-cream-200 text-charcoal-600'
-          }`}>
-            <Timer className="w-4 h-4" />
-          </div>
-          <span className="text-xs font-bold uppercase tracking-wider text-charcoal-600">
-            {activeTimer.is_running ? 'Timer Running' : elapsedSeconds > 0 ? 'Timer Paused' : 'Study Timer'}
+      {/* Main Focus Timer Experience Card */}
+      <div className="bg-white border border-sand-border rounded-3xl p-6 sm:p-10 shadow-xs relative overflow-hidden flex flex-col items-center text-center max-w-2xl mx-auto w-full min-w-0">
+        {/* Subtle Ambient Background Ring */}
+        <div className="absolute -top-24 -right-24 w-64 h-64 rounded-full bg-forest-50/50 blur-2xl pointer-events-none" />
+        <div className="absolute -bottom-24 -left-24 w-64 h-64 rounded-full bg-terracotta-50/40 blur-2xl pointer-events-none" />
+
+        {/* Status Pill Indicator */}
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cream-100 border border-sand-border/80 mb-4 transition-all">
+          <span
+            className={`w-2 h-2 rounded-full ${
+              activeTimer.is_running
+                ? 'bg-emerald-600 animate-ping'
+                : elapsedSeconds > 0
+                ? 'bg-amber-500'
+                : 'bg-charcoal-400'
+            }`}
+          />
+          <span className="text-[11px] font-bold uppercase tracking-wider text-charcoal-700 font-mono">
+            {activeTimer.is_running
+              ? 'Focus Session Active'
+              : elapsedSeconds > 0
+              ? 'Session Paused'
+              : 'Ready To Focus'}
           </span>
         </div>
 
-        {/* Big Stopwatch Display */}
-        <div className="font-mono text-5xl sm:text-6xl font-black text-charcoal-900 tracking-tight my-4">
+        {/* Large Monospace Stopwatch Display */}
+        <div className="font-mono text-5xl sm:text-7xl font-black text-charcoal-900 tracking-tight tabular-nums my-2 selection:bg-forest-100">
           {formatSeconds(elapsedSeconds)}
         </div>
 
-        {/* Course Assignment for Timer */}
-        <div className="w-full max-w-xs mb-6">
-          <label className="block text-[11px] font-semibold text-charcoal-500 uppercase tracking-wider mb-1.5">
-            Link session to course:
+        {/* Course Assignment Dropdown */}
+        <div className="w-full max-w-sm mb-6 mt-2 text-left">
+          <label className="block text-[11px] font-bold text-charcoal-500 uppercase tracking-wider mb-1.5">
+            Link Focus Session to:
           </label>
-          <select
-            value={selectedCourseForTimer}
-            onChange={(e) => setSelectedCourseForTimer(e.target.value)}
-            disabled={activeTimer.is_running}
-            className="w-full text-xs font-semibold bg-cream-50 border border-sand-border rounded-xl px-3 py-2 text-charcoal-800 focus:outline-none focus:ring-2 focus:ring-forest-600"
-          >
-            <option value="">General Study (No specific course)</option>
-            {courses.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.title}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              value={selectedCourseForTimer}
+              onChange={(e) => setSelectedCourseForTimer(e.target.value)}
+              disabled={activeTimer.is_running}
+              aria-label="Link session to course"
+              className="w-full text-xs font-semibold bg-cream-50/80 hover:bg-cream-100/60 border border-sand-border rounded-xl px-3.5 py-2.5 text-charcoal-800 transition-colors focus:outline-none focus:ring-2 focus:ring-forest-600/30 disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+              <option value="">General Study (No Course Linked)</option>
+              {courses.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.title}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        {/* Timer Control Buttons */}
+        {/* Tactile Timer Controls */}
         <div className="flex flex-wrap items-center justify-center gap-3 w-full">
           {activeTimer.is_running ? (
             <button
               onClick={pauseTimer}
-              className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-charcoal-800 hover:bg-charcoal-900 text-white font-bold text-sm shadow-sm transition-all"
+              className="inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-charcoal-800 hover:bg-charcoal-900 active:scale-98 text-white font-bold text-sm shadow-sm transition-all duration-200"
             >
               <Pause className="w-4 h-4" />
-              <span>Pause</span>
+              <span>Pause Focus</span>
             </button>
           ) : elapsedSeconds > 0 ? (
             <button
               onClick={resumeTimer}
-              className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-forest-600 hover:bg-forest-700 text-white font-bold text-sm shadow-sm transition-all"
+              className="inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-forest-600 hover:bg-forest-700 active:scale-98 text-white font-bold text-sm shadow-sm transition-all duration-200"
             >
               <Play className="w-4 h-4 fill-current" />
-              <span>Resume</span>
+              <span>Resume Study</span>
             </button>
           ) : (
             <button
               onClick={handleStartTimer}
-              className="flex items-center gap-2 px-8 py-3 rounded-2xl bg-forest-600 hover:bg-forest-700 text-white font-bold text-sm shadow-md shadow-forest-700/20 transition-all hover:scale-102"
+              className="inline-flex items-center gap-2.5 px-8 py-3.5 rounded-xl bg-forest-600 hover:bg-forest-700 active:scale-98 text-white font-bold text-sm shadow-md shadow-forest-700/20 hover:shadow-lg hover:shadow-forest-700/25 transition-all duration-200 hover:-translate-y-0.5"
             >
               <Play className="w-4 h-4 fill-current" />
-              <span>Start Timer</span>
+              <span>Start Study Session</span>
             </button>
           )}
 
@@ -268,16 +292,16 @@ export default function SessionsPage() {
             <>
               <button
                 onClick={() => finishTimer()}
-                className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm shadow-sm transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-terracotta-500 hover:bg-terracotta-600 active:scale-98 text-white font-bold text-sm shadow-sm transition-all duration-200"
               >
                 <Square className="w-4 h-4 fill-current" />
-                <span>Finish & Save</span>
+                <span>Finish & Record</span>
               </button>
 
               <button
                 onClick={resetTimer}
-                title="Reset Timer"
-                className="p-3 rounded-2xl border border-sand-border bg-cream-100 hover:bg-cream-200 text-charcoal-600 transition-colors"
+                title="Reset timer without saving"
+                className="p-3 rounded-xl border border-sand-border bg-cream-100/70 hover:bg-cream-200/70 text-charcoal-600 transition-colors active:scale-95"
               >
                 <RotateCcw className="w-4 h-4" />
               </button>
@@ -286,111 +310,178 @@ export default function SessionsPage() {
         </div>
       </div>
 
-      {/* Sessions History Table */}
-      <div className="bg-white border border-sand-border rounded-2xl p-6 shadow-xs flex flex-col gap-4">
+      {/* Sessions History Section */}
+      <div className="bg-white border border-sand-border rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col gap-4">
+        {/* History Header & Course Filter */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-sand-border">
-          <div className="flex items-center gap-2">
-            <h2 className="text-base font-bold text-charcoal-900">Session History</h2>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-cream-200 text-charcoal-700">
+          <div className="flex items-center gap-2.5">
+            <h2 className="text-base sm:text-lg font-bold text-charcoal-900 tracking-tight">
+              Study History
+            </h2>
+            <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-cream-200 text-charcoal-700 font-mono">
               {filteredSessions.length} sessions • {formatDuration(Math.floor(totalSessionSeconds / 60))}
             </span>
           </div>
 
-          {/* Filter dropdown */}
-          <select
-            value={filterCourseId}
-            onChange={(e) => setFilterCourseId(e.target.value)}
-            className="text-xs font-medium bg-cream-50 border border-sand-border rounded-xl px-3 py-1.5 text-charcoal-800 focus:outline-none"
-          >
-            <option value="all">All Courses</option>
-            {courses.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.title}
-              </option>
-            ))}
-          </select>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <Filter className="w-3.5 h-3.5 text-charcoal-400 hidden sm:inline-block" />
+            <select
+              value={filterCourseId}
+              onChange={(e) => setFilterCourseId(e.target.value)}
+              aria-label="Filter sessions by course"
+              className="w-full sm:w-auto text-xs font-semibold bg-cream-50 border border-sand-border rounded-xl px-3 py-1.5 text-charcoal-800 focus:outline-none focus:ring-2 focus:ring-forest-600/30"
+            >
+              <option value="all">All Courses</option>
+              {courses.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.title}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {filteredSessions.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs">
-              <thead>
-                <tr className="border-b border-sand-border text-charcoal-400 uppercase tracking-wider text-[10px]">
-                  <th className="py-2.5 px-3">Date & Time ({preferences.timezone})</th>
-                  <th className="py-2.5 px-3">Course</th>
-                  <th className="py-2.5 px-3">Duration</th>
-                  <th className="py-2.5 px-3">Notes</th>
-                  <th className="py-2.5 px-3 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-sand-border/60">
-                {filteredSessions.map((session) => (
-                  <tr key={session.id} className="hover:bg-cream-50/80 transition-colors">
-                    <td className="py-3 px-3 text-charcoal-600 font-mono whitespace-nowrap">
-                      {formatDateTimeInTimezone(session.started_at, preferences.timezone)}
-                    </td>
-                    <td className="py-3 px-3 font-semibold text-charcoal-900">
-                      {session.course_title || 'General Study'}
-                    </td>
-                    <td className="py-3 px-3 font-bold text-forest-800 whitespace-nowrap">
-                      {formatDuration(Math.floor(session.duration_seconds / 60))}
-                    </td>
-                    <td className="py-3 px-3 text-charcoal-600 max-w-xs truncate">
-                      {session.notes || '—'}
-                    </td>
-                    <td className="py-3 px-3 text-right whitespace-nowrap">
-                      <div className="flex items-center justify-end gap-1">
-                        <button
-                          onClick={() => handleOpenEdit(session)}
-                          title="Edit session"
-                          className="p-1.5 rounded text-charcoal-500 hover:text-forest-700 hover:bg-forest-50 transition-colors"
-                        >
-                          <Edit2 className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => deleteSession(session.id)}
-                          title="Delete session"
-                          className="p-1.5 rounded text-charcoal-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </td>
+          <>
+            {/* Desktop Table View */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="border-b border-sand-border text-charcoal-400 uppercase tracking-wider text-[10px] font-bold">
+                    <th className="py-3 px-4">Date & Time ({preferences.timezone})</th>
+                    <th className="py-3 px-4">Course</th>
+                    <th className="py-3 px-4">Duration</th>
+                    <th className="py-3 px-4">Notes</th>
+                    <th className="py-3 px-4 text-right">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-sand-border/60">
+                  {filteredSessions.map((session) => (
+                    <tr key={session.id} className="hover:bg-cream-50/70 transition-colors">
+                      <td className="py-3.5 px-4 text-charcoal-600 font-mono text-[11px] whitespace-nowrap">
+                        {formatDateTimeInTimezone(session.started_at, preferences.timezone)}
+                      </td>
+                      <td className="py-3.5 px-4 font-semibold text-charcoal-900">
+                        {session.course_title ? (
+                          <span className="inline-flex items-center gap-1.5">
+                            <BookOpen className="w-3.5 h-3.5 text-forest-700 shrink-0" />
+                            <span>{session.course_title}</span>
+                          </span>
+                        ) : (
+                          <span className="text-charcoal-500 font-medium">General Study</span>
+                        )}
+                      </td>
+                      <td className="py-3.5 px-4 font-bold text-forest-800 whitespace-nowrap font-mono">
+                        {formatDuration(Math.floor(session.duration_seconds / 60))}
+                      </td>
+                      <td className="py-3.5 px-4 text-charcoal-600 max-w-xs truncate text-[11px]">
+                        {session.notes || <span className="text-charcoal-300">—</span>}
+                      </td>
+                      <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => handleOpenEdit(session)}
+                            title="Edit session"
+                            aria-label="Edit session"
+                            className="p-1.5 rounded-lg text-charcoal-500 hover:text-forest-700 hover:bg-forest-50 transition-colors"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => deleteSession(session.id)}
+                            title="Delete session"
+                            aria-label="Delete session"
+                            className="p-1.5 rounded-lg text-charcoal-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card Stack (< sm) to prevent table horizontal scrolling */}
+            <div className="flex sm:hidden flex-col gap-2.5">
+              {filteredSessions.map((session) => (
+                <div
+                  key={session.id}
+                  className="p-3.5 rounded-xl border border-sand-border bg-cream-50/50 flex flex-col gap-2"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="font-semibold text-xs text-charcoal-900 line-clamp-1">
+                      {session.course_title || 'General Study'}
+                    </span>
+                    <span className="font-bold text-xs font-mono text-forest-800 bg-forest-50 px-2 py-0.5 rounded-md shrink-0">
+                      {formatDuration(Math.floor(session.duration_seconds / 60))}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-[11px] text-charcoal-500 pt-1 border-t border-sand-border/50">
+                    <span className="font-mono">
+                      {formatDateTimeInTimezone(session.started_at, preferences.timezone)}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleOpenEdit(session)}
+                        title="Edit session"
+                        aria-label="Edit session"
+                        className="p-1.5 rounded text-charcoal-500 hover:text-forest-700 hover:bg-forest-50"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => deleteSession(session.id)}
+                        title="Delete session"
+                        aria-label="Delete session"
+                        className="p-1.5 rounded text-charcoal-400 hover:text-rose-600 hover:bg-rose-50"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {session.notes && (
+                    <p className="text-[11px] text-charcoal-600 italic bg-white p-2 rounded-lg border border-sand-border/40">
+                      &quot;{session.notes}&quot;
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
           <div className="text-center py-12 px-4 flex flex-col items-center justify-center max-w-sm mx-auto">
             <div className="w-12 h-12 rounded-2xl bg-cream-200 text-charcoal-500 flex items-center justify-center mb-3">
               <Clock className="w-6 h-6 text-forest-600" />
             </div>
-            <h4 className="text-sm font-bold text-charcoal-900 mb-1">No study sessions logged yet</h4>
-            <p className="text-xs text-charcoal-500 leading-relaxed mb-4">
-              Focus time completed with the stopwatch above or added manually will appear in this history table.
+            <h4 className="text-sm font-bold text-charcoal-900 mb-1">No study sessions recorded</h4>
+            <p className="text-xs text-charcoal-500 leading-relaxed mb-5">
+              Timer sessions and manual offline study entries will automatically appear here with exact timestamp logs.
             </p>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center justify-center gap-2.5">
               <button
                 type="button"
                 onClick={handleOpenManualModal}
                 className="px-4 py-2 rounded-xl bg-forest-600 hover:bg-forest-700 text-white font-bold text-xs shadow-xs transition-all"
               >
-                Log manual session
+                Log manual study
               </button>
               <button
                 type="button"
                 onClick={() => startTimer(selectedCourseForTimer || undefined)}
                 className="px-4 py-2 rounded-xl bg-white hover:bg-cream-100 border border-sand-border text-charcoal-800 font-bold text-xs shadow-2xs transition-all"
               >
-                Start study timer
+                Start stopwatch
               </button>
             </div>
           </div>
         )}
       </div>
 
-      {/* Log Manual Session Modal (supports date backdating) */}
+      {/* Log Manual Session Modal */}
       {showManualModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white border border-sand-border rounded-3xl max-w-md w-full p-6 shadow-2xl animate-in zoom-in-95">
@@ -419,7 +510,7 @@ export default function SessionsPage() {
                   required
                   value={manualDateTime}
                   onChange={(e) => setManualDateTime(e.target.value)}
-                  className="w-full text-xs bg-cream-50 border border-sand-border rounded-xl px-3 py-2 text-charcoal-800 font-mono focus:outline-none focus:ring-2 focus:ring-forest-600"
+                  className="w-full text-xs bg-cream-50 border border-sand-border rounded-xl px-3 py-2 text-charcoal-800 font-mono focus:outline-none focus:ring-2 focus:ring-forest-600/30"
                 />
               </div>
 
@@ -430,7 +521,7 @@ export default function SessionsPage() {
                 <select
                   value={manualCourseId}
                   onChange={(e) => setManualCourseId(e.target.value)}
-                  className="w-full text-xs bg-cream-50 border border-sand-border rounded-xl px-3 py-2 text-charcoal-800 focus:outline-none focus:ring-2 focus:ring-forest-600 font-medium"
+                  className="w-full text-xs bg-cream-50 border border-sand-border rounded-xl px-3 py-2 text-charcoal-800 focus:outline-none focus:ring-2 focus:ring-forest-600/30 font-medium"
                 >
                   <option value="">General Self-Study</option>
                   {courses.map((c) => (
@@ -452,7 +543,7 @@ export default function SessionsPage() {
                   value={manualMinutes}
                   onChange={(e) => setManualMinutes(e.target.value)}
                   placeholder="e.g. 60"
-                  className="w-full text-xs bg-cream-50 border border-sand-border rounded-xl px-3 py-2 text-charcoal-800 focus:outline-none focus:ring-2 focus:ring-forest-600 font-medium"
+                  className="w-full text-xs bg-cream-50 border border-sand-border rounded-xl px-3 py-2 text-charcoal-800 focus:outline-none focus:ring-2 focus:ring-forest-600/30 font-medium"
                 />
               </div>
 
@@ -465,7 +556,7 @@ export default function SessionsPage() {
                   value={manualNotes}
                   onChange={(e) => setManualNotes(e.target.value)}
                   placeholder="What topics or lessons were covered?"
-                  className="w-full text-xs bg-cream-50 border border-sand-border rounded-xl p-3 text-charcoal-800 focus:outline-none focus:ring-2 focus:ring-forest-600"
+                  className="w-full text-xs bg-cream-50 border border-sand-border rounded-xl p-3 text-charcoal-800 focus:outline-none focus:ring-2 focus:ring-forest-600/30"
                 />
               </div>
 
@@ -496,7 +587,7 @@ export default function SessionsPage() {
         </div>
       )}
 
-      {/* Edit Session Modal (Requirement 6) */}
+      {/* Edit Session Modal */}
       {editingSession && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white border border-sand-border rounded-3xl max-w-md w-full p-6 shadow-2xl animate-in zoom-in-95">
@@ -525,7 +616,7 @@ export default function SessionsPage() {
                   required
                   value={editDateTime}
                   onChange={(e) => setEditDateTime(e.target.value)}
-                  className="w-full text-xs bg-cream-50 border border-sand-border rounded-xl px-3 py-2 text-charcoal-800 font-mono focus:outline-none focus:ring-2 focus:ring-forest-600"
+                  className="w-full text-xs bg-cream-50 border border-sand-border rounded-xl px-3 py-2 text-charcoal-800 font-mono focus:outline-none focus:ring-2 focus:ring-forest-600/30"
                 />
               </div>
 
@@ -536,7 +627,7 @@ export default function SessionsPage() {
                 <select
                   value={editCourseId}
                   onChange={(e) => setEditCourseId(e.target.value)}
-                  className="w-full text-xs bg-cream-50 border border-sand-border rounded-xl px-3 py-2 text-charcoal-800 focus:outline-none focus:ring-2 focus:ring-forest-600 font-medium"
+                  className="w-full text-xs bg-cream-50 border border-sand-border rounded-xl px-3 py-2 text-charcoal-800 focus:outline-none focus:ring-2 focus:ring-forest-600/30 font-medium"
                 >
                   <option value="">General Self-Study</option>
                   {courses.map((c) => (
@@ -557,7 +648,7 @@ export default function SessionsPage() {
                   required
                   value={editMinutes}
                   onChange={(e) => setEditMinutes(e.target.value)}
-                  className="w-full text-xs bg-cream-50 border border-sand-border rounded-xl px-3 py-2 text-charcoal-800 focus:outline-none focus:ring-2 focus:ring-forest-600 font-medium"
+                  className="w-full text-xs bg-cream-50 border border-sand-border rounded-xl px-3 py-2 text-charcoal-800 focus:outline-none focus:ring-2 focus:ring-forest-600/30 font-medium"
                 />
               </div>
 
@@ -569,7 +660,7 @@ export default function SessionsPage() {
                   rows={2}
                   value={editNotes}
                   onChange={(e) => setEditNotes(e.target.value)}
-                  className="w-full text-xs bg-cream-50 border border-sand-border rounded-xl p-3 text-charcoal-800 focus:outline-none focus:ring-2 focus:ring-forest-600"
+                  className="w-full text-xs bg-cream-50 border border-sand-border rounded-xl p-3 text-charcoal-800 focus:outline-none focus:ring-2 focus:ring-forest-600/30"
                 />
               </div>
 

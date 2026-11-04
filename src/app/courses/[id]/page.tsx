@@ -25,6 +25,8 @@ import {
   LayoutDashboard,
   PlusCircle,
   BookOpen,
+  ChevronRight,
+  Flame,
 } from 'lucide-react';
 import { QuizModal } from '@/components/course-player/QuizModal';
 import { NotesModal } from '@/components/course-player/NotesModal';
@@ -88,12 +90,11 @@ export default function CoursePlayerPage() {
     }
   }, [currentLesson, selectedDay]);
 
-  // Handle Loading & Not Found states truthfully (Requirement 8)
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
-        <div className="w-9 h-9 border-3 border-forest-600 border-t-transparent rounded-full animate-spin" />
-        <p className="text-xs text-charcoal-500 font-medium">Loading course data...</p>
+        <div className="w-10 h-10 border-3 border-forest-600 border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs text-charcoal-500 font-medium font-mono">Loading course curriculum...</p>
       </div>
     );
   }
@@ -101,42 +102,42 @@ export default function CoursePlayerPage() {
   if (!course) {
     if (matchedPreset) {
       return (
-        <div className="p-8 sm:p-12 text-center flex flex-col items-center max-w-lg mx-auto">
-          <div className="w-12 h-12 rounded-2xl bg-forest-100 text-forest-700 flex items-center justify-center mb-4">
-            <Sparkles className="w-6 h-6" />
+        <div className="p-8 sm:p-14 text-center flex flex-col items-center max-w-xl mx-auto my-8 bg-white border border-sand-border rounded-3xl shadow-xs">
+          <div className="w-14 h-14 rounded-2xl bg-forest-100 text-forest-700 flex items-center justify-center mb-4">
+            <Sparkles className="w-7 h-7" />
           </div>
-          <span className="text-[11px] font-bold uppercase tracking-wider text-forest-800 bg-sand-200 px-3 py-1 rounded-full mb-3">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-forest-800 bg-sand-200 px-3.5 py-1 rounded-full mb-3">
             Featured Masterclass
           </span>
-          <h2 className="text-xl sm:text-2xl font-extrabold text-charcoal-900 tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-charcoal-900 tracking-tight">
             {matchedPreset.title}
           </h2>
-          <p className="text-xs text-charcoal-600 mt-2 leading-relaxed">
+          <p className="text-xs sm:text-sm text-charcoal-600 mt-2.5 leading-relaxed">
             {matchedPreset.description}
           </p>
-          <div className="mt-4 flex items-center gap-3 text-xs text-charcoal-500 font-medium">
-            <span>By {matchedPreset.provider}</span>
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-3 text-xs text-charcoal-500 font-medium">
+            <span className="font-semibold text-charcoal-800">By {matchedPreset.provider}</span>
             <span>•</span>
-            <span>{Math.round(matchedPreset.total_minutes / 60)} Hours Total</span>
+            <span className="font-mono">{Math.round(matchedPreset.total_minutes / 60)} Hours Total</span>
             <span>•</span>
             <span>{matchedPreset.lessons.length} structured lessons</span>
           </div>
 
-          <div className="mt-6 flex flex-col sm:flex-row items-center gap-3 w-full">
+          <div className="mt-7 flex flex-col sm:flex-row items-center gap-3 w-full">
             <button
               onClick={() => {
                 enrollPreset(matchedPreset.key);
               }}
-              className="w-full flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-forest-600 hover:bg-forest-700 active:bg-forest-800 text-white font-bold text-xs shadow-sm transition-all"
+              className="w-full flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-forest-600 hover:bg-forest-700 active:scale-98 text-white font-bold text-xs sm:text-sm shadow-md shadow-forest-700/20 transition-all"
             >
               <Play className="w-4 h-4 fill-current" />
               <span>Enroll & Start Learning</span>
             </button>
             <Link
               href="/courses"
-              className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-white hover:bg-cream-200 border border-sand-border text-charcoal-700 font-bold text-xs shadow-2xs transition-colors"
+              className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-cream-50 hover:bg-cream-100 border border-sand-border text-charcoal-700 font-bold text-xs sm:text-sm transition-colors"
             >
-              Browse Courses
+              Browse Library
             </Link>
           </div>
         </div>
@@ -144,35 +145,28 @@ export default function CoursePlayerPage() {
     }
 
     return (
-      <div className="p-12 text-center flex flex-col items-center max-w-md mx-auto">
+      <div className="p-12 text-center flex flex-col items-center max-w-md mx-auto my-12 bg-white border border-sand-border rounded-3xl shadow-xs">
         <div className="w-12 h-12 rounded-2xl bg-sand-200 text-charcoal-500 flex items-center justify-center mb-4">
           <BookOpen className="w-6 h-6" />
         </div>
-        <h2 className="text-xl font-bold text-charcoal-900">Course not found</h2>
-        <p className="text-xs text-charcoal-500 mt-1">
-          This course ID does not exist or may have been deleted from your library.
+        <h2 className="text-xl font-bold text-charcoal-900">Course Not Found</h2>
+        <p className="text-xs text-charcoal-500 mt-1 leading-relaxed">
+          This course ID does not exist in your local library or may have been deleted.
         </p>
         <div className="mt-6 flex flex-col sm:flex-row items-center gap-2.5 w-full">
           <Link
             href="/courses"
-            className="w-full sm:w-auto flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-forest-600 hover:bg-forest-700 text-white font-semibold text-xs shadow-sm transition-all"
+            className="w-full sm:w-auto flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-forest-600 hover:bg-forest-700 text-white font-bold text-xs shadow-sm transition-all"
           >
             <BookOpen className="w-3.5 h-3.5" />
-            <span>Browse Courses</span>
+            <span>Courses</span>
           </Link>
           <Link
             href="/dashboard"
-            className="w-full sm:w-auto flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-white hover:bg-cream-200 border border-sand-border text-charcoal-700 font-semibold text-xs shadow-2xs transition-all"
+            className="w-full sm:w-auto flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-white hover:bg-cream-100 border border-sand-border text-charcoal-700 font-bold text-xs shadow-2xs transition-all"
           >
             <LayoutDashboard className="w-3.5 h-3.5" />
             <span>Dashboard</span>
-          </Link>
-          <Link
-            href="/courses/new"
-            className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-white hover:bg-cream-200 border border-sand-border text-charcoal-700 font-semibold text-xs shadow-2xs transition-all"
-            title="Create Course"
-          >
-            <PlusCircle className="w-3.5 h-3.5" />
           </Link>
         </div>
       </div>
@@ -191,7 +185,7 @@ export default function CoursePlayerPage() {
     if (currentLesson) {
       toggleLessonCompletion(course.id, currentLesson.id);
 
-      // If auto-advance is enabled and marking complete, move to next lesson!
+      // If auto-advance is enabled and marking complete, move to next lesson
       if (!currentLesson.is_completed && autoAdvance) {
         const nextIdx = course.lessons.findIndex((l) => l.id === currentLesson.id) + 1;
         if (nextIdx < course.lessons.length) {
@@ -212,7 +206,7 @@ export default function CoursePlayerPage() {
     }
   };
 
-  // Video embed source with start offset (Requirement 5: allowlisted embed checking)
+  // Video embed source with start offset
   const isEmbedAllowlisted = isAllowlistedEmbedUrl(course.embed_url);
   const videoStartSec = currentLesson?.video_start_seconds || 0;
   const videoSrc = course.embed_url.includes('?')
@@ -231,35 +225,40 @@ export default function CoursePlayerPage() {
         <div className="flex items-center gap-3 min-w-0">
           <Link
             href="/courses"
-            className="p-1.5 rounded-lg border border-sand-border hover:bg-cream-200 text-charcoal-600 transition-colors shrink-0"
+            className="p-2 rounded-xl border border-sand-border hover:bg-cream-100 text-charcoal-600 transition-colors shrink-0"
             title="Back to Courses"
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <div className="flex flex-col min-w-0">
-            <h1 className="text-xs sm:text-sm font-bold text-charcoal-900 truncate">
-              {course.title}
-            </h1>
-            <div className="flex items-center gap-2 text-[11px] text-charcoal-500">
-              <span>{course.provider}</span>
-              <span>•</span>
-              <span className="font-semibold text-forest-700">{progress.percentage}% completed</span>
+            <div className="flex items-center gap-1.5 text-[11px] text-charcoal-500 font-medium">
+              <Link href="/courses" className="hover:text-charcoal-800">Courses</Link>
+              <ChevronRight className="w-3 h-3 text-charcoal-400" />
+              <span className="truncate max-w-[200px] sm:max-w-xs">{course.title}</span>
+            </div>
+            <div className="flex items-center gap-2 mt-0.5">
+              <h1 className="text-xs sm:text-sm font-bold text-charcoal-900 truncate">
+                {currentLesson?.title || course.title}
+              </h1>
+              <span className="hidden sm:inline-block font-mono text-[11px] font-bold text-forest-700 bg-forest-50 px-2 py-0.5 rounded-md border border-forest-200">
+                {progress.percentage}% completed
+              </span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2.5 shrink-0">
           <button
             onClick={() => setActiveModal('dayplan')}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-sand-border bg-white hover:bg-cream-100 text-charcoal-700 font-semibold text-xs transition-colors"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-sand-border bg-white hover:bg-cream-100 text-charcoal-700 font-semibold text-xs transition-colors"
           >
             <Calendar className="w-3.5 h-3.5 text-forest-600" />
-            <span>Day plan</span>
+            <span>Day Plan</span>
           </button>
 
           <button
             onClick={handleToggleCurrentCompleted}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm ${
+            className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm ${
               currentLesson?.is_completed
                 ? 'bg-cream-200 text-forest-800 border border-forest-300'
                 : 'bg-forest-600 hover:bg-forest-700 text-white'
@@ -271,13 +270,13 @@ export default function CoursePlayerPage() {
         </div>
       </div>
 
-      {/* Main 2-Column Content */}
+      {/* Main 2-Column Content Layout */}
       <div className="flex-1 max-w-[1600px] w-full mx-auto px-4 sm:px-6 xl:px-8 py-6 grid grid-cols-1 xl:grid-cols-12 gap-6 min-w-0">
-        {/* Left Column: Video Player & Lesson Details */}
+        {/* Left Column: Video Cinema Player & Lesson Details */}
         <div className="xl:col-span-8 flex flex-col gap-4 min-w-0">
-          {/* Responsive Video Frame or Safe Link */}
-          <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-charcoal-900 shadow-lg border border-charcoal-800">
-            {/* Intentional branded fallback backdrop (never an empty black box) */}
+          {/* Cinema 16:9 Video Player */}
+          <div className="relative aspect-video w-full rounded-3xl overflow-hidden bg-charcoal-900 shadow-md border border-charcoal-800">
+            {/* Branded Fallback / Loading Background */}
             <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-gradient-to-br from-charcoal-900 via-charcoal-800 to-black text-cream-100 z-0 select-none">
               <div className="w-12 h-12 rounded-2xl bg-white/10 text-white flex items-center justify-center mb-3">
                 <Play className="w-5 h-5 fill-current ml-0.5 text-forest-400" />
@@ -331,27 +330,27 @@ export default function CoursePlayerPage() {
             )}
           </div>
 
-          {/* Under Video Controls & Metadata */}
-          <div className="bg-white border border-sand-border rounded-2xl p-5 shadow-xs flex flex-col gap-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-sand-border">
+          {/* Under-Video Focus Control & Curriculum Meta */}
+          <div className="bg-white border border-sand-border rounded-3xl p-5 sm:p-6 shadow-xs flex flex-col gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 border-b border-sand-border">
               <div>
-                <span className="text-[10px] font-bold text-forest-700 uppercase tracking-wider bg-forest-50 px-2 py-0.5 rounded">
+                <span className="text-[11px] font-bold text-forest-700 uppercase tracking-wider bg-forest-50 px-2.5 py-0.5 rounded-md border border-forest-200">
                   Day {currentLesson?.day_number || 1} • Lesson {currentLessonIndex} of {totalLessons}
                 </span>
-                <h2 className="text-base sm:text-lg font-bold text-charcoal-900 mt-1">
+                <h2 className="text-base sm:text-xl font-extrabold text-charcoal-900 mt-2 tracking-tight">
                   {currentLesson?.title || 'Lesson Overview'}
                 </h2>
               </div>
 
-              {/* Lesson Completion Action & Auto-advance Toggle */}
+              {/* Completion CTA & Auto-Advance */}
               <div className="flex items-center gap-3 shrink-0">
                 <button
                   type="button"
                   onClick={handleToggleCurrentCompleted}
-                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+                  className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 ${
                     currentLesson?.is_completed
                       ? 'bg-forest-600 text-white shadow-xs'
-                      : 'bg-sand-100 hover:bg-forest-50 text-charcoal-800 border border-sand-border'
+                      : 'bg-cream-100 hover:bg-forest-50 text-charcoal-800 border border-sand-border'
                   }`}
                 >
                   <Check className="w-3.5 h-3.5 stroke-[3]" />
@@ -370,7 +369,7 @@ export default function CoursePlayerPage() {
               </div>
             </div>
 
-            {/* Provider Info & Action CTA */}
+            {/* Provider and Quick Focus Timer CTA */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
               <div className="flex items-center gap-2 text-charcoal-700">
                 <span className="font-semibold text-charcoal-900">{course.provider}</span>
@@ -379,18 +378,17 @@ export default function CoursePlayerPage() {
                     href={course.course_url}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center gap-1 text-forest-700 hover:underline font-semibold ml-2"
+                    className="inline-flex items-center gap-1 text-forest-700 hover:underline font-semibold ml-2"
                   >
-                    <span>Open External Source</span>
+                    <span>Original Source</span>
                     <ExternalLink className="w-3 h-3" />
                   </a>
                 )}
               </div>
 
-              {/* Focus Timer CTA Button */}
               <button
                 onClick={handleStartFocusTimer}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-forest-50 border border-forest-200 text-forest-800 hover:bg-forest-100 font-bold text-xs transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-forest-50 hover:bg-forest-100 border border-forest-200 text-forest-800 font-bold text-xs transition-colors shadow-2xs"
               >
                 <Clock className="w-3.5 h-3.5 text-forest-600" />
                 <span>Focus timer on this lesson</span>
@@ -398,32 +396,32 @@ export default function CoursePlayerPage() {
             </div>
 
             {course.description && (
-              <p className="text-xs text-charcoal-600 leading-relaxed pt-2 border-t border-sand-border/60">
+              <p className="text-xs text-charcoal-600 leading-relaxed pt-3 border-t border-sand-border/60">
                 {course.description}
               </p>
             )}
           </div>
         </div>
 
-        {/* Right Column: Day Tabs, Lessons List & Study Tools */}
+        {/* Right Column: Day Tabs, Lessons List & Study Dock */}
         <div className="xl:col-span-4 flex flex-col gap-4 min-w-0">
-          <div className="bg-white border border-sand-border rounded-2xl p-4 shadow-xs flex flex-col">
+          <div className="bg-white border border-sand-border rounded-3xl p-5 shadow-xs flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-sand-border">
+            <div className="flex items-center justify-between pb-3.5 border-b border-sand-border">
               <div>
-                <h3 className="text-xs font-bold text-charcoal-900 truncate">
-                  {course.title}
+                <h3 className="text-xs sm:text-sm font-bold text-charcoal-900 truncate">
+                  Course Curriculum
                 </h3>
-                <span className="text-[11px] text-charcoal-500">
-                  Lesson {currentLessonIndex} of {totalLessons} videos
+                <span className="text-[11px] text-charcoal-500 font-mono">
+                  Lesson {currentLessonIndex} of {totalLessons} total
                 </span>
               </div>
-              <span className="text-xs font-bold text-forest-700 bg-forest-50 px-2 py-0.5 rounded">
+              <span className="text-xs font-bold text-forest-700 bg-forest-50 px-2.5 py-0.5 rounded-full border border-forest-200 font-mono">
                 {progress.percentage}%
               </span>
             </div>
 
-            {/* Day Tabs */}
+            {/* Day Selector Tabs */}
             <div className="flex items-center gap-1.5 py-3 overflow-x-auto no-scrollbar border-b border-sand-border/70">
               {dayGroups.map((group) => {
                 const isSelected = selectedDay === group.day_number;
@@ -431,7 +429,7 @@ export default function CoursePlayerPage() {
                   <button
                     key={group.day_number}
                     onClick={() => setSelectedDay(group.day_number)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1 ${
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
                       isSelected
                         ? 'bg-forest-700 text-white shadow-2xs'
                         : 'bg-cream-100 text-charcoal-700 hover:bg-cream-200'
@@ -445,7 +443,7 @@ export default function CoursePlayerPage() {
             </div>
 
             {/* Lessons List for Selected Day */}
-            <div className="flex flex-col gap-1.5 py-3 max-h-[380px] overflow-y-auto pr-1">
+            <div className="flex flex-col gap-2 py-3.5 max-h-[380px] overflow-y-auto pr-1">
               {activeDayGroup ? (
                 activeDayGroup.lessons.map((lesson) => {
                   const isActive = currentLesson?.id === lesson.id;
@@ -454,10 +452,10 @@ export default function CoursePlayerPage() {
                     <div
                       key={lesson.id}
                       onClick={() => handleLessonSelect(lesson.id)}
-                      className={`flex items-center justify-between gap-2.5 p-2.5 rounded-xl border transition-all cursor-pointer ${
+                      className={`flex items-center justify-between gap-2.5 p-3 rounded-xl border transition-all cursor-pointer ${
                         isActive
                           ? 'border-forest-600 bg-forest-50/70 shadow-2xs ring-1 ring-forest-600'
-                          : 'border-sand-border/70 bg-cream-50/40 hover:bg-cream-100'
+                          : 'border-sand-border/70 bg-cream-50/50 hover:bg-cream-100'
                       }`}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
@@ -467,6 +465,7 @@ export default function CoursePlayerPage() {
                             e.stopPropagation();
                             toggleLessonCompletion(course.id, lesson.id);
                           }}
+                          aria-label={lesson.is_completed ? 'Mark incomplete' : 'Mark complete'}
                           className="shrink-0 p-0.5 text-charcoal-400 hover:text-forest-600"
                         >
                           {lesson.is_completed ? (
@@ -479,14 +478,14 @@ export default function CoursePlayerPage() {
                         <div className="flex flex-col min-w-0">
                           <span
                             className={`text-xs font-semibold line-clamp-1 ${
-                              isActive ? 'text-forest-900' : 'text-charcoal-800'
+                              isActive ? 'text-forest-900 font-bold' : 'text-charcoal-800'
                             } ${lesson.is_completed ? 'line-through opacity-70' : ''}`}
                             title={lesson.title}
                           >
                             {lesson.title}
                           </span>
-                          <span className="text-[10px] text-charcoal-400">
-                            {lesson.duration_minutes}m
+                          <span className="text-[10px] text-charcoal-400 font-mono">
+                            {lesson.duration_minutes} min
                           </span>
                         </div>
                       </div>
@@ -504,62 +503,68 @@ export default function CoursePlayerPage() {
               )}
             </div>
 
-            {/* Study Tools Section */}
-            <div className="pt-3 border-t border-sand-border">
-              <span className="text-[11px] font-bold text-charcoal-400 uppercase tracking-wider block mb-2">
-                Study tools
+            {/* Study Tools Dock */}
+            <div className="pt-3.5 border-t border-sand-border">
+              <span className="text-[11px] font-bold text-charcoal-500 uppercase tracking-wider block mb-2.5">
+                Active Study Tools
               </span>
 
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-2.5">
                 {/* Quiz Tool */}
                 <button
                   type="button"
                   onClick={() => setActiveModal('quiz')}
-                  className="bg-cream-50 hover:bg-forest-50/60 border border-sand-border rounded-xl p-2.5 text-left transition-all flex flex-col justify-between group"
+                  className="bg-cream-50/70 hover:bg-forest-50/70 border border-sand-border rounded-2xl p-3 text-left transition-all duration-200 flex flex-col justify-between group hover:border-forest-200"
                 >
                   <div className="flex items-center justify-between w-full">
-                    <HelpCircle className="w-4 h-4 text-forest-600" />
-                    <span className="text-[10px] text-charcoal-400 group-hover:text-forest-700">→</span>
+                    <div className="w-7 h-7 rounded-lg bg-forest-100 text-forest-700 flex items-center justify-center">
+                      <HelpCircle className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-[10px] text-charcoal-400 group-hover:text-forest-700 font-mono">→</span>
                   </div>
-                  <div className="mt-2">
-                    <div className="text-xs font-bold text-charcoal-900">Quiz</div>
+                  <div className="mt-2.5">
+                    <div className="text-xs font-bold text-charcoal-900">Recall Quiz</div>
                     <div className="text-[10px] text-charcoal-500">
                       {course.quizzes?.length || 2} questions
                     </div>
                   </div>
                 </button>
 
-                {/* My Notes Tool */}
+                {/* Smart Notes Tool */}
                 <button
                   type="button"
                   onClick={() => setActiveModal('notes')}
-                  className="bg-cream-50 hover:bg-forest-50/60 border border-sand-border rounded-xl p-2.5 text-left transition-all flex flex-col justify-between group"
+                  className="bg-cream-50/70 hover:bg-forest-50/70 border border-sand-border rounded-2xl p-3 text-left transition-all duration-200 flex flex-col justify-between group hover:border-forest-200"
                 >
                   <div className="flex items-center justify-between w-full">
-                    <FileText className="w-4 h-4 text-forest-600" />
-                    <span className="text-[10px] text-charcoal-400 group-hover:text-forest-700">→</span>
+                    <div className="w-7 h-7 rounded-lg bg-forest-100 text-forest-700 flex items-center justify-center">
+                      <FileText className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-[10px] text-charcoal-400 group-hover:text-forest-700 font-mono">→</span>
                   </div>
-                  <div className="mt-2">
-                    <div className="text-xs font-bold text-charcoal-900">My notes</div>
+                  <div className="mt-2.5">
+                    <div className="text-xs font-bold text-charcoal-900">Smart Notes</div>
                     <div className="text-[10px] text-charcoal-500">
                       {course.notes?.length || 0} saved
                     </div>
                   </div>
                 </button>
 
-                {/* Day Test Tool */}
+                {/* Day Plan Tool */}
                 <button
                   type="button"
                   onClick={() => setActiveModal('dayplan')}
-                  className="bg-cream-50 hover:bg-forest-50/60 border border-sand-border rounded-xl p-2.5 text-left transition-all flex flex-col justify-between group"
+                  className="bg-cream-50/70 hover:bg-forest-50/70 border border-sand-border rounded-2xl p-3 text-left transition-all duration-200 flex flex-col justify-between group hover:border-forest-200"
                 >
                   <div className="flex items-center justify-between w-full">
-                    <Calendar className="w-4 h-4 text-forest-600" />
-                    <span className="text-[10px] text-charcoal-400 group-hover:text-forest-700">→</span>
+                    <div className="w-7 h-7 rounded-lg bg-forest-100 text-forest-700 flex items-center justify-center">
+                      <Calendar className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-[10px] text-charcoal-400 group-hover:text-forest-700 font-mono">→</span>
                   </div>
-                  <div className="mt-2">
-                    <div className="text-xs font-bold text-charcoal-900">Day plan</div>
-                    <div className="text-[10px] text-charcoal-500">The whole day</div>
+                  <div className="mt-2.5">
+                    <div className="text-xs font-bold text-charcoal-900">Day Plan</div>
+                    <div className="text-[10px] text-charcoal-500">Daily syllabus</div>
                   </div>
                 </button>
 
@@ -567,15 +572,17 @@ export default function CoursePlayerPage() {
                 <button
                   type="button"
                   onClick={() => setActiveModal('flashcards')}
-                  className="bg-cream-50 hover:bg-forest-50/60 border border-sand-border rounded-xl p-2.5 text-left transition-all flex flex-col justify-between group"
+                  className="bg-cream-50/70 hover:bg-forest-50/70 border border-sand-border rounded-2xl p-3 text-left transition-all duration-200 flex flex-col justify-between group hover:border-forest-200"
                 >
                   <div className="flex items-center justify-between w-full">
-                    <Layers className="w-4 h-4 text-forest-600" />
-                    <span className="text-[10px] text-charcoal-400 group-hover:text-forest-700">→</span>
+                    <div className="w-7 h-7 rounded-lg bg-forest-100 text-forest-700 flex items-center justify-center">
+                      <Layers className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-[10px] text-charcoal-400 group-hover:text-forest-700 font-mono">→</span>
                   </div>
-                  <div className="mt-2">
+                  <div className="mt-2.5">
                     <div className="text-xs font-bold text-charcoal-900">Flashcards</div>
-                    <div className="text-[10px] text-charcoal-500">Key ideas</div>
+                    <div className="text-[10px] text-charcoal-500">Key concepts</div>
                   </div>
                 </button>
               </div>

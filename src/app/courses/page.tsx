@@ -6,6 +6,7 @@ import { useLearning } from '@/context/LearningContext';
 import { Course, CourseStatus } from '@/types';
 import { CourseCard } from '@/components/courses/CourseCard';
 import { CourseForm } from '@/components/courses/CourseForm';
+import { PRESET_COURSES } from '@/lib/youtube';
 import {
   Plus,
   Search,
@@ -14,10 +15,12 @@ import {
   AlertTriangle,
   X,
   Trash2,
+  Sparkles,
+  ArrowRight,
 } from 'lucide-react';
 
 export default function CoursesPage() {
-  const { courses, deleteCourse } = useLearning();
+  const { courses, deleteCourse, enrollPreset } = useLearning();
 
   const [activeTab, setActiveTab] = useState<'all' | CourseStatus>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -64,22 +67,22 @@ export default function CoursesPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-sand-border">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <h1 className="text-2xl sm:text-3xl font-extrabold text-charcoal-900 tracking-tight">
               My Courses
             </h1>
-            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-sand-200 text-charcoal-700">
+            <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-sand-200 text-charcoal-700 font-mono">
               {courses.length}
             </span>
           </div>
           <p className="text-xs sm:text-sm text-charcoal-500 mt-1">
-            Turn long tutorials and playlists into steady 1-hour daily progress.
+            Turn long tutorials and multi-hour lectures into steady 1-hour daily progress.
           </p>
         </div>
 
         <Link
           href="/courses/new"
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-forest-600 hover:bg-forest-700 text-white font-semibold text-xs sm:text-sm shadow-sm transition-all"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-forest-600 hover:bg-forest-700 active:bg-forest-800 text-white font-bold text-xs sm:text-sm shadow-sm transition-all active:scale-[0.98]"
         >
           <Plus className="w-4 h-4 stroke-[2.5]" />
           <span>New course</span>
@@ -89,10 +92,10 @@ export default function CoursesPage() {
       {/* Search & Tabs Toolbar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 min-w-0">
         {/* Filter Tabs */}
-        <div className="flex items-center gap-1.5 p-1 bg-cream-200/80 rounded-xl border border-sand-border overflow-x-auto text-xs font-medium max-w-full min-w-0">
+        <div className="flex items-center gap-1.5 p-1 bg-cream-200/80 rounded-xl border border-sand-border overflow-x-auto text-xs font-semibold max-w-full min-w-0 shadow-2xs">
           <button
             onClick={() => setActiveTab('all')}
-            className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
+            className={`px-3 py-1.5 rounded-lg transition-all whitespace-nowrap ${
               activeTab === 'all'
                 ? 'bg-white text-forest-800 font-bold shadow-2xs'
                 : 'text-charcoal-600 hover:text-charcoal-900'
@@ -102,7 +105,7 @@ export default function CoursesPage() {
           </button>
           <button
             onClick={() => setActiveTab('active')}
-            className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
+            className={`px-3 py-1.5 rounded-lg transition-all whitespace-nowrap ${
               activeTab === 'active'
                 ? 'bg-white text-forest-800 font-bold shadow-2xs'
                 : 'text-charcoal-600 hover:text-charcoal-900'
@@ -112,7 +115,7 @@ export default function CoursesPage() {
           </button>
           <button
             onClick={() => setActiveTab('completed')}
-            className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
+            className={`px-3 py-1.5 rounded-lg transition-all whitespace-nowrap ${
               activeTab === 'completed'
                 ? 'bg-white text-forest-800 font-bold shadow-2xs'
                 : 'text-charcoal-600 hover:text-charcoal-900'
@@ -122,7 +125,7 @@ export default function CoursesPage() {
           </button>
           <button
             onClick={() => setActiveTab('archived')}
-            className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
+            className={`px-3 py-1.5 rounded-lg transition-all whitespace-nowrap ${
               activeTab === 'archived'
                 ? 'bg-white text-forest-800 font-bold shadow-2xs'
                 : 'text-charcoal-600 hover:text-charcoal-900'
@@ -139,8 +142,8 @@ export default function CoursesPage() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search courses..."
-            className="w-full text-xs sm:text-sm pl-9 pr-4 py-2 bg-white border border-sand-border rounded-xl focus:outline-none focus:ring-2 focus:ring-forest-600 text-charcoal-800 placeholder:text-charcoal-400"
+            placeholder="Search courses or topics..."
+            className="w-full text-xs sm:text-sm pl-9 pr-4 py-2 bg-white border border-sand-border rounded-xl focus:outline-none focus:ring-2 focus:ring-forest-600 text-charcoal-800 placeholder:text-charcoal-400 font-medium"
           />
         </div>
       </div>
@@ -158,24 +161,52 @@ export default function CoursesPage() {
           ))}
         </div>
       ) : (
-        <div className="bg-white border border-sand-border rounded-2xl p-12 text-center flex flex-col items-center max-w-lg mx-auto">
-          <div className="w-12 h-12 rounded-2xl bg-cream-200 text-charcoal-500 flex items-center justify-center mb-3">
-            <BookOpen className="w-6 h-6" />
+        <div className="bg-white border border-sand-border rounded-3xl p-10 sm:p-12 text-center flex flex-col items-center max-w-lg mx-auto shadow-xs">
+          <div className="w-14 h-14 rounded-2xl bg-cream-200 text-charcoal-600 flex items-center justify-center mb-4">
+            <BookOpen className="w-7 h-7 text-forest-700" />
           </div>
-          <h3 className="font-bold text-base text-charcoal-800">No courses found</h3>
-          <p className="text-xs text-charcoal-500 mt-1 max-w-sm">
+          <h3 className="font-extrabold text-lg text-charcoal-900">
+            {searchQuery ? 'No matching courses' : 'Your course library is empty'}
+          </h3>
+          <p className="text-xs text-charcoal-500 mt-1.5 max-w-sm leading-relaxed">
             {searchQuery
-              ? `No course matched "${searchQuery}". Try a different search.`
+              ? `No course matched "${searchQuery}". Try a different search term or clear the filter.`
               : activeTab === 'archived'
-              ? 'No archived courses.'
-              : 'You have not added any courses yet. Add your first course or paste a YouTube video to get started.'}
+              ? 'No courses are currently archived.'
+              : 'Add your own tutorial via URL or pick one of our partitioned masterclasses below to begin.'}
           </p>
+
+          {!searchQuery && activeTab !== 'archived' && (
+            <div className="mt-6 flex flex-col gap-2.5 w-full">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-charcoal-400">
+                Quick-Enroll Curated Masterclass:
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-left">
+                {PRESET_COURSES.slice(0, 2).map((preset) => (
+                  <button
+                    key={preset.key}
+                    onClick={() => enrollPreset(preset.key)}
+                    className="p-3 rounded-xl border border-sand-border bg-cream-50 hover:bg-forest-50 text-left transition-colors flex flex-col justify-between"
+                  >
+                    <span className="text-xs font-bold text-charcoal-800 line-clamp-1">
+                      {preset.title}
+                    </span>
+                    <span className="text-[10px] text-forest-700 font-semibold mt-1 flex items-center gap-1">
+                      <span>Enroll in {Math.round(preset.total_minutes / 60)}h course</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <Link
             href="/courses/new"
-            className="mt-4 flex items-center gap-1.5 px-4 py-2 rounded-xl bg-forest-600 text-white font-semibold text-xs shadow-sm hover:bg-forest-700"
+            className="mt-6 flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-forest-600 text-white font-bold text-xs shadow-sm hover:bg-forest-700 transition-all active:scale-[0.98]"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>Add course</span>
+            <span>Create Custom Course</span>
           </Link>
         </div>
       )}
@@ -196,26 +227,26 @@ export default function CoursesPage() {
       {/* Confirm Delete Dialog */}
       {deletingCourse && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-sand-border rounded-2xl max-w-md w-full p-6 shadow-2xl animate-in zoom-in-95">
-            <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center mb-3">
+          <div className="bg-white border border-sand-border rounded-3xl max-w-md w-full p-6 shadow-2xl animate-in zoom-in-95">
+            <div className="w-11 h-11 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center mb-3">
               <AlertTriangle className="w-5 h-5" />
             </div>
             <h3 className="text-base font-bold text-charcoal-900">Delete Course?</h3>
-            <p className="text-xs text-charcoal-600 mt-1">
-              Are you sure you want to delete <span className="font-semibold">{deletingCourse.title}</span>? This will remove the course and its lesson plan. Saved learning sessions will be preserved.
+            <p className="text-xs text-charcoal-600 mt-1 leading-relaxed">
+              Are you sure you want to delete <span className="font-semibold text-charcoal-900">{deletingCourse.title}</span>? This will remove the course and its lesson plan. Saved learning sessions will be preserved.
             </p>
-            <div className="flex items-center justify-end gap-2 mt-6">
+            <div className="flex items-center justify-end gap-2.5 mt-6">
               <button
                 type="button"
                 onClick={() => setDeletingCourse(null)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-charcoal-600 hover:bg-cream-100"
+                className="px-4 py-2 rounded-xl text-xs font-bold text-charcoal-600 hover:bg-cream-100 transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={confirmDelete}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-sm"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-sm transition-all active:scale-[0.98]"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 <span>Delete</span>
@@ -227,4 +258,3 @@ export default function CoursesPage() {
     </div>
   );
 }
-

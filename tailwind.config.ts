@@ -47,6 +47,8 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["var(--font-sans)", "Inter", "system-ui", "sans-serif"],
+        mono: ["var(--font-mono)", "ui-monospace", "SFMono-Regular", "monospace"],
+        serif: ["var(--font-serif)", "Georgia", "Cambria", "serif"],
       },
     },
   },

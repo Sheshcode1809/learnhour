@@ -8,6 +8,7 @@ import {
 import {
   calculateStreaks,
   getDayOffset,
+  getTodayDateString,
   groupSessionsByDate,
   isValidTimezone,
 } from '../lib/calculations/streaks';
@@ -200,7 +201,8 @@ describe('Derived Course Completed Minutes (Single Source of Truth)', () => {
 });
 
 describe('Streak & Timezone Calculations', () => {
-  const baseDate = '2026-11-04';
+  const testTz = 'UTC';
+  const baseDate = getTodayDateString(testTz);
 
   it('validates IANA timezones properly', () => {
     expect(isValidTimezone('America/New_York')).toBe(true);
@@ -278,7 +280,7 @@ describe('Streak & Timezone Calculations', () => {
     ];
 
     // Daily goal 60 min
-    const res = calculateStreaks(sessions, 60);
+    const res = calculateStreaks(sessions, 60, testTz);
     expect(res.todayGoalMet).toBe(true);
     expect(res.currentStreak).toBe(3);
     expect(res.bestStreak).toBe(3);
@@ -302,7 +304,7 @@ describe('Streak & Timezone Calculations', () => {
       },
     ];
 
-    const res = calculateStreaks(sessions, 60);
+    const res = calculateStreaks(sessions, 60, testTz);
     expect(res.todayGoalMet).toBe(false);
     expect(res.currentStreak).toBe(1); // counts yesterday
     expect(res.remainingMinutesToday).toBe(40);
@@ -319,7 +321,7 @@ describe('Streak & Timezone Calculations', () => {
       },
     ];
 
-    const res = calculateStreaks(sessions, 60);
+    const res = calculateStreaks(sessions, 60, testTz);
     expect(res.currentStreak).toBe(0);
     expect(res.bestStreak).toBe(1);
   });
