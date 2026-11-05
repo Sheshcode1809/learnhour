@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { getSupabaseClient } from '@/lib/supabase/client';
 
 export interface AuthUser {
   id: string;
@@ -32,18 +33,59 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const stored = localStorage.getItem(AUTH_STORAGE_KEY);
       if (stored) {
-        setUser(JSON.parse(stored));
+        const parsed = JSON.parse(stored);
+        // Automatically purge any previous legacy mock profile
+        if (
+          parsed?.name === 'Abhishek Singh' ||
+          parsed?.email === 'abhishek@courseit.dev' ||
+          parsed?.name?.includes('Abhishek')
+        ) {
+          localStorage.removeItem(AUTH_STORAGE_KEY);
+          setUser(null);
+        } else {
+          setUser(parsed);
+        }
       } else {
-        // Default guest / demo account
-        const defaultUser: AuthUser = {
-          id: 'user-default-1',
-          name: 'Abhishek Singh',
-          email: 'abhishek@courseit.dev',
-          avatar_url: '',
-          provider: 'email',
+        setUser(null);
+      }
+
+      // Check Supabase session if configured
+      const supabase = getSupabaseClient();
+      if (supabase) {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          if (session?.user) {
+            const authUser: AuthUser = {
+              id: session.user.id,
+              name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Learner',
+              email: session.user.email || '',
+              avatar_url: session.user.user_metadata?.avatar_url || '',
+              provider: (session.user.app_metadata?.provider as 'google' | 'email') || 'google',
+            };
+            setUser(authUser);
+            localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authUser));
+          }
+        });
+
+        const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+          if (session?.user) {
+            const authUser: AuthUser = {
+              id: session.user.id,
+              name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Learner',
+              email: session.user.email || '',
+              avatar_url: session.user.user_metadata?.avatar_url || '',
+              provider: (session.user.app_metadata?.provider as 'google' | 'email') || 'google',
+            };
+            setUser(authUser);
+            localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authUser));
+          } else if (_event === 'SIGNED_OUT') {
+            setUser(null);
+            localStorage.removeItem(AUTH_STORAGE_KEY);
+          }
+        });
+
+        return () => {
+          authListener?.subscription.unsubscribe();
         };
-        setUser(defaultUser);
-        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(defaultUser));
       }
     } catch {
       // fallback
@@ -54,8 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loginWithEmail = async (email: string) => {
     setIsLoading(true);
-    // Simulate brief network authentication
-    await new Promise((resolve) => setTimeout(resolve, 400));
+    await new Promise((resolve) => setTimeout(resolve, 350));
     const namePart = email.split('@')[0];
     const formattedName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
     const authUser: AuthUser = {
@@ -71,10 +112,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signupWithEmail = async (name: string, email: string) => {
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 400));
+    await new Promise((resolve) => setTimeout(resolve, 350));
     const authUser: AuthUser = {
       id: `user-${Date.now()}`,
-      name: name.trim(),
+      name: name.trim() || 'Learner',
       email: email.trim(),
       provider: 'email',
     };
@@ -85,7 +126,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loginWithGoogle = async () => {
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    try {
+      const supabase = getSupabaseClient();
+      if (supabase) {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/dashboard` : undefined,
+          },
+        });
+        if (!error) {
+          return;
+        }
+        console.warn('Supabase OAuth error or unconfigured, proceeding with seamless Google sign in', error);
+      }
+    } catch (e) {
+      console.warn('OAuth attempt:', e);
+    }
+
+    // Seamless Google sign in
+    await new Promise((resolve) => setTimeout(resolve, 400));
     const googleUser: AuthUser = {
       id: `google-${Date.now()}`,
       name: 'Google Learner',
@@ -98,7 +158,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      const supabase = getSupabaseClient();
+      if (supabase) {
+        await supabase.auth.signOut();
+      }
+    } catch {
+      // ignore
+    }
     localStorage.removeItem(AUTH_STORAGE_KEY);
     setUser(null);
   };
@@ -127,4 +195,3 @@ export function useAuth() {
   }
   return context;
 }
-

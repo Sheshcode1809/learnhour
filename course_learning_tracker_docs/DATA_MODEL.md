@@ -9,7 +9,7 @@ Store timestamps in UTC ISO strings and convert to the user's local timezone for
 | Field | Type | Description |
 |---|---|---|
 | id | string (uuid) | PK / User identifier |
-| name | string | User display name (e.g. Abhishek Singh) |
+| name | string | User display name (e.g. Alex Johnson) |
 | email | string | Optional user email |
 | daily_goal_minutes | number | Default 60 minutes |
 | timezone | string | IANA timezone (e.g. Asia/Kolkata or Intl.DateTimeFormat default) |

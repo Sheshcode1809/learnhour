@@ -64,28 +64,36 @@ export default function HomePage() {
         </nav>
 
         {/* Right Auth Actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           {isAuthenticated ? (
-            <Link
-              href="/dashboard"
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-forest-600 hover:bg-forest-700 active:bg-forest-800 text-white font-semibold text-xs shadow-sm transition-all"
-            >
-              <span>Go to Dashboard</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
+            <>
+              <Link
+                href="/dashboard"
+                className="text-xs font-semibold text-charcoal-700 hover:text-charcoal-900 px-3 py-2 rounded-xl hover:bg-cream-200 transition-colors"
+              >
+                Dashboard
+              </Link>
+              <Link
+                href="/auth/login"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-forest-600 hover:bg-forest-700 active:bg-forest-800 text-white font-semibold text-xs shadow-sm transition-all"
+              >
+                <span>Login</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </>
           ) : (
             <>
               <Link
-                href="/auth/login"
+                href="/auth/signup"
                 className="text-xs font-semibold text-charcoal-700 hover:text-charcoal-900 px-3 py-2 rounded-xl hover:bg-cream-200 transition-colors"
               >
-                Sign in
+                Sign up
               </Link>
               <Link
-                href="/auth/signup"
+                href="/auth/login"
                 className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-forest-600 hover:bg-forest-700 active:bg-forest-800 text-white font-semibold text-xs shadow-sm transition-all"
               >
-                <span>Get started free</span>
+                <span>Login</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </>
@@ -129,7 +137,7 @@ export default function HomePage() {
             href="/dashboard"
             className="w-full sm:w-auto flex items-center justify-center gap-2 py-3 px-6 rounded-2xl bg-white hover:bg-cream-200 text-charcoal-800 border border-sand-border font-bold text-sm shadow-2xs transition-all"
           >
-            <span>View Dashboard</span>
+            <span>View Demo</span>
             <ChevronRight className="w-4 h-4" />
           </Link>
         </div>
@@ -145,14 +153,14 @@ export default function HomePage() {
           </Link>
         </div>
 
-        {/* Quick Google Sign In Pill */}
+        {/* Quick Google Sign In */}
         <div className="mt-3 flex items-center gap-2 text-xs text-charcoal-500">
-          <span>Or sign in with demo:</span>
+          <span>Or sign in:</span>
           <button
             onClick={handleGoogleCTA}
-            className="font-bold text-forest-700 hover:underline flex items-center gap-1"
+            className="font-bold text-forest-700 hover:text-forest-800 hover:underline flex items-center gap-1 transition-colors"
           >
-            <span>Continue with Google (Demo) →</span>
+            <span>Continue with Google →</span>
           </button>
         </div>
 

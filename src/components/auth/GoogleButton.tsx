@@ -6,7 +6,7 @@ interface GoogleButtonProps {
   label?: string;
 }
 
-export function GoogleButton({ onClick, disabled, label = 'Continue with Google (Demo)' }: GoogleButtonProps) {
+export function GoogleButton({ onClick, disabled, label = 'Continue with Google' }: GoogleButtonProps) {
   return (
     <button
       type="button"

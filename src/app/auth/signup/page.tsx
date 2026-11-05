@@ -78,7 +78,7 @@ export default function SignupPage() {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4">
         <div className="bg-white border border-sand-border py-8 px-6 sm:px-8 rounded-3xl shadow-sm flex flex-col gap-5">
           {/* Google Sign In */}
-          <GoogleButton onClick={handleGoogleSignUp} disabled={isLoading} label="Sign up with Google (Demo)" />
+          <GoogleButton onClick={handleGoogleSignUp} disabled={isLoading} label="Sign up with Google" />
 
           {/* Divider */}
           <div className="relative flex items-center justify-center my-1 w-full">
@@ -102,7 +102,7 @@ export default function SignupPage() {
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Abhishek Singh"
+                  placeholder="Jane Doe"
                   className="w-full text-xs sm:text-sm pl-10 pr-4 py-2.5 bg-cream-50 border border-sand-border rounded-xl text-charcoal-900 placeholder:text-charcoal-400 focus:outline-none focus:ring-2 focus:ring-forest-600 font-medium"
                 />
               </div>

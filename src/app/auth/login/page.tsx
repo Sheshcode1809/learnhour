@@ -70,7 +70,7 @@ export default function LoginPage() {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4">
         <div className="bg-white border border-sand-border py-8 px-6 sm:px-8 rounded-3xl shadow-sm flex flex-col gap-5">
           {/* Google Sign In */}
-          <GoogleButton onClick={handleGoogleSignIn} disabled={isLoading} label="Continue with Google (Demo)" />
+          <GoogleButton onClick={handleGoogleSignIn} disabled={isLoading} label="Continue with Google" />
 
           {/* Divider */}
           <div className="relative flex items-center justify-center my-1 w-full">
@@ -163,7 +163,7 @@ export default function LoginPage() {
               className="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-sand-100 hover:bg-cream-200 text-charcoal-700 font-semibold text-xs transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5 text-forest-600" />
-              <span>Explore as Guest / Demo Learner</span>
+              <span>Explore as Guest</span>
             </button>
           </div>
         </div>

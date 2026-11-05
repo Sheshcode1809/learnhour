@@ -116,3 +116,4 @@ A frame-by-frame production storyboard and motion-graphics architecture for the 
 4. `VOICEOVER_SCRIPT.txt`: Synchronized audio transcript with scene cues.
 5. `STORYBOARD_60S.md`: This full production document.
 6. **NullMotion Studio (`http://127.0.0.1:4343`)**: Fully registered and interactive frame-by-frame breakdown engine.
+

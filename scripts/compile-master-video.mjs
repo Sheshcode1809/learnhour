@@ -289,3 +289,4 @@ tempFiles.forEach((f) => {
 });
 
 console.log('✓ All steps completed successfully!');
+
