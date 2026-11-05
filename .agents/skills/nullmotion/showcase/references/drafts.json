@@ -297,110 +297,124 @@
     },
     "learnhour-app": {
       "palette": {
-        "bg": "#0F172A",
-        "fg": "#FAF8F5",
+        "bg": "#FAF8F5",
+        "fg": "#1C1917",
         "accent": "#2D5A27"
       },
       "sections": [
         {
-          "name": "Landing Page",
+          "name": "Scene 1: The Problem",
           "beats": [
             [
               "text",
-              "92% of online courses",
+              "Too many courses.",
               {
-                "size": 40
+                "size": 44,
+                "weight": 800
               }
             ],
             [
               "text",
-              "are never finished",
+              "Too little consistency.",
               {
                 "size": 48,
-                "weight": 700
+                "weight": 900
               }
             ]
           ]
         },
         {
-          "name": "Dashboard",
+          "name": "Scene 2: Introducing Learnhour",
           "beats": [
             [
               "logo",
               "Learnhour",
               {
-                "mark": "⏱️",
-                "markSize": 60,
-                "size": 44,
-                "sub": "1 Hour Every Day"
+                "mark": "🎓",
+                "markSize": 64,
+                "size": 48,
+                "sub": "One hour. Every day. Real progress."
               }
             ],
             [
               "cards",
-              "Continue Learning Hero · Habit Meter"
+              "Continue Learning Hero · 1h Habit Meter"
             ]
           ]
         },
         {
-          "name": "Course Library",
-          "beats": [
-            [
-              "cards",
-              "Masterclasses & Curated Playlists"
-            ],
-            [
-              "list",
-              "Python 2026 | Full Stack Dev | AI & Machine Learning"
-            ]
-          ]
-        },
-        {
-          "name": "YouTube Ingestion",
-          "beats": [
-            [
-              "phone",
-              "Paste any YouTube link",
-              {
-                "stack": true
-              }
-            ],
-            [
-              "window",
-              "Auto-Split into 1-Hour Days"
-            ]
-          ]
-        },
-        {
-          "name": "Cinema Player",
+          "name": "Scene 3: Add Your Courses",
           "beats": [
             [
               "window",
-              "16:9 Cinema Player & Syllabus"
+              "Paste any YouTube playlist or tutorial link"
             ],
             [
               "list",
-              "Active Recall Quizzes | Smart Notes | Flashcards | Day Plan"
+              "Auto-Splits 10h Course → 11 Daily 1-Hour Lessons"
             ]
           ]
         },
         {
-          "name": "Focus Stopwatch",
+          "name": "Scene 4: Focused Learning",
+          "beats": [
+            [
+              "window",
+              "Distraction-Free Focus Stopwatch"
+            ],
+            [
+              "chart",
+              "Live Session Tracking & Daily Target Meter"
+            ]
+          ]
+        },
+        {
+          "name": "Scene 5: Build the Habit",
           "beats": [
             [
               "shape",
-              "Keep The Daily Streak Alive",
+              "Active Recall Dock & Daily Streaks",
               {
                 "bg": "#2D5A27"
               }
             ],
             [
+              "list",
+              "Smart Notes | Flashcards | Self-Check Quizzes"
+            ]
+          ]
+        },
+        {
+          "name": "Scene 6: Your Learning, Your Way",
+          "beats": [
+            [
+              "cards",
+              "100% Local-First · Zero Account Lock-in"
+            ],
+            [
+              "phone",
+              "Responsive on Mobile & Desktop"
+            ]
+          ]
+        },
+        {
+          "name": "Scene 7: Product Launch",
+          "beats": [
+            [
               "logo",
-              "Learnhour",
+              "LEARNHOUR",
               {
-                "mark": "⏱️",
-                "markSize": 70,
-                "size": 52,
-                "sub": "Free & Local-First"
+                "mark": "🎓",
+                "markSize": 76,
+                "size": 54,
+                "sub": "Start your learning journey today."
+              }
+            ],
+            [
+              "text",
+              "github.com/Sheshcode1809/learnhour",
+              {
+                "size": 24
               }
             ]
           ]

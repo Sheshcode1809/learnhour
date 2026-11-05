@@ -21,3 +21,4 @@ scenes.forEach((file, index) => {
 });
 
 console.log('Thumbnails created successfully!');
+

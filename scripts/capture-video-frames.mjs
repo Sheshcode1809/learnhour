@@ -61,3 +61,4 @@ capture().catch((err) => {
   console.error('Fatal capture error:', err);
   process.exit(1);
 });
+

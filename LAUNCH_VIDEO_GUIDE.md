@@ -4,77 +4,57 @@ This guide details how the **NullMotion** skill (`.agents/skills/nullmotion/`) i
 
 ---
 
-## 🎬 1. Launch Film Architecture
+## 🎬 1. Official 60-Second Product Launch Video
 
-NullMotion pairs a finished motion graphics ad sequence on top with frame-accurate **HyperFrames** motion graphics drafts underneath.
+*Reference ID: `learnhour-app` | Resolution: 1920x1080 @ 30fps | Format: H.264 / AAC 192k*
 
-We have authored two distinct motion graphics sequences for **Learnhour**:
+The launch video pairs high-resolution screen recordings of the real Learnhour application with synchronized **HyperFrames** motion graphics drafts underneath.
 
-### Sequence A: The Full SaaS Launch Breakdown (63 seconds)
-*Reference ID: `227b019e7968` | 1920x1080 @ 60fps*
-
-| Timeline | Section Name | Visual Beat 1 | Visual Beat 2 | Story & Motion Concept |
-| :--- | :--- | :--- | :--- | :--- |
-| **0:00 – 0:08** | **Hook** | `text`: "92% of online courses" | `window`: "Are Never Finished" | Highlights the core pain point: abandoned tutorials. |
-| **0:08 – 0:17** | **Problem** | `text`: "Long 80-hour playlists" | `notify`: "Overwhelmed & no habit" | Demonstrates course fatigue and information overload. |
-| **0:17 – 0:24** | **Solution** | `burst`: Abstract kinetic energy | `logo`: **Learnhour** (⏱️) | Dramatic brand reveal: "1 Hour Every Day". |
-| **0:24 – 0:32** | **Generator** | `phone`: "Paste any YouTube video" | `cards`: "Auto-Split into 1h Days" | Shows YouTube link ingestion and automatic syllabus generation. |
-| **0:32 – 0:39** | **Focus Timer** | `window`: "Distraction-Free Stopwatch" | `list`: "Live Focus Ticker \| Zero Clutter \| Confetti" | Displays clean stopwatch UI with milestone feedback. |
-| **0:39 – 0:48** | **Active Study** | `cards`: "Active Recall Tools" | `list`: "Quizzes \| Smart Notes \| Flashcards" | Highlights interactive learning features. |
-| **0:48 – 0:56** | **Streaks** | `window`: "Timezone-Aware Habits" | `chart`: "Daily Streak: 14 Days" | Kinetic line chart showing streak progression. |
-| **0:56 – 1:03** | **End Card** | `shape`: "Master any skill in 1h/day" | `logo`: **Learnhour** (Free & Open Source) | Punchy closing CTA with brand mark. |
+| Timeline | Scene | Visual / Route | Kinetic Typography & Audio |
+| :--- | :--- | :--- | :--- |
+| **0:00 – 0:07** | **The Problem** | Dark cinematic course backlog, stalled progress bars | *"Too many courses. Too little consistency."*<br>Voiceover: *"We all have courses we promised ourselves we would finish..."* |
+| **0:07 – 0:14** | **Introducing Learnhour** | Live Dashboard (`/dashboard`), habit meter, greeting | *"Meet Learnhour. One hour. Every day. Real progress."*<br>Voiceover: *"Meet Learnhour, your personal learning and habit tracker..."* |
+| **0:14 – 0:23** | **Add Your Courses** | Course Creator (`/courses/new`), YouTube playlist ingestion | *"Turn long courses into daily learning plans."*<br>Voiceover: *"Add your favourite courses and playlists..."* |
+| **0:23 – 0:33** | **Focused Learning** | Focus Stopwatch (`/sessions`), timer controls, live log | *"Focus. Learn. Track your progress."*<br>Voiceover: *"Start your focus timer, track every learning session..."* |
+| **0:33 – 0:43** | **Build the Habit** | Cinema Player (`/courses/python-2026`), Recall Dock | *"Build consistency. Strengthen knowledge."*<br>Voiceover: *"Build learning streaks, track your daily goals..."* |
+| **0:43 – 0:51** | **Your Learning, Your Way** | Settings (`/settings`), local-first, responsive layouts | *"Your learning. Your progress. Your control."*<br>Voiceover: *"With local-first learning and optional cloud synchronization..."* |
+| **0:51 – 1:00** | **Product Launch** | Warm ivory grand brand reveal, badges, final CTA | *"LEARNHOUR · Learn consistently. Progress every day."*<br>Voiceover: *"Stop collecting courses. Start completing them..."* |
 
 ---
 
-### Sequence B: 30-Second Fast Punchy Promo (30 seconds)
-*Reference ID: `69614b10fa87` | 1920x1080 @ 60fps*
+## 📁 2. Generated Artifacts & Files
 
-- **0:00 – 0:04**: Giant typography hook: *"Online courses — too long"*
-- **0:04 – 0:08**: Kinetic geometric burst: *"The 1-Hour Habit"*
-- **0:08 – 0:13**: Logo reveal: **Learnhour (⏱️)**
-- **0:13 – 0:17**: Phone mockup showing instant YouTube course generation
-- **0:17 – 0:22**: Active study tools (Recall Quizzes & Smart Notes)
-- **0:22 – 0:26**: Flame streak chart
-- **0:26 – 0:30**: End card CTA
+| Deliverable | File Path | Description |
+| :--- | :--- | :--- |
+| **16:9 Master Video** | [`learnhour-launch-60s.mp4`](file:///s:/Projects/productivity%20project/learnhour-launch-60s.mp4) | 1920x1080 Full HD 60s launch video with dual-track voiceover & music |
+| **9:16 Social Reel** | [`learnhour-launch-9x16.mp4`](file:///s:/Projects/productivity%20project/learnhour-launch-9x16.mp4) | 1080x1920 vertical video for Instagram Reels, YouTube Shorts, & TikTok |
+| **Launch Thumbnail** | [`thumbnail.jpg`](file:///s:/Projects/productivity%20project/thumbnail.jpg) | 1920x1080 crisp YouTube / social launch poster |
+| **Voiceover Script** | [`VOICEOVER_SCRIPT.txt`](file:///s:/Projects/productivity%20project/VOICEOVER_SCRIPT.txt) | Complete spoken script with scene timecodes and voice direction |
+| **Storyboard** | [`STORYBOARD_60S.md`](file:///s:/Projects/productivity%20project/STORYBOARD_60S.md) | Comprehensive scene-by-scene motion design documentation |
 
 ---
 
-## 🚀 2. How to Preview & Export
+## 🚀 3. How to Preview & Export in NullMotion Studio
 
 The NullMotion studio server runs locally with zero external dependencies.
 
-### Step 1: Launch the Studio
-```bash
-cd .agents/skills/nullmotion
-npm start
-```
-*(The studio starts at `http://127.0.0.1:4343`)*
-
-### Step 2: Open in Chrome or Edge
+### Step 1: Open NullMotion Studio
 Navigate to:
 ```
 http://127.0.0.1:4343
 ```
+*(Reference `#1` is pre-selected: **Learnhour · Official 60s Launch Film**)*
 
-### Step 3: Keyboard Controls & Scrubbing
-- **Space**: Play / Pause film & motion drafts in sync.
-- **`,` (comma)**: Step backward 1 single frame (1/30s).
-- **`.` (period)**: Step forward 1 single frame (1/30s).
-- **Left / Right Arrow**: Jump between sections.
-- **Home / End**: Jump to the start or end of the film.
+### Step 2: Controls & Timeline Scrubbing
+- **Space**: Play / Pause video and HyperFrames drafts in perfect sync.
+- **← / → Arrow Keys**: Step frame-by-frame (1 frame per tap).
+- **Shift + ← / →**: Jump through the 7 scene cut points.
+- **J / K / L**: Scrub backward, pause, and scrub forward at variable speeds.
 
-### Step 4: Export Frame-Accurate 1080p MP4
-1. Click the **Download** dropdown in the top right.
-2. Select **"Whole preview"**.
-3. Chrome/Edge will use **WebCodecs** and **mp4-muxer** to render every single frame at 24 Mbps (1920x1080) with full synced audio.
-4. The `.mp4` file will automatically download to your computer.
-
----
-
-## 🛠️ Customizing the Drafts
-
-To adjust text, beat types, or colors:
-1. Open [`.agents/skills/nullmotion/public/references/drafts.json`](file:///s:/Projects/productivity%20project/.agents/skills/nullmotion/public/references/drafts.json).
-2. Modify any beat text or options (e.g. `size`, `y`, `stack`, `bg`).
-3. Refresh `http://127.0.0.1:4343` to see the live updates instantly.
-
+### Step 3: Exporting Custom MP4 Videos
+1. Click the **"Export Film"** button in the top-right toolbar.
+2. Select your export mode:
+   - **Composite (Film + HyperFrames Draft)**: Exports the split-screen sequence.
+   - **HyperFrames Draft Only**: Exports pure animated graphic frames.
+   - **Source Film Only**: Clean video pass-through.
+3. The in-browser WebCodecs engine renders the 1080p MP4 directly to your Downloads folder at 24Mbps.

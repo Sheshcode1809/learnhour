@@ -110,3 +110,4 @@ drafts.drafts['learnhour-app'] = {
 fs.writeFileSync(draftsPath, JSON.stringify(drafts, null, 2));
 fs.writeFileSync(path.join(publicRefDir, 'drafts.json'), JSON.stringify(drafts, null, 2));
 console.log('✓ Drafts configured for learnhour-app!');
+

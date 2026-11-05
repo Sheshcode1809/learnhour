@@ -80,27 +80,31 @@
   "learnhour-app": [
     {
       "start": 0,
-      "end": 5.01
+      "end": 7
     },
     {
-      "start": 5.01,
-      "end": 10.02
+      "start": 7,
+      "end": 14
     },
     {
-      "start": 10.02,
-      "end": 15.03
+      "start": 14,
+      "end": 23
     },
     {
-      "start": 15.03,
-      "end": 20.04
+      "start": 23,
+      "end": 33
     },
     {
-      "start": 20.04,
-      "end": 25.05
+      "start": 33,
+      "end": 43
     },
     {
-      "start": 25.05,
-      "end": 30.06
+      "start": 43,
+      "end": 51
+    },
+    {
+      "start": 51,
+      "end": 60
     }
   ]
 }

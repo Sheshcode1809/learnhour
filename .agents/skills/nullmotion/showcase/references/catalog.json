@@ -2,54 +2,61 @@
   "references": [
     {
       "id": "learnhour-app",
-      "name": "Learnhour · 1-Hour Daily Habit Launch",
-      "duration": 30.06,
+      "name": "Learnhour · Official 60s Launch Film",
+      "duration": 60,
       "width": 1920,
       "height": 1080,
       "src": "/media/references/learnhour-app.mp4",
-      "poster": "/references/learnhour-app-0.jpg",
+      "poster": "/references/learnhour-app-1.jpg",
       "segments": [
         {
           "ref": "learnhour-app",
           "in": 0,
-          "out": 5.01,
+          "out": 7,
           "part": 1,
           "poster": "/references/learnhour-app-0.jpg"
         },
         {
           "ref": "learnhour-app",
-          "in": 5.01,
-          "out": 10.02,
+          "in": 7,
+          "out": 14,
           "part": 2,
           "poster": "/references/learnhour-app-1.jpg"
         },
         {
           "ref": "learnhour-app",
-          "in": 10.02,
-          "out": 15.03,
+          "in": 14,
+          "out": 23,
           "part": 3,
           "poster": "/references/learnhour-app-2.jpg"
         },
         {
           "ref": "learnhour-app",
-          "in": 15.03,
-          "out": 20.04,
+          "in": 23,
+          "out": 33,
           "part": 4,
           "poster": "/references/learnhour-app-3.jpg"
         },
         {
           "ref": "learnhour-app",
-          "in": 20.04,
-          "out": 25.05,
+          "in": 33,
+          "out": 43,
           "part": 5,
           "poster": "/references/learnhour-app-4.jpg"
         },
         {
           "ref": "learnhour-app",
-          "in": 25.05,
-          "out": 30.06,
+          "in": 43,
+          "out": 51,
           "part": 6,
           "poster": "/references/learnhour-app-5.jpg"
+        },
+        {
+          "ref": "learnhour-app",
+          "in": 51,
+          "out": 60,
+          "part": 7,
+          "poster": "/references/learnhour-app-6.jpg"
         }
       ]
     },

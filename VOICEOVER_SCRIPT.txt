@@ -1,0 +1,82 @@
+================================================================================
+LEARNHOUR — OFFICIAL PRODUCT LAUNCH VIDEO
+VOICEOVER SCRIPT & AUDIO TIMING SPECIFICATION
+================================================================================
+
+Total Duration: 60 Seconds
+Tone: Confident, Inspiring, Friendly, Modern Technology Startup (Clear enunciation, medium pace)
+Audio Profile: Dual-track Master (Spoken Narration + Ambient Technology Soundtrack at -18dB)
+Resolution: 1920x1080 (16:9 Landscape) & 1080x1920 (9:16 Vertical Reel)
+Website: https://github.com/Sheshcode1809/learnhour
+
+--------------------------------------------------------------------------------
+SCENE 1: THE PROBLEM (0:00 – 0:07)
+--------------------------------------------------------------------------------
+Duration: 7.0 Seconds
+On-Screen Text: "Too many courses. Too little consistency."
+Subtext: "92% of online learners abandon courses within the first 14 days."
+Visual: Dark, cinematic mood. Scattered tutorial tabs, massive backlog, 65h bootcamp stuck at 8%.
+Voiceover:
+"We all have courses we promised ourselves we would finish. But finding the time and staying consistent is the real challenge."
+
+--------------------------------------------------------------------------------
+SCENE 2: INTRODUCING LEARNHOUR (0:07 – 0:14)
+--------------------------------------------------------------------------------
+Duration: 7.0 Seconds
+On-Screen Text: "Meet Learnhour. One hour. Every day. Real progress."
+Visual: Smooth camera zoom into the live Learnhour dashboard, brand graduation mark, warm ivory palette, Continue Learning hero card.
+Voiceover:
+"Meet Learnhour, your personal learning and habit tracker, designed to turn big learning goals into daily achievements."
+
+--------------------------------------------------------------------------------
+SCENE 3: ADD YOUR COURSES (0:14 – 0:23)
+--------------------------------------------------------------------------------
+Duration: 9.0 Seconds
+On-Screen Text: "Turn long courses into daily learning plans."
+Visual: Course Creator route (/courses/new). Pasting a YouTube link, auto-splitting a 10h 45m tutorial into 11 manageable 1-hour daily lessons.
+Voiceover:
+"Add your favourite courses and playlists, organize your learning, and turn hours of content into a manageable daily plan."
+
+--------------------------------------------------------------------------------
+SCENE 4: FOCUSED LEARNING (0:23 – 0:33)
+--------------------------------------------------------------------------------
+Duration: 10.0 Seconds
+On-Screen Text: "Focus. Learn. Track your progress."
+Visual: Focus Stopwatch and Sessions page (/sessions). Digital timer counting 45:00, start/pause/resume controls, daily target progress bar.
+Voiceover:
+"Start your focus timer, track every learning session, and see your progress grow with every minute invested."
+
+--------------------------------------------------------------------------------
+SCENE 5: BUILD THE HABIT (0:33 – 0:43)
+--------------------------------------------------------------------------------
+Duration: 10.0 Seconds
+On-Screen Text: "Build consistency. Strengthen knowledge."
+Visual: Course detail page (/courses/python-2026). 16:9 cinema video player, curriculum checklist, and active recall dock (Flashcards, Quizzes, Smart Notes).
+Voiceover:
+"Build learning streaks, track your daily goals, review with flashcards, and reinforce what you learn."
+
+--------------------------------------------------------------------------------
+SCENE 6: YOUR LEARNING, YOUR WAY (0:43 – 0:51)
+--------------------------------------------------------------------------------
+Duration: 8.0 Seconds
+On-Screen Text: "Your learning. Your progress. Your control."
+Visual: Settings page (/settings) and local-first data architecture. JSON backups, zero vendor lock-in, side-by-side desktop and mobile responsive layout.
+Voiceover:
+"With local-first learning and optional cloud synchronization, your learning journey stays organized and accessible."
+
+--------------------------------------------------------------------------------
+SCENE 7: PRODUCT LAUNCH (0:51 – 1:00)
+--------------------------------------------------------------------------------
+Duration: 9.0 Seconds
+On-Screen Text:
+"LEARNHOUR"
+"Learn consistently. Progress every day."
+"Start your learning journey today."
+"https://github.com/Sheshcode1809/learnhour"
+Visual: Grand launch brand reveal on Warm Ivory (#FAF8F5) with Forest Green (#2D5A27) accents, product feature badges, and primary CTA.
+Voiceover:
+"Stop collecting courses. Start completing them. Learnhour. Learn consistently. Progress every day."
+
+================================================================================
+END OF SCRIPT
+================================================================================
