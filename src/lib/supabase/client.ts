@@ -4,7 +4,7 @@ let clientInstance: SupabaseClient | null = null;
 
 /** Supabase Auth is opt-in. Local-first guest mode is the default. */
 export function isSupabaseConfigured(): boolean {
-  if (process.env.NEXT_PUBLIC_SUPABASE_AUTH_ENABLED !== 'true') return false;
+  if (process.env.NEXT_PUBLIC_SUPABASE_AUTH_ENABLED === 'false') return false;
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();

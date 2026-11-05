@@ -57,14 +57,40 @@ export default function HomePage() {
         </nav>
 
         {/* Right Auth Actions */}
-        <div className="flex items-center gap-2.5">
-          {authConfigured && !isAuthenticated && (
-            <Link href="/auth/login" className="text-xs font-semibold text-charcoal-700 hover:text-charcoal-900 px-3 py-2 rounded-xl hover:bg-cream-200 transition-colors">Sign in</Link>
+        <div className="flex items-center gap-2 sm:gap-3">
+          {isAuthenticated ? (
+            <>
+              <Link
+                href="/dashboard"
+                className="text-xs font-semibold text-charcoal-700 hover:text-charcoal-900 px-3 py-2 rounded-xl hover:bg-cream-200 transition-colors"
+              >
+                Dashboard
+              </Link>
+              <Link
+                href="/auth/login"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-forest-600 hover:bg-forest-700 active:bg-forest-800 text-white font-semibold text-xs shadow-sm transition-all"
+              >
+                <span>Login</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/auth/signup"
+                className="text-xs font-semibold text-charcoal-700 hover:text-charcoal-900 px-3 py-2 rounded-xl hover:bg-cream-200 transition-colors"
+              >
+                Sign up
+              </Link>
+              <Link
+                href="/auth/login"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-forest-600 hover:bg-forest-700 active:bg-forest-800 text-white font-semibold text-xs shadow-sm transition-all"
+              >
+                <span>Login</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </>
           )}
-          <Link href="/dashboard" className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-forest-600 hover:bg-forest-700 text-white font-semibold text-xs shadow-sm transition-all">
-            <span>{isAuthenticated ? 'Continue learning' : 'Open Learnhour'}</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
         </div>
       </header>
 
@@ -396,15 +422,23 @@ export default function HomePage() {
 
           <div className="mt-7 flex flex-col sm:flex-row items-center gap-3 w-full max-w-sm">
             <Link
-              href="/dashboard"
+              href="/auth/signup"
               className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-2xl bg-forest-600 hover:bg-forest-700 text-white font-bold text-sm shadow-sm"
             >
-              <span>Open Learnhour</span>
+              <span>Create Free Account</span>
               <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
+              href="/dashboard"
+              className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-2xl bg-white hover:bg-cream-200 text-charcoal-800 border border-sand-border font-bold text-sm shadow-sm"
+            >
+              <span>View Demo</span>
             </Link>
           </div>
 
-          {authConfigured && <Link href="/auth/login" className="mt-4 text-xs font-semibold text-charcoal-600 hover:text-charcoal-900 underline">Or sign in to your account</Link>}
+          <Link href="/auth/login" className="mt-4 text-xs font-semibold text-charcoal-600 hover:text-charcoal-900 underline">
+            Already have an account? Sign in
+          </Link>
         </div>
       </section>
 
@@ -418,12 +452,14 @@ export default function HomePage() {
           <span>— One focused hour a day.</span>
         </div>
 
-        <div className="flex items-center gap-4 text-xs font-medium">
+        <div className="flex flex-wrap items-center gap-4 text-xs font-medium">
+          <Link href="/auth/login" className="font-semibold text-forest-700 hover:text-forest-800">Login</Link>
+          <Link href="/auth/signup" className="font-semibold text-forest-700 hover:text-forest-800">Sign up</Link>
+          <Link href="/dashboard" className="hover:text-charcoal-900">Dashboard</Link>
           <Link href="/about" className="hover:text-charcoal-900">About</Link>
           <Link href="/privacy" className="hover:text-charcoal-900">Privacy</Link>
           <Link href="/terms" className="hover:text-charcoal-900">Terms</Link>
           <Link href="/contact" className="hover:text-charcoal-900">Contact</Link>
-          <Link href="/dashboard" className="hover:text-charcoal-900">Open app</Link>
         </div>
       </footer>
     </div>
