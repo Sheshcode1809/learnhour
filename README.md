@@ -1,158 +1,339 @@
-# Learnhour — Course Learning & Habit Tracker ⏱️📚
+# Learnhour — Course Learning & Habit Tracker
 
-> Transform long YouTube playlists and masterclasses into consistent, 1-hour daily learning habits.
-
-[![Next.js](https://img.shields.io/badge/Next.js-14.2-black?style=flat-square&logo=next.js)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-3.4-38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
-[![Supabase](https://img.shields.io/badge/Supabase-Ready-3ECF8E?style=flat-square&logo=supabase)](https://supabase.com/)
-[![Tests](https://img.shields.io/badge/Vitest-19%2F19%20Passing-6E9F18?style=flat-square&logo=vitest)](https://vitest.dev/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
+Transform long YouTube playlists and masterclasses into consistent, one-hour daily learning habits.
 
 ---
 
-## ✨ Features
+## Overview
 
-- **🎯 1-Hour Daily Habit Focus**: Splits comprehensive masterclasses and tutorials into manageable 1-hour study chunks so you finish courses steadily.
-- **⚡ Quick Paste & Course Generator**: Paste any YouTube video or playlist link to automatically partition it into structured daily syllabus schedules.
-- **⏱️ Distraction-Free Study Timer**: Integrated stopwatch with course-linking, live focus ticker, pause, resume, and milestone confetti celebrations.
-- **📝 Offline Study & Backdating**: Log offline learning sessions with retrospective date and time entry.
-- **🔥 Habit Streaks & Timezone Accuracy**: Timezone-aware streak tracking (IANA compliant) ensuring your streak updates accurately at local midnight.
-- **🧠 Active Study Tools Dock**:
-  - **Recall Quiz**: Test conceptual understanding after each lesson.
-  - **Smart Notes**: Save key takeaways and code snippets linked to specific lessons.
-  - **Flashcards**: Quick-flip review cards for core terminology and principles.
-  - **Day Plan**: High-level daily syllabus breakdown.
-- **💾 Local-First with Optional Cloud Sync**:
-  - Works 100% offline out-of-the-box using persistent local storage.
-  - Multi-device cloud sync ready via Supabase PostgreSQL with Row Level Security (RLS).
-- **🎨 UI/UX Pro Max Design System**: Minimal, editorial, and calm aesthetics with warm ivory canvas (`#FAF8F5`), forest green progress indicators (`#2D5A27`), and terracotta flame accents (`#C85A32`).
+Learnhour is a personal learning and productivity tracker designed to help users complete long online courses, YouTube playlists, and masterclasses through consistent daily learning sessions.
+
+Instead of feeling overwhelmed by lengthy courses, Learnhour breaks learning into manageable daily goals, helping users build sustainable habits and monitor their progress.
+
+The platform follows a simple philosophy:
+
+**One hour of focused learning every day can make a meaningful difference.**
 
 ---
 
-## 🛠️ Tech Stack
+## Features
 
-- **Framework**: Next.js 14 (App Router)
-- **Language**: TypeScript (Strict Mode)
-- **Styling**: Tailwind CSS
-- **Typography**: Google Fonts via `next/font` (`Plus Jakarta Sans` & `JetBrains Mono`)
-- **Icons**: Lucide React
-- **Testing**: Vitest (19 unit test suites covering progress, streaks, and day planners)
-- **Database / Auth (Optional)**: Supabase (PostgreSQL + RLS)
+### 1. Daily Learning Goals
+
+- Set a default daily learning target of 60 minutes.
+- Track daily study progress.
+- Monitor completed and remaining learning time.
+- Build consistent learning habits.
+
+### 2. Course Management
+
+- Add courses using YouTube video or playlist URLs.
+- Automatically partition supported course content into structured daily learning schedules.
+- Organize courses and masterclasses.
+- Track total, completed, and remaining course duration.
+- Monitor course completion percentages.
+
+### 3. Distraction-Free Study Timer
+
+- Integrated study stopwatch.
+- Link study sessions to individual courses.
+- Start, pause, resume, and finish sessions.
+- Monitor live learning duration.
+- Celebrate learning milestones.
+
+### 4. Offline Study Tracking
+
+- Manually record learning sessions.
+- Add retrospective study entries.
+- Track offline learning activities.
+- Maintain an accurate learning history.
+
+### 5. Learning Streaks
+
+- Monitor daily learning streaks.
+- Track personal best streaks.
+- Use timezone-aware date calculations.
+- Support IANA timezone handling.
+- Ensure streak calculations remain accurate across local midnight.
+
+### 6. Active Study Tools
+
+Learnhour includes an integrated study tools dock:
+
+**Recall Quiz**
+
+- Test understanding after completing lessons.
+- Practice recalling important concepts.
+
+**Smart Notes**
+
+- Save important takeaways.
+- Store code snippets and learning notes.
+- Associate notes with specific lessons.
+
+**Flashcards**
+
+- Create review cards for important concepts.
+- Practice terminology and definitions.
+- Reinforce learning through active recall.
+
+**Day Plan**
+
+- View daily learning schedules.
+- Break larger courses into manageable study sessions.
+- Organize learning activities.
+
+### 7. Local-First Storage and Optional Cloud Sync
+
+**Local-first mode**
+
+- Works offline without requiring external API credentials.
+- Persists learning data locally.
+- Supports personal learning without mandatory registration.
+
+**Optional cloud synchronization**
+
+- Supabase PostgreSQL integration.
+- Authentication support.
+- Row Level Security (RLS).
+- Multi-device synchronization when configured.
+
+### 8. Modern User Interface
+
+Built with a minimal, editorial, and distraction-free design system.
+
+Design palette:
+
+- Background: Warm Ivory `#FAF8F5`
+- Progress: Forest Green `#2D5A27`
+- Accent: Terracotta `#C85A32`
+
+The interface prioritizes readability, visual consistency, and responsive layouts across desktop, tablet, and mobile devices.
 
 ---
 
-## 🚀 Getting Started
+## Tech Stack
+
+| Technology        | Purpose                                    |
+| ----------------- | ------------------------------------------ |
+| Next.js 14        | React framework and App Router             |
+| TypeScript 5      | Strictly typed development                 |
+| Tailwind CSS 3.4  | Utility-first styling                      |
+| Plus Jakarta Sans | Primary typography                         |
+| JetBrains Mono    | Monospaced typography                      |
+| Lucide React      | Icons                                      |
+| Vitest            | Unit testing                               |
+| Supabase          | Optional authentication and cloud database |
+| PostgreSQL        | Persistent cloud storage                   |
+
+---
+
+## Getting Started
 
 ### Prerequisites
 
-- **Node.js**: v18.17.0 or higher
-- **npm** or **yarn** or **pnpm**
+- Node.js v18.17.0 or higher
+- npm, yarn, or pnpm
+- Git
 
-### Installation
+### 1. Clone the Repository
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/Sheshcode1809/learnhour.git
-   cd learnhour
-   ```
+```bash
+git clone https://github.com/Sheshcode1809/learnhour.git
 
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+cd learnhour
+```
 
-3. **Configure Environment Variables**:
-   Copy `.env.example` to `.env.local`:
-   ```bash
-   cp .env.example .env.local
-   ```
-   *(The application works out of the box in local-first mode without requiring external API keys).*
+### 2. Install Dependencies
 
-4. **Start the development server**:
-   ```bash
-   npm run dev
-   ```
+```bash
+npm install
+```
 
-5. **Open in browser**:
-   Navigate to [http://localhost:3000](http://localhost:3000).
+### 3. Configure Environment Variables
+
+Copy `.env.example` to `.env.local`.
+
+```bash
+cp .env.example .env.local
+```
+
+The application works in local-first mode without requiring external API credentials.
+
+### 4. Start the Development Server
+
+```bash
+npm run dev
+```
+
+### 5. Open the Application
+
+Navigate to:
+
+[http://localhost:3000](http://localhost:3000)
 
 ---
 
-## 🧪 Testing & Verification
+## Testing and Verification
 
 Run the test suite:
+
 ```bash
 npm test
 ```
 
-Typecheck with TypeScript:
+Run TypeScript checks:
+
 ```bash
 npx tsc --noEmit
 ```
 
-Lint code:
+Run linting:
+
 ```bash
 npm run lint
 ```
 
-Build for production:
+Create a production build:
+
 ```bash
 npm run build
 ```
 
----
-
-## 🗄️ Optional: Supabase Cloud Sync Setup
-
-To enable multi-device synchronization and PostgreSQL storage:
-
-1. Create a free project at [supabase.com](https://supabase.com).
-2. Go to the **SQL Editor** in your Supabase dashboard.
-3. Run the complete migration schema located at:
-   ```
-   supabase/migrations/001_initial_schema.sql
-   ```
-4. Copy your project credentials into `.env.local`:
-   ```env
-   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-public-key
-   ```
-5. Restart your server (`npm run dev`). Your app will automatically switch to cloud-backed persistence!
+The project includes 19 Vitest test suites covering learning progress, streak calculations, and daily planning.
 
 ---
 
-## 📂 Project Structure
+## Optional: Supabase Cloud Sync Setup
+
+Learnhour supports optional cloud synchronization using Supabase.
+
+### Step 1: Create a Supabase Project
+
+Visit [Supabase](https://supabase.com/) and create a project.
+
+### Step 2: Configure the Database
+
+Open the SQL Editor in your Supabase dashboard.
+
+Execute the migration located at:
 
 ```text
+supabase/migrations/001_initial_schema.sql
+```
+
+### Step 3: Configure Environment Variables
+
+Add your Supabase project credentials to `.env.local`:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-public-key
+```
+
+### Step 4: Restart the Development Server
+
+```bash
+npm run dev
+```
+
+Verify that authentication, database connectivity, and Row Level Security policies are configured correctly before enabling cloud synchronization.
+
+Never expose your Supabase service-role key in client-side code.
+
+---
+
+## Project Structure
+
+```text
+learnhour/
+|
 ├── src/
-│   ├── app/                    # Next.js App Router routes
-│   │   ├── (auth)/             # Login & signup authentication pages
-│   │   ├── courses/            # Course library, creator, & cinema player
-│   │   │   ├── [id]/           # Lesson player & study tools dock
-│   │   │   └── new/            # Course creation hero & manual builder
-│   │   ├── dashboard/          # Today overview, habit meter, & activity chart
-│   │   ├── sessions/           # Focus stopwatch & study session history
-│   │   └── settings/           # Habit targets, timezone, & JSON backups
-│   ├── components/             # Reusable UI & course components
-│   │   ├── course-player/      # Quiz, notes, flashcards, & day plan modals
-│   │   ├── courses/            # Course cards, scenic banner, & hero
-│   │   └── layout/             # Sidebar, mobile drawer, & global timer bar
-│   ├── context/                # Learning & Auth React context providers
+│   ├── app/
+│   │   ├── (auth)/              # Login and signup pages
+│   │   ├── courses/             # Course library and player
+│   │   │   ├── [id]/            # Course details and study tools
+│   │   │   └── new/             # Course creation
+│   │   ├── dashboard/           # Learning dashboard
+│   │   ├── sessions/            # Timer and session history
+│   │   └── settings/            # Goals, timezone, and backups
+│   │
+│   ├── components/
+│   │   ├── course-player/       # Quiz, notes, flashcards, day plan
+│   │   ├── courses/             # Course cards and components
+│   │   └── layout/              # Sidebar and navigation
+│   │
+│   ├── context/                 # Learning and auth providers
+│   │
 │   ├── lib/
-│   │   ├── calculations/       # Progress, streaks, & day planner formulas
-│   │   ├── storage/            # Local-first repository & backup helpers
-│   │   ├── supabase/           # Optional Supabase client configuration
-│   │   └── youtube.ts          # YouTube URL parser & embed validators
-│   └── tests/                  # Vitest calculation unit tests
+│   │   ├── calculations/        # Progress and streak calculations
+│   │   ├── storage/             # Local storage and backup helpers
+│   │   ├── supabase/            # Supabase configuration
+│   │   └── youtube.ts           # YouTube URL parsing and validation
+│   │
+│   └── tests/                   # Vitest unit tests
+│
 ├── supabase/
-│   └── migrations/             # Production PostgreSQL schema & RLS policies
-└── public/                     # Static assets & screenshots
+│   └── migrations/              # Database schema and RLS policies
+│
+├── public/                      # Static assets
+│
+├── .env.example
+├── .gitignore
+├── package.json
+├── next.config.js
+├── tailwind.config.ts
+└── README.md
 ```
 
 ---
 
-## 📄 License
+## Deployment
 
-Distributed under the MIT License. See `LICENSE` for more information.
+Learnhour can be deployed using Vercel.
 
+Recommended deployment process:
+
+1. Push the project to GitHub.
+2. Import the repository into [Vercel](https://vercel.com/).
+3. Configure the required production environment variables.
+4. Configure Supabase production credentials if cloud synchronization is enabled.
+5. Deploy the application.
+6. Verify authentication, data persistence, and responsive behavior.
+
+Refer to `DEPLOYMENT.md` for detailed deployment instructions if available.
+
+---
+
+## Future Improvements
+
+Potential future enhancements include:
+
+- Advanced learning analytics.
+- Calendar-based study planning.
+- Learning reminders and notifications.
+- YouTube playlist synchronization.
+- AI-powered learning recommendations.
+- Advanced course completion reports.
+- Exportable learning statistics.
+
+---
+
+## License
+
+This project is distributed under the MIT License.
+
+See the [LICENSE](LICENSE) file for details.
+
+---
+
+## Author
+
+**Shesh Kanade**
+
+GitHub: [@Sheshcode1809](https://github.com/Sheshcode1809)
+
+---
+
+**Learnhour — Learn consistently. Progress every day.**
