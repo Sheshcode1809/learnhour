@@ -6,11 +6,11 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useLearning } from '@/context/LearningContext';
 import { GoogleButton } from '@/components/auth/GoogleButton';
-import { ArrowRight, GraduationCap, Lock, Mail, Sparkles, Target, User } from 'lucide-react';
+import { ArrowRight, GraduationCap, Lock, Mail, Target, User } from 'lucide-react';
 
 export default function SignupPage() {
   const router = useRouter();
-  const { signupWithEmail, loginWithGoogle, continueAsGuest, isLoading, authConfigured } = useAuth();
+  const { signupWithEmail, loginWithGoogle, isLoading, authConfigured } = useAuth();
   const { updatePreferences } = useLearning();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -47,12 +47,6 @@ export default function SignupPage() {
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Google sign-in could not be started.');
     }
-  };
-
-  const handleGuest = () => {
-    updatePreferences({ ...(name.trim() ? { name: name.trim() } : {}), daily_goal_minutes: dailyGoal });
-    continueAsGuest();
-    router.replace('/dashboard');
   };
 
   return (
@@ -96,14 +90,13 @@ export default function SignupPage() {
                 {error && <p role="alert" className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-sm text-rose-800">{error}</p>}
                 {notice && <p role="status" className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-sm text-emerald-800">{notice}</p>}
                 <button type="submit" disabled={isLoading} className="w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-forest-600 hover:bg-forest-700 text-white font-bold text-sm disabled:opacity-50"><span>{isLoading ? 'Creating account…' : 'Create account'}</span><ArrowRight aria-hidden="true" className="w-4 h-4" /></button>
-                <p className="text-xs leading-relaxed text-charcoal-600">Courses and study sessions are currently saved in this browser. Signing in does not sync them across devices.</p>
+                <p className="text-xs leading-relaxed text-charcoal-600">Courses and study sessions are saved in your local browser workspace.</p>
               </form>
             </>
           ) : (
-            <div className="rounded-2xl border border-sand-border bg-cream-50 p-4 text-sm leading-relaxed text-charcoal-700">Account creation is not configured in this deployment. Continue as a guest to use Learnhour; your records stay in this browser.</div>
+            <div className="rounded-2xl border border-sand-border bg-cream-50 p-4 text-sm leading-relaxed text-charcoal-700">Account creation is currently unavailable. Please verify your authentication configuration.</div>
           )}
           {!authConfigured && error && <p role="alert" className="text-sm text-rose-800">{error}</p>}
-          <button type="button" onClick={handleGuest} className="w-full min-h-11 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-sand-100 hover:bg-cream-200 text-charcoal-800 font-semibold text-sm"><Sparkles aria-hidden="true" className="w-4 h-4 text-forest-700" />Continue as guest</button>
         </section>
         <p className="mt-6 text-center text-sm text-charcoal-600">Already have an account? <Link href="/auth/login" className="font-bold text-forest-700 hover:underline">Sign in</Link></p>
       </div>

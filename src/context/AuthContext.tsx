@@ -9,7 +9,7 @@ export interface AuthUser {
   name: string;
   email: string;
   avatar_url?: string;
-  provider: 'google' | 'email' | 'guest';
+  provider: 'google' | 'email';
 }
 
 export interface AuthActionResult {
@@ -25,12 +25,11 @@ interface AuthContextType {
   loginWithEmail: (email: string, password: string) => Promise<void>;
   signupWithEmail: (name: string, email: string, password: string) => Promise<AuthActionResult>;
   loginWithGoogle: () => Promise<void>;
-  continueAsGuest: () => void;
   logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-const GUEST_STORAGE_KEY = 'courseit_auth_user_v1';
+const LEGACY_STORAGE_KEY = 'courseit_auth_user_v1';
 
 function mapSessionUser(session: Session): AuthUser {
   const user = session.user;
@@ -45,35 +44,6 @@ function mapSessionUser(session: Session): AuthUser {
   };
 }
 
-function readGuestUser(): AuthUser | null {
-  try {
-    const value = window.localStorage.getItem(GUEST_STORAGE_KEY);
-    if (!value) return null;
-    const parsed: unknown = JSON.parse(value);
-    if (
-      typeof parsed === 'object' && parsed !== null &&
-      'provider' in parsed && parsed.provider === 'guest'
-    ) {
-      return {
-        id: 'local-guest',
-        name: 'Learner',
-        email: '',
-        provider: 'guest',
-      };
-    }
-
-    // Remove identities written by the previous mock-auth implementation.
-    window.localStorage.removeItem(GUEST_STORAGE_KEY);
-  } catch {
-    try {
-      window.localStorage.removeItem(GUEST_STORAGE_KEY);
-    } catch {
-      // Storage may be disabled; guest mode can still be used for this page view.
-    }
-  }
-  return null;
-}
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -81,11 +51,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let mounted = true;
-    const guest = readGuestUser();
-    const supabase = getSupabaseClient();
 
+    // Purge any legacy guest identity from storage
+    try {
+      window.localStorage.removeItem(LEGACY_STORAGE_KEY);
+    } catch {
+      // Storage unavailable
+    }
+
+    const supabase = getSupabaseClient();
     if (!supabase) {
-      setUser(guest);
+      setUser(null);
       setIsLoading(false);
       return () => {
         mounted = false;
@@ -94,17 +70,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!mounted) return;
-      setUser(session ? mapSessionUser(session) : guest);
+      setUser(session ? mapSessionUser(session) : null);
     });
 
     supabase.auth.getSession()
       .then(({ data, error }) => {
         if (!mounted) return;
         if (error) throw error;
-        setUser(data.session ? mapSessionUser(data.session) : guest);
+        setUser(data.session ? mapSessionUser(data.session) : null);
       })
       .catch(() => {
-        if (mounted) setUser(guest);
+        if (mounted) setUser(null);
       })
       .finally(() => {
         if (mounted) setIsLoading(false);
@@ -118,7 +94,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loginWithEmail = async (email: string, password: string) => {
     const supabase = getSupabaseClient();
-    if (!supabase) throw new Error('Email sign-in is not configured. Continue as a guest to use local storage.');
+    if (!supabase) throw new Error('Email sign-in is not configured.');
 
     setIsLoading(true);
     try {
@@ -135,7 +111,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signupWithEmail = async (name: string, email: string, password: string): Promise<AuthActionResult> => {
     const supabase = getSupabaseClient();
-    if (!supabase) throw new Error('Account creation is not configured. Continue as a guest to use local storage.');
+    if (!supabase) throw new Error('Account creation is not configured.');
 
     setIsLoading(true);
     try {
@@ -161,7 +137,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loginWithGoogle = async () => {
     const supabase = getSupabaseClient();
-    if (!supabase) throw new Error('Google sign-in is not configured. Continue as a guest to use local storage.');
+    if (!supabase) throw new Error('Google sign-in is not configured.');
 
     setIsLoading(true);
     const { data, error } = await supabase.auth.signInWithOAuth({
@@ -180,44 +156,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     window.location.assign(data.url);
   };
 
-  const continueAsGuest = () => {
-    const guest: AuthUser = {
-      id: 'local-guest',
-      name: 'Learner',
-      email: '',
-      provider: 'guest',
-    };
-    try {
-      window.localStorage.setItem(GUEST_STORAGE_KEY, JSON.stringify(guest));
-    } catch {
-      // Continue in memory if browser storage is disabled.
-    }
-    setUser(guest);
-  };
-
   const logout = async () => {
     const supabase = getSupabaseClient();
-    if (supabase && user?.provider !== 'guest') {
+    if (supabase && user) {
       const { error } = await supabase.auth.signOut();
       if (error) throw new Error('Unable to sign out. Please try again.');
-    }
-    try {
-      window.localStorage.removeItem(GUEST_STORAGE_KEY);
-    } catch {
-      // The current page still clears its in-memory identity.
     }
     setUser(null);
   };
 
   const value: AuthContextType = {
     user,
-    isAuthenticated: Boolean(user && user.provider !== 'guest'),
+    isAuthenticated: Boolean(user),
     isLoading,
     authConfigured,
     loginWithEmail,
     signupWithEmail,
     loginWithGoogle,
-    continueAsGuest,
     logout,
   };
 

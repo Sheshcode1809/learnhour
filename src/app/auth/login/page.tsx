@@ -5,18 +5,18 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { GoogleButton } from '@/components/auth/GoogleButton';
-import { GraduationCap, Lock, Mail, ArrowRight, Sparkles } from 'lucide-react';
+import { GraduationCap, Lock, Mail, ArrowRight } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { loginWithEmail, loginWithGoogle, continueAsGuest, isLoading, authConfigured } = useAuth();
+  const { loginWithEmail, loginWithGoogle, isLoading, authConfigured } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
     const reason = new URLSearchParams(window.location.search).get('error');
-    if (reason === 'auth-not-configured') setError('Account sign-in is not configured here. Continue as a guest.');
+    if (reason === 'auth-not-configured') setError('Account sign-in is being set up. Please try again shortly.');
     else if (reason === 'callback-failed') setError('Sign-in could not be verified. Please try again.');
   }, []);
 
@@ -38,11 +38,6 @@ export default function LoginPage() {
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Google sign-in could not be started.');
     }
-  };
-
-  const handleGuest = () => {
-    continueAsGuest();
-    router.replace('/dashboard');
   };
 
   return (
@@ -85,7 +80,7 @@ export default function LoginPage() {
                   </div>
                 </div>
                 <p className="rounded-xl border border-sand-border bg-cream-50 p-3 text-xs leading-relaxed text-charcoal-600">
-                  Your learning records are currently stored in this browser. Signing in does not sync courses or sessions between devices yet.
+                  Your learning records are stored in this browser. Signing in gives you secure access to your account.
                 </p>
                 {error && <p role="alert" className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-sm text-rose-800">{error}</p>}
                 <button type="submit" disabled={isLoading} className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-forest-600 hover:bg-forest-700 text-white font-bold text-sm disabled:opacity-50">
@@ -95,24 +90,16 @@ export default function LoginPage() {
             </>
           ) : (
             <div className="rounded-2xl border border-sand-border bg-cream-50 p-4 text-sm leading-relaxed text-charcoal-700">
-              Account sign-in is not configured in this deployment. You can use Learnhour as a guest; your learning records stay in this browser.
+              Account sign-in is currently unavailable. Please verify your authentication configuration.
             </div>
           )}
 
           {error && !authConfigured && <p role="alert" className="text-sm text-rose-800">{error}</p>}
-          <div className="pt-3 border-t border-sand-border">
-            <button type="button" onClick={handleGuest} className="w-full min-h-11 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-sand-100 hover:bg-cream-200 text-charcoal-800 font-semibold text-sm transition-colors">
-              <Sparkles aria-hidden="true" className="w-4 h-4 text-forest-700" />
-              Continue as guest
-            </button>
-          </div>
         </div>
 
-        {authConfigured && (
-          <p className="mt-6 text-center text-sm text-charcoal-600">
-            New here? <Link href="/auth/signup" className="font-bold text-forest-700 hover:underline">Create an account</Link>
-          </p>
-        )}
+        <p className="mt-6 text-center text-sm text-charcoal-600">
+          New here? <Link href="/auth/signup" className="font-bold text-forest-700 hover:underline">Create an account</Link>
+        </p>
       </div>
     </div>
   );

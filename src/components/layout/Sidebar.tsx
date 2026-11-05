@@ -31,8 +31,8 @@ export function Sidebar() {
   ];
 
   const recentCourses = courses.slice(0, 4);
-  const displayName = user?.name || 'Learner';
-  const displayEmail = user?.email || 'learner@courseit.dev';
+  const displayName = user?.name || (user ? 'Learner' : 'Learnhour');
+  const displayEmail = user?.email || (user ? '' : 'Sign in');
 
   return (
     <aside className="hidden lg:flex w-64 flex-col justify-between border-r border-sand-border bg-cream-50 h-screen sticky top-0 px-4 py-5 select-none overflow-y-auto">
@@ -180,9 +180,15 @@ export function Sidebar() {
         </div>
 
         <div className="flex items-center gap-1">
-          <Link href="/auth/login" title="Switch account / Sign in" className="text-charcoal-400 hover:text-charcoal-700 p-1">
-            <LogOut className="w-3.5 h-3.5" />
-          </Link>
+          {user ? (
+            <button onClick={() => logout()} title="Sign out" className="text-charcoal-400 hover:text-charcoal-700 p-1">
+              <LogOut className="w-3.5 h-3.5" />
+            </button>
+          ) : (
+            <Link href="/auth/login" title="Sign in" className="text-charcoal-400 hover:text-charcoal-700 p-1">
+              <LogOut className="w-3.5 h-3.5" />
+            </Link>
+          )}
         </div>
       </div>
     </aside>

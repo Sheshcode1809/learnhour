@@ -2,7 +2,7 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 let clientInstance: SupabaseClient | null = null;
 
-/** Supabase Auth is opt-in. Local-first guest mode is the default. */
+/** Supabase Auth is enabled when configured. Courses are stored locally in the browser. */
 export function isSupabaseConfigured(): boolean {
   if (process.env.NEXT_PUBLIC_SUPABASE_AUTH_ENABLED === 'false') return false;
 
