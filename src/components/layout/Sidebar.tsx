@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   GraduationCap,
   Plus,
@@ -20,8 +20,14 @@ import { useAuth } from '@/context/AuthContext';
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { courses, stats } = useLearning();
   const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    router.replace('/');
+  };
 
   const navItems = [
     { label: 'Today', href: '/dashboard', icon: Calendar },
@@ -181,7 +187,7 @@ export function Sidebar() {
 
         <div className="flex items-center gap-1">
           {user ? (
-            <button onClick={() => logout()} title="Sign out" className="text-charcoal-400 hover:text-charcoal-700 p-1">
+            <button onClick={handleLogout} title="Sign out" aria-label="Sign out" className="text-charcoal-400 hover:text-charcoal-700 p-1">
               <LogOut className="w-3.5 h-3.5" />
             </button>
           ) : (

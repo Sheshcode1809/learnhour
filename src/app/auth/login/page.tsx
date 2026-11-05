@@ -3,16 +3,18 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
+import { AuthActionError, useAuth } from '@/context/AuthContext';
 import { GoogleButton } from '@/components/auth/GoogleButton';
 import { GraduationCap, Lock, Mail, ArrowRight } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { loginWithEmail, loginWithGoogle, isLoading } = useAuth();
+  const { loginWithEmail, loginWithGoogle, resendSignupConfirmation, isLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+  const [showResendConfirmation, setShowResendConfirmation] = useState(false);
 
   useEffect(() => {
     const reason = new URLSearchParams(window.location.search).get('error');
@@ -23,11 +25,33 @@ export default function LoginPage() {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError('');
+    setNotice('');
+    setShowResendConfirmation(false);
     try {
       await loginWithEmail(email, password);
       router.replace('/dashboard');
     } catch (cause) {
+      if (cause instanceof AuthActionError && cause.code === 'email_not_confirmed') {
+        setShowResendConfirmation(true);
+      }
       setError(cause instanceof Error ? cause.message : 'Unable to sign in. Please try again.');
+    }
+  };
+
+  const handleResendConfirmation = async () => {
+    setError('');
+    setNotice('');
+    if (!email.trim()) {
+      setError('Enter your email address first.');
+      return;
+    }
+
+    try {
+      await resendSignupConfirmation(email);
+      setShowResendConfirmation(false);
+      setNotice('If this account needs confirmation, a new link has been sent. Check your inbox and spam folder.');
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Unable to resend the confirmation email.');
     }
   };
 
@@ -82,6 +106,8 @@ export default function LoginPage() {
               Your learning records are stored in this browser. Signing in gives you secure access to your account.
             </p>
             {error && <p role="alert" className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-sm text-rose-800">{error}</p>}
+            {notice && <p role="status" className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-sm text-emerald-800">{notice}</p>}
+            {showResendConfirmation && <button type="button" onClick={handleResendConfirmation} disabled={isLoading} className="text-left text-sm font-semibold text-forest-700 hover:underline disabled:opacity-50">Resend confirmation email</button>}
             <button type="submit" disabled={isLoading} className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-forest-600 hover:bg-forest-700 text-white font-bold text-sm disabled:opacity-50">
               <span>{isLoading ? 'Signing in…' : 'Sign in'}</span><ArrowRight aria-hidden="true" className="w-4 h-4" />
             </button>

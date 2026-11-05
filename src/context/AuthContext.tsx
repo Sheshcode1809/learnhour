@@ -17,6 +17,13 @@ export interface AuthActionResult {
   message?: string;
 }
 
+export class AuthActionError extends Error {
+  constructor(message: string, public readonly code: string) {
+    super(message);
+    this.name = 'AuthActionError';
+  }
+}
+
 interface AuthContextType {
   user: AuthUser | null;
   isAuthenticated: boolean;
@@ -24,12 +31,14 @@ interface AuthContextType {
   authConfigured: boolean;
   loginWithEmail: (email: string, password: string) => Promise<void>;
   signupWithEmail: (name: string, email: string, password: string) => Promise<AuthActionResult>;
+  resendSignupConfirmation: (email: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const LEGACY_STORAGE_KEY = 'courseit_auth_user_v1';
+const normalizeEmail = (email: string) => email.trim().toLowerCase();
 
 function mapSessionUser(session: Session): AuthUser {
   const user = session.user;
@@ -99,10 +108,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
+        email: normalizeEmail(email),
         password,
       });
-      if (error || !data.session) throw new Error('Unable to sign in with those credentials.');
+      if (error?.code === 'email_not_confirmed') {
+        throw new AuthActionError('Confirm your email using the link we sent, then sign in again.', error.code);
+      }
+      if (error?.code === 'invalid_credentials') {
+        throw new AuthActionError('Email or password is incorrect. If you just signed up, confirm your email first.', error.code);
+      }
+      if (error || !data.session) {
+        throw new AuthActionError('Unable to sign in right now. Please try again.', error?.code || 'sign_in_failed');
+      }
       setUser(mapSessionUser(data.session));
     } finally {
       setIsLoading(false);
@@ -116,10 +133,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
     try {
       const { data, error } = await supabase.auth.signUp({
-        email: email.trim(),
+        email: normalizeEmail(email),
         password,
-        options: { data: { full_name: name.trim() } },
+        options: {
+          data: { full_name: name.trim() },
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
       });
+      if (error?.code === 'email_address_invalid') {
+        throw new Error('Enter a valid email address and try again.');
+      }
+      if (error?.code === 'weak_password') {
+        throw new Error('Choose a stronger password and try again.');
+      }
+      if (error?.code === 'over_email_send_rate_limit') {
+        throw new Error('Too many confirmation emails were requested. Wait a few minutes and try again.');
+      }
+      if (error?.code === 'email_address_not_authorized') {
+        throw new Error('This Supabase project is not configured to send email to this address yet. Please contact support.');
+      }
       if (error) throw new Error('Unable to create an account. Check your details and try again.');
       if (!data.session) {
         return {
@@ -130,6 +162,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       setUser(mapSessionUser(data.session));
       return { authenticated: true };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const resendSignupConfirmation = async (email: string) => {
+    const supabase = getSupabaseClient();
+    if (!supabase) throw new Error('Email confirmation is not configured.');
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: normalizeEmail(email),
+        options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+      });
+      if (error?.code === 'over_email_send_rate_limit') {
+        throw new Error('A confirmation email was sent recently. Wait a few minutes before requesting another.');
+      }
+      if (error) throw new Error('Unable to resend the confirmation email. Please try again later.');
     } finally {
       setIsLoading(false);
     }
@@ -172,6 +224,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     authConfigured,
     loginWithEmail,
     signupWithEmail,
+    resendSignupConfirmation,
     loginWithGoogle,
     logout,
   };
