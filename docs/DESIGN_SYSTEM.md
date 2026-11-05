@@ -1,4 +1,6 @@
-# Courseit Design System Specifications
+# Learnhour Design System Specifications
+
+> **Design reference, not accessibility certification:** The palette and typography below describe intended design tokens. Contrast ratios have not been re-measured in this audit, Plus Jakarta Sans and JetBrains Mono are not bundled, and responsive behavior is not browser-verified. See `UI_UX_TEST_REPORT.md` for current evidence.
 
 **Created with**: UI/UX Pro Max Design Intelligence  
 **Version**: 2.0.0  

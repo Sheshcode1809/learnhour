@@ -1,10 +1,12 @@
 # Functional and Non-functional Requirements
 
+> **Status:** This is a product requirements document, not verification evidence. See `PRODUCTION_AUDIT.md` and `TEST_REPORT.md` for current implementation and verification status.
+
 ## Functional requirements
 | ID | Requirement | Priority |
 |---|---|---|
 | FR-01 | Create a course with title, provider/source, URL, total duration, and optional description/thumbnail | Must |
-| FR-02 | Ingest YouTube video/playlist URL: preset links auto-populate rich metadata; custom links extract video ID and prompt for title/duration confirmation without silent fallback to sample videos | Must |
+| FR-02 | Accept supported HTTPS YouTube video URLs and exact known presets; reject playlist pages and unsupported hosts; require learner-entered title/duration for custom videos | Must |
 | FR-03 | Divide long courses into structured day-by-day plans (Day 1, Day 2, Day 3) targeting ~60 mins/day | Must |
 | FR-04 | Interactive Course Player with allowlisted YouTube video player, lesson list, "Mark as completed" action, "Auto-advance on completion" toggle, and per-course last-selected lesson persistence | Must |
 | FR-05 | Study tools: Interactive Quiz with question scoring, lesson-context Notes with editable minute offset, and Flashcards | Must |
@@ -16,7 +18,7 @@
 | FR-11 | Calculate current streak and best streak using local calendar day boundaries in configured IANA timezone, strictly excluding future-dated sessions | Must |
 | FR-12 | Quick "Continue Learning" action on Dashboard to immediately resume last active course and its last active lesson | Must |
 | FR-13 | Configure daily learning goal (default: 60 minutes) and user preferences with IANA timezone validation | Must |
-| FR-14 | Persist all data locally (localStorage) with instant zero-config startup, clear demo auth labeling, and reset to demo data option | Must |
+| FR-14 | Persist learning data locally with zero-config guest startup; production begins empty and reset must not silently reseed sample data | Must |
 | FR-15 | Export all user data as JSON backup | Should |
 
 ## Non-functional requirements

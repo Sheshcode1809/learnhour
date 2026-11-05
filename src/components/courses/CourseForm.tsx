@@ -31,6 +31,7 @@ export function CourseForm({ initialData, onSuccess, onCancel }: CourseFormProps
   const [rebuildPlan, setRebuildPlan] = useState(false);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [actionError, setActionError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleUrlBlur = () => {
@@ -59,6 +60,7 @@ export function CourseForm({ initialData, onSuccess, onCancel }: CourseFormProps
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setActionError('');
     if (!validate()) return;
 
     setIsSubmitting(true);
@@ -113,8 +115,8 @@ export function CourseForm({ initialData, onSuccess, onCancel }: CourseFormProps
           router.push(`/courses/${created.id}`);
         }
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
+      setActionError('Could not save this course. Check the storage warning and try again.');
       setIsSubmitting(false);
     }
   };
@@ -140,6 +142,8 @@ export function CourseForm({ initialData, onSuccess, onCancel }: CourseFormProps
           </button>
         )}
       </div>
+
+      {actionError && <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">{actionError}</p>}
 
       {/* Title */}
       <div>

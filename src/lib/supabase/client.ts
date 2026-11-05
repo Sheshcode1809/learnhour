@@ -1,36 +1,39 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const DEFAULT_SUPABASE_URL = 'https://pxbmhjqfxfjgjtcuqlbr.supabase.co';
-const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_mWOtgggvIUu8bjZR71kfCQ_8ddUIF5L';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || DEFAULT_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || DEFAULT_SUPABASE_ANON_KEY;
-
 let clientInstance: SupabaseClient | null = null;
 
+/** Supabase Auth is opt-in. Local-first guest mode is the default. */
 export function isSupabaseConfigured(): boolean {
-  return Boolean(
-    supabaseUrl &&
-    supabaseAnonKey &&
-    supabaseUrl !== 'https://your-project.supabase.co' &&
-    supabaseAnonKey !== 'your-anon-public-key'
-  );
+  if (process.env.NEXT_PUBLIC_SUPABASE_AUTH_ENABLED !== 'true') return false;
+
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
+  if (!url || !anonKey || anonKey === 'your-anon-public-key') return false;
+
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'https:' || parsed.hostname === 'localhost';
+  } catch {
+    return false;
+  }
 }
 
 export function getSupabaseClient(): SupabaseClient | null {
-  if (!isSupabaseConfigured()) {
-    return null;
-  }
+  if (!isSupabaseConfigured()) return null;
 
-  if (!clientInstance && supabaseUrl && supabaseAnonKey) {
-    clientInstance = createClient(supabaseUrl, supabaseAnonKey, {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
+  if (!url || !anonKey) return null;
+
+  if (!clientInstance) {
+    clientInstance = createClient(url, anonKey, {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
+        detectSessionInUrl: true,
       },
     });
   }
 
   return clientInstance;
 }
-

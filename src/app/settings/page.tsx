@@ -27,6 +27,9 @@ export default function SettingsPage() {
   const [timezoneError, setTimezoneError] = useState('');
   const [savedMessage, setSavedMessage] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [actionError, setActionError] = useState('');
+  const [backupError, setBackupError] = useState('');
+  const [resetError, setResetError] = useState('');
 
   useEffect(() => {
     setName(preferences.name);
@@ -36,6 +39,8 @@ export default function SettingsPage() {
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+    setActionError('');
+    setSavedMessage(false);
     setTimezoneError('');
 
     const trimmedTz = timezone.trim();
@@ -45,33 +50,47 @@ export default function SettingsPage() {
     }
 
     const parsedGoal = parseInt(dailyGoal, 10);
-    updatePreferences({
-      name: name.trim() || 'Learner',
-      daily_goal_minutes: isNaN(parsedGoal) || parsedGoal <= 0 ? 60 : parsedGoal,
-      timezone: trimmedTz,
-    });
-    setSavedMessage(true);
-    setTimeout(() => setSavedMessage(false), 2500);
+    try {
+      updatePreferences({
+        name: name.trim() || 'Learner',
+        daily_goal_minutes: isNaN(parsedGoal) || parsedGoal <= 0 ? 60 : parsedGoal,
+        timezone: trimmedTz,
+      });
+      setSavedMessage(true);
+      setTimeout(() => setSavedMessage(false), 2500);
+    } catch {
+      setActionError('Preferences were not saved. Check the storage warning and try again.');
+    }
   };
 
   const handleExport = () => {
-    const jsonStr = exportData();
-    const blob = new Blob([jsonStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `courseit-backup-${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    setBackupError('');
+    try {
+      const jsonStr = exportData();
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `learnhour-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch {
+      setBackupError('Could not export your data from browser storage.');
+    }
   };
 
   const handleReset = () => {
-    resetAllData();
-    setShowResetConfirm(false);
-    setName('Learner');
-    setDailyGoal('60');
-    setTimezone('Asia/Kolkata');
-    setTimezoneError('');
+    setResetError('');
+    try {
+      resetAllData();
+      setShowResetConfirm(false);
+      setName('Learner');
+      setDailyGoal('60');
+      setTimezone('Asia/Kolkata');
+      setTimezoneError('');
+    } catch {
+      setResetError('Data was not fully cleared. Check the storage warning before trying again.');
+    }
   };
 
   return (
@@ -210,6 +229,8 @@ export default function SettingsPage() {
           </div>
         </div>
 
+        {actionError && <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">{actionError}</p>}
+
         {/* Global Action Save Bar */}
         <div className="bg-white border border-sand-border rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-charcoal-600 font-medium text-center sm:text-left">
@@ -240,7 +261,7 @@ export default function SettingsPage() {
           <div>
             <h2 className="text-sm sm:text-base font-bold text-charcoal-900">Storage Architecture</h2>
             <p className="text-[11px] text-charcoal-500">
-              Local-first repository with cloud-ready database schemas.
+              Learning records are stored in this browser only.
             </p>
           </div>
         </div>
@@ -248,14 +269,12 @@ export default function SettingsPage() {
         <div className="p-4 rounded-2xl bg-cream-100/70 border border-sand-border text-xs text-charcoal-700 flex flex-col gap-2 leading-relaxed">
           <div className="flex items-center gap-2">
             <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-bold text-charcoal-900">Local-First Storage Active</span>
+            <span className="font-bold text-charcoal-900">Browser storage active</span>
           </div>
           <p>
-            Your courses, lessons, and learning sessions are saved safely in your browser&apos;s persistent local storage. They persist across reloads and device restarts.
+            Courses, lessons, notes, preferences, and study sessions stay in this browser. They do not sync to other devices. Browser storage can be cleared, so export a copy if you need to keep your records.
           </p>
-          <p className="text-[11px] text-charcoal-500 pt-1 font-mono">
-            PostgreSQL starter migrations are located at <code className="bg-cream-200 px-1 py-0.5 rounded text-charcoal-800">supabase/migrations/001_initial_schema.sql</code> for future cloud sync.
-          </p>
+          <p className="text-[11px] text-charcoal-500 pt-1">Account sign-in, if enabled, does not sync these learning records.</p>
         </div>
       </div>
 
@@ -266,9 +285,9 @@ export default function SettingsPage() {
             <Download className="w-5 h-5 stroke-[2.2]" />
           </div>
           <div>
-            <h2 className="text-sm sm:text-base font-bold text-charcoal-900">Data Backup & Demo Reset</h2>
+            <h2 className="text-sm sm:text-base font-bold text-charcoal-900">Export & {process.env.NODE_ENV === 'production' ? 'clear data' : 'reset demo'}</h2>
             <p className="text-[11px] text-charcoal-500">
-              Download your complete JSON history or restore original masterclasses.
+              Export your browser data before clearing it. There is no import or cloud recovery yet.
             </p>
           </div>
         </div>
@@ -287,9 +306,10 @@ export default function SettingsPage() {
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-rose-200 text-rose-700 hover:bg-rose-50 font-semibold text-xs transition-colors"
           >
             <RotateCcw className="w-4 h-4" />
-            <span>Reset to Demo Data</span>
+            <span>{process.env.NODE_ENV === 'production' ? 'Clear all data' : 'Reset demo data'}</span>
           </button>
         </div>
+        {backupError && <p role="alert" className="text-xs text-rose-800">{backupError}</p>}
       </div>
 
       {/* Reset Confirmation Modal */}
@@ -299,10 +319,13 @@ export default function SettingsPage() {
             <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center mb-3">
               <AlertTriangle className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-bold text-charcoal-900">Reset All Learning Data?</h3>
+            <h3 className="text-base font-bold text-charcoal-900">{process.env.NODE_ENV === 'production' ? 'Clear all learning data?' : 'Reset learning data?'}</h3>
             <p className="text-xs text-charcoal-600 mt-1 leading-relaxed">
-              This will restore sample masterclasses and clear your current sessions. You can export a JSON backup beforehand if you wish to retain your records.
+              {process.env.NODE_ENV === 'production'
+                ? 'This permanently clears the courses, notes, preferences, and study sessions stored in this browser. Export a JSON copy first if you need to keep them.'
+                : 'This restores the development sample courses and clears your current sessions. Export a JSON copy first if you need to keep them.'}
             </p>
+            {resetError && <p role="alert" className="mt-3 text-xs text-rose-800">{resetError}</p>}
             <div className="flex items-center justify-end gap-2 mt-6">
               <button
                 type="button"
@@ -317,7 +340,7 @@ export default function SettingsPage() {
                 className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-sm"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
-                <span>Yes, Reset</span>
+                <span>{process.env.NODE_ENV === 'production' ? 'Clear my data' : 'Reset data'}</span>
               </button>
             </div>
           </div>

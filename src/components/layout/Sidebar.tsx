@@ -44,7 +44,7 @@ export function Sidebar() {
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-lg text-charcoal-800 tracking-tight">Courseit</span>
+              <span className="font-bold text-lg text-charcoal-800 tracking-tight">Learnhour</span>
               <span className="text-[10px] font-semibold bg-terracotta-100 text-terracotta-600 px-1.5 py-0.5 rounded-full">
                 1h/day
               </span>

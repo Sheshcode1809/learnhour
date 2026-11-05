@@ -39,7 +39,7 @@ export function MobileHeader() {
           <div className="w-8 h-8 rounded-lg bg-forest-600 flex items-center justify-center text-white">
             <GraduationCap className="w-4 h-4" />
           </div>
-          <span className="font-bold text-charcoal-800 text-base">Courseit</span>
+          <span className="font-bold text-charcoal-800 text-base">Learnhour</span>
         </Link>
 
         <div className="flex items-center gap-2">

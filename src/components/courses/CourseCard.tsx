@@ -66,7 +66,7 @@ export function CourseCard({ course, onEdit, onDelete }: CourseCardProps) {
                 {course.title}
               </p>
               <span className="text-[11px] font-semibold text-charcoal-500 mt-0.5">
-                {course.provider || 'Courseit'}
+                {course.provider || 'Learnhour'}
               </span>
             </div>
           )}

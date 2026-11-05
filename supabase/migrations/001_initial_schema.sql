@@ -1,5 +1,5 @@
--- Courseit Learning Tracker Database Schema
--- Multi-device PostgreSQL + Supabase with Row Level Security (RLS)
+-- Learnhour starter schema only. The application does not currently read/write these tables.
+-- Do not describe this migration as active cloud synchronization or run it as a launch step.
 
 -- 1. Enable UUID Extension
 create extension if not exists "uuid-ossp";

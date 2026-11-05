@@ -2,6 +2,8 @@
 
 This guide details how the **NullMotion** skill (`.agents/skills/nullmotion/`) is configured to create, preview, and export the official motion-graphics launch video for **Learnhour**.
 
+> **Publication note:** The timeline below is a draft. Verify the footage and claims against the current product before publishing. Playlist ingestion, cloud synchronization, responsive acceptance, and legal/privacy approval are not established by the existence of these video files.
+
 ---
 
 ## 🎬 1. Official 60-Second Product Launch Video
@@ -14,10 +16,10 @@ The launch video pairs high-resolution screen recordings of the real Learnhour a
 | :--- | :--- | :--- | :--- |
 | **0:00 – 0:07** | **The Problem** | Dark cinematic course backlog, stalled progress bars | *"Too many courses. Too little consistency."*<br>Voiceover: *"We all have courses we promised ourselves we would finish..."* |
 | **0:07 – 0:14** | **Introducing Learnhour** | Live Dashboard (`/dashboard`), habit meter, greeting | *"Meet Learnhour. One hour. Every day. Real progress."*<br>Voiceover: *"Meet Learnhour, your personal learning and habit tracker..."* |
-| **0:14 – 0:23** | **Add Your Courses** | Course Creator (`/courses/new`), YouTube playlist ingestion | *"Turn long courses into daily learning plans."*<br>Voiceover: *"Add your favourite courses and playlists..."* |
+| **0:14 – 0:23** | **Add Your Courses** | Course Creator (`/courses/new`), supported video or manual course entry | *"Turn long courses into daily learning plans."*<br>Voiceover: *"Add a supported video or course, confirm its details..."* |
 | **0:23 – 0:33** | **Focused Learning** | Focus Stopwatch (`/sessions`), timer controls, live log | *"Focus. Learn. Track your progress."*<br>Voiceover: *"Start your focus timer, track every learning session..."* |
 | **0:33 – 0:43** | **Build the Habit** | Cinema Player (`/courses/python-2026`), Recall Dock | *"Build consistency. Strengthen knowledge."*<br>Voiceover: *"Build learning streaks, track your daily goals..."* |
-| **0:43 – 0:51** | **Your Learning, Your Way** | Settings (`/settings`), local-first, responsive layouts | *"Your learning. Your progress. Your control."*<br>Voiceover: *"With local-first learning and optional cloud synchronization..."* |
+| **0:43 – 0:51** | **Your Learning, Your Way** | Settings (`/settings`), local browser storage and JSON export | *"Your learning. Your progress. Your control."*<br>Voiceover: *"Keep your learning records in this browser and export a JSON copy..."* |
 | **0:51 – 1:00** | **Product Launch** | Warm ivory grand brand reveal, badges, final CTA | *"LEARNHOUR · Learn consistently. Progress every day."*<br>Voiceover: *"Stop collecting courses. Start completing them..."* |
 
 ---

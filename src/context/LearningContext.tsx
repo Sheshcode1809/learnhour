@@ -1,12 +1,13 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Course, LearningSession, UserPreferences, ActiveTimerState, CourseLesson, CourseNote } from '@/types';
 import { repository } from '@/lib/storage/repository';
 import { calculateStreaks, getWeeklyActivity } from '@/lib/calculations/streaks';
 import { generateLessonsForCourse } from '@/lib/calculations/dayPlanner';
 import { PRESET_COURSES } from '@/lib/youtube';
 import { INITIAL_PREFERENCES } from '@/lib/storage/mockData';
+import { canSwitchTimerTarget, getElapsedTimerSeconds, pauseTimerState, resumeTimerState, startTimerState, timerTargetMatches } from '@/lib/calculations/timer';
 
 interface LearningContextType {
   courses: Course[];
@@ -14,6 +15,8 @@ interface LearningContextType {
   preferences: UserPreferences;
   activeTimer: ActiveTimerState;
   elapsedSeconds: number;
+  timerNotice: string | null;
+  storageWarning: string | null;
   lastActiveCourse: Course | null;
   isLoading: boolean;
   
@@ -53,7 +56,7 @@ interface LearningContextType {
   deleteSession: (id: string) => void;
 
   // Timer actions
-  startTimer: (courseId?: string, lessonId?: string) => void;
+  startTimer: (courseId?: string, lessonId?: string) => boolean;
   pauseTimer: () => void;
   resumeTimer: () => void;
   resetTimer: () => void;
@@ -90,11 +93,21 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
     session_start_epoch: null,
   });
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
-  const [lastActiveId, setLastActiveId] = useState<string>('python-2026');
+  const [lastActiveId, setLastActiveId] = useState<string>('');
+  const [timerNotice, setTimerNotice] = useState<string | null>(null);
+  const [storageWarning, setStorageWarning] = useState<string | null>(null);
+  const finishingTimerRef = useRef(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Initial client hydration from storage
   useEffect(() => {
+    setStorageWarning(repository.getStorageFailure());
+    const handleStorageFailure = (event: Event) => {
+      const message = (event as CustomEvent<string>).detail;
+      setStorageWarning(message || 'Browser storage is unavailable. Changes may not persist.');
+    };
+    window.addEventListener('learnhour:storage-failure', handleStorageFailure);
+
     try {
       const loadedCourses = repository.getCourses();
       const loadedSessions = repository.getSessions();
@@ -120,6 +133,8 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsLoading(false);
     }
+
+    return () => window.removeEventListener('learnhour:storage-failure', handleStorageFailure);
   }, []);
 
   // Timer ticker loop
@@ -140,82 +155,55 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
 
   // Sync timer state changes to persistent repository
   const updateTimerState = useCallback((nextState: ActiveTimerState) => {
-    setActiveTimer(nextState);
     repository.saveActiveTimer(nextState);
+    setActiveTimer(nextState);
   }, []);
 
   const startTimer = useCallback((courseId?: string, lessonId?: string) => {
     const now = Date.now();
     const targetCourseId = courseId || activeTimer.course_id || lastActiveId;
+    const targetLessonId = lessonId !== undefined ? lessonId : activeTimer.lesson_id;
+    if (!canSwitchTimerTarget(activeTimer, targetCourseId, targetLessonId, now)) {
+      setTimerNotice('This timer already has recorded time for another course or lesson. Save or reset it before switching.');
+      return false;
+    }
+
     if (targetCourseId) {
       setLastActiveId(targetCourseId);
       repository.setLastActiveCourseId(targetCourseId);
     }
 
-    // Idempotent check when already running
-    if (activeTimer.is_running) {
-      const targetLessonId = lessonId !== undefined ? lessonId : activeTimer.lesson_id;
-      if (activeTimer.course_id === targetCourseId && activeTimer.lesson_id === targetLessonId) {
-        return; // already running with exact target, do not reset
-      }
-      // If switching target while running, flush current live segment into accumulated_seconds
-      const liveSegment = activeTimer.started_at ? Math.max(0, Math.floor((now - activeTimer.started_at) / 1000)) : 0;
-      const nextAccumulated = activeTimer.accumulated_seconds + liveSegment;
-      const nextState: ActiveTimerState = {
-        is_running: true,
-        course_id: targetCourseId || null,
-        lesson_id: targetLessonId || null,
-        started_at: now,
-        accumulated_seconds: nextAccumulated,
-        session_start_epoch: activeTimer.session_start_epoch || (now - nextAccumulated * 1000),
-      };
-      setElapsedSeconds(nextAccumulated);
-      updateTimerState(nextState);
-      return;
+    if (activeTimer.is_running && timerTargetMatches(activeTimer, targetCourseId, targetLessonId)) {
+      setTimerNotice(null);
+      return true;
     }
 
-    // Starting from paused / stopped
-    const currentAccumulated = activeTimer.accumulated_seconds > 0 ? activeTimer.accumulated_seconds : elapsedSeconds;
-    const nextState: ActiveTimerState = {
-      is_running: true,
-      course_id: targetCourseId || null,
-      lesson_id: lessonId || activeTimer.lesson_id || null,
-      started_at: now,
-      accumulated_seconds: currentAccumulated,
-      session_start_epoch: activeTimer.session_start_epoch || (now - currentAccumulated * 1000),
-    };
+    const nextState = startTimerState(activeTimer, targetCourseId, targetLessonId, now);
     updateTimerState(nextState);
-  }, [activeTimer, elapsedSeconds, lastActiveId, updateTimerState]);
+    setElapsedSeconds(nextState.accumulated_seconds);
+    setTimerNotice(null);
+    return true;
+  }, [activeTimer, lastActiveId, updateTimerState]);
 
   const pauseTimer = useCallback(() => {
     if (!activeTimer.is_running) return;
+    setTimerNotice(null);
     const now = Date.now();
-    const segment = activeTimer.started_at ? Math.floor((now - activeTimer.started_at) / 1000) : 0;
-    const totalAccumulated = activeTimer.accumulated_seconds + Math.max(0, segment);
-
-    const nextState: ActiveTimerState = {
-      ...activeTimer,
-      is_running: false,
-      started_at: null,
-      accumulated_seconds: totalAccumulated,
-    };
-    setElapsedSeconds(totalAccumulated);
+    const nextState = pauseTimerState(activeTimer, now);
     updateTimerState(nextState);
+    setElapsedSeconds(nextState.accumulated_seconds);
   }, [activeTimer, updateTimerState]);
 
   const resumeTimer = useCallback(() => {
     if (activeTimer.is_running) return;
+    setTimerNotice(null);
     const now = Date.now();
-    const nextState: ActiveTimerState = {
-      ...activeTimer,
-      is_running: true,
-      started_at: now,
-      session_start_epoch: activeTimer.session_start_epoch || (now - activeTimer.accumulated_seconds * 1000),
-    };
+    const nextState = resumeTimerState(activeTimer, now);
     updateTimerState(nextState);
   }, [activeTimer, updateTimerState]);
 
   const resetTimer = useCallback(() => {
+    setTimerNotice(null);
     const nextState: ActiveTimerState = {
       is_running: false,
       course_id: null,
@@ -230,43 +218,44 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
 
   // Finish timer and record session losslessly
   const finishTimer = useCallback((notes?: string) => {
-    const now = Date.now();
-    const liveSegment = activeTimer.is_running && activeTimer.started_at
-      ? Math.max(0, Math.floor((now - activeTimer.started_at) / 1000))
-      : 0;
-    const finalSeconds = activeTimer.accumulated_seconds + liveSegment;
+    if (finishingTimerRef.current) return;
+    finishingTimerRef.current = true;
+    setTimerNotice(null);
+    try {
+      const now = Date.now();
+      const finalSeconds = getElapsedTimerSeconds(activeTimer, now);
 
-    if (finalSeconds < 5) {
-      // Ignore accidental micro-clicks under 5 seconds
+      if (finalSeconds < 5) {
+        resetTimer();
+        return;
+      }
+
+      const sessionStart = activeTimer.session_start_epoch
+        ? new Date(activeTimer.session_start_epoch).toISOString()
+        : new Date(now - finalSeconds * 1000).toISOString();
+      const sessionEnd = new Date(now).toISOString();
+      const course = activeTimer.course_id ? repository.getCourseById(activeTimer.course_id) : null;
+
+      const newSession: LearningSession = {
+        id: `timer-session-${activeTimer.session_start_epoch || now}`,
+        user_id: preferences.user_id,
+        course_id: activeTimer.course_id,
+        lesson_id: activeTimer.lesson_id,
+        course_title: course?.title || 'General Study',
+        started_at: sessionStart,
+        ended_at: sessionEnd,
+        duration_seconds: finalSeconds,
+        notes: notes || undefined,
+        created_at: sessionEnd,
+      };
+
+      repository.addSession(newSession);
+      setSessions(repository.getSessions());
+      setCourses(repository.getCourses());
       resetTimer();
-      return;
+    } finally {
+      finishingTimerRef.current = false;
     }
-
-    const sessionStart = activeTimer.session_start_epoch
-      ? new Date(activeTimer.session_start_epoch).toISOString()
-      : new Date(now - finalSeconds * 1000).toISOString();
-    const sessionEnd = new Date(now).toISOString();
-
-    const course = activeTimer.course_id ? repository.getCourseById(activeTimer.course_id) : null;
-
-    const newSession: LearningSession = {
-      id: `session-${Date.now()}`,
-      user_id: preferences.user_id,
-      course_id: activeTimer.course_id,
-      lesson_id: activeTimer.lesson_id,
-      course_title: course?.title || 'General Study',
-      started_at: sessionStart,
-      ended_at: sessionEnd,
-      duration_seconds: finalSeconds,
-      notes: notes || undefined,
-      created_at: sessionEnd,
-    };
-
-    repository.addSession(newSession);
-    setSessions(repository.getSessions());
-    setCourses(repository.getCourses());
-
-    resetTimer();
   }, [activeTimer, preferences.user_id, resetTimer]);
 
   // Course operations
@@ -491,6 +480,8 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
         preferences,
         activeTimer,
         elapsedSeconds,
+        timerNotice,
+        storageWarning,
         lastActiveCourse,
         isLoading,
         addCourse,

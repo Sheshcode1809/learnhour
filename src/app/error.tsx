@@ -12,7 +12,7 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error('Unhandled Application Error:', error);
+    if (error.digest) console.error('Application error reference:', error.digest);
   }, [error]);
 
   return (
@@ -31,15 +31,13 @@ export default function GlobalError({
         </h1>
 
         <p className="text-xs text-charcoal-600 mt-2 leading-relaxed">
-          An unexpected error occurred while loading this view. Your saved courses and study progress are safe in local storage.
+          We could not load this view. Try again, or return to your dashboard. If the issue continues, share the reference below with the site operator.
         </p>
 
-        {error.message && (
-          <div className="mt-4 p-3 rounded-xl bg-white border border-sand-border text-left w-full">
-            <span className="text-[10px] font-mono text-charcoal-500 break-words block">
-              {error.message}
-            </span>
-          </div>
+        {error.digest && (
+          <p className="mt-4 text-[10px] font-mono text-charcoal-500" role="note">
+            Reference: {error.digest}
+          </p>
         )}
 
         <div className="mt-6 flex flex-col sm:flex-row items-center gap-3 w-full">

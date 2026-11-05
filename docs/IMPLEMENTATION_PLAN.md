@@ -1,5 +1,7 @@
 # Implementation Plan
 
+> **Historical plan:** Checked boxes describe prior planning activity and are not current test results. This plan contains aspirational features; use the root audit and readiness reports as the current source of truth. Current responsive behavior has not been browser-verified, and Supabase learning-data sync is not implemented.
+
 ## Phase 0 — Documentation and Discovery
 - [x] Inspect reference video (extracted frames, analyzed UI, color palette, workflows, course player, quiz modal, day planner).
 - [x] Inspect existing directory structure and tools.
@@ -10,7 +12,7 @@
 - Initialize Next.js project with TypeScript and Tailwind CSS.
 - Configure color tokens (`cream`, `charcoal`, `forest-green`, `terracotta`) and typography.
 - Build responsive App Shell:
-  - Sidebar with logo "Courseit", "+ New course" CTA, navigation links (`Today`, `My courses`, `Sessions`, `Settings`), recents list, and user profile pill.
+  - Sidebar with logo "Learnhour", "+ New course" CTA, navigation links (`Today`, `My courses`, `Sessions`, `Settings`), recents list, and user profile pill.
   - Mobile header and responsive drawer.
   - Persistent global floating timer bar.
 - Verification: run Next.js, check console, verify responsive shell layout at 360px and 1200px.

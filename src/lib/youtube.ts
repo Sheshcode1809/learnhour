@@ -316,21 +316,24 @@ export const PRESET_COURSES = [
 
 export function extractYouTubeVideoId(url: string): string | null {
   if (!url) return null;
-  const trimmed = url.trim();
+  try {
+    const parsed = new URL(url.trim());
+    if (parsed.protocol !== 'https:') return null;
 
-  // Handle standard watch url: youtube.com/watch?v=VIDEO_ID
-  const watchMatch = trimmed.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
-  if (watchMatch) return watchMatch[1];
+    const host = parsed.hostname.toLowerCase();
+    const isYouTubeHost = ['youtube.com', 'www.youtube.com', 'm.youtube.com', 'youtube-nocookie.com', 'www.youtube-nocookie.com'].includes(host);
+    const isShortHost = host === 'youtu.be' || host === 'www.youtu.be';
+    if (!isYouTubeHost && !isShortHost) return null;
 
-  // Handle short url: youtu.be/VIDEO_ID
-  const shortMatch = trimmed.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
-  if (shortMatch) return shortMatch[1];
+    let candidate: string | null = null;
+    if (isShortHost) candidate = parsed.pathname.split('/').filter(Boolean)[0] || null;
+    else if (parsed.pathname === '/watch') candidate = parsed.searchParams.get('v');
+    else if (parsed.pathname.startsWith('/embed/')) candidate = parsed.pathname.split('/')[2] || null;
 
-  // Handle embed url: youtube.com/embed/VIDEO_ID
-  const embedMatch = trimmed.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/);
-  if (embedMatch) return embedMatch[1];
-
-  return null;
+    return candidate && /^[a-zA-Z0-9_-]{11}$/.test(candidate) ? candidate : null;
+  } catch {
+    return null;
+  }
 }
 
 export function isAllowlistedEmbedUrl(url: string): boolean {
@@ -339,11 +342,15 @@ export function isAllowlistedEmbedUrl(url: string): boolean {
     const parsed = new URL(url);
     const host = parsed.hostname.toLowerCase();
     return (
-      host === 'www.youtube.com' ||
-      host === 'youtube.com' ||
-      host === 'youtu.be' ||
-      host === 'www.youtube-nocookie.com' ||
-      host === 'youtube-nocookie.com'
+      parsed.protocol === 'https:' &&
+      !parsed.username &&
+      !parsed.password &&
+      !parsed.port &&
+      (host === 'www.youtube.com' ||
+        host === 'youtube.com' ||
+        host === 'youtu.be' ||
+        host === 'www.youtube-nocookie.com' ||
+        host === 'youtube-nocookie.com')
     );
   } catch {
     return false;
@@ -358,16 +365,17 @@ export function parseYouTubeUrlOrPreset(url: string): ParsedVideoInfo | null {
   if (!url) return null;
   const trimmed = url.trim();
 
-  // 1. Check if matches one of our curated preset masterclasses
+  // A preset is recognized only by its exact key or a URL containing the same video ID.
+  const videoId = extractYouTubeVideoId(trimmed);
   const matchedPreset = PRESET_COURSES.find(
-    (p) => p.url.toLowerCase() === trimmed.toLowerCase() || trimmed.includes(p.key)
+    (preset) => preset.key === trimmed || (videoId && extractYouTubeVideoId(preset.url) === videoId)
   );
 
   if (matchedPreset) {
-    const videoId = extractYouTubeVideoId(matchedPreset.url);
+    const presetVideoId = extractYouTubeVideoId(matchedPreset.url);
     return {
-      videoId,
-      embedUrl: videoId ? `https://www.youtube.com/embed/${videoId}?enablejsapi=1` : '',
+      videoId: presetVideoId,
+      embedUrl: presetVideoId ? `https://www.youtube.com/embed/${presetVideoId}?enablejsapi=1` : '',
       thumbnailUrl: matchedPreset.thumbnail_url,
       suggestedTitle: matchedPreset.title,
       suggestedDuration: matchedPreset.total_minutes,
@@ -377,7 +385,6 @@ export function parseYouTubeUrlOrPreset(url: string): ParsedVideoInfo | null {
   }
 
   // 2. Check if it's a valid YouTube URL
-  const videoId = extractYouTubeVideoId(trimmed);
   if (videoId) {
     return {
       videoId,

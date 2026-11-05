@@ -459,7 +459,7 @@ export default function SessionsPage() {
             </div>
             <h4 className="text-sm font-bold text-charcoal-900 mb-1">No study sessions recorded</h4>
             <p className="text-xs text-charcoal-500 leading-relaxed mb-5">
-              Timer sessions and manual offline study entries will automatically appear here with exact timestamp logs.
+              Timer sessions and manually logged study entries appear here with their saved date and duration.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-2.5">
               <button

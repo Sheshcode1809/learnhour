@@ -2,6 +2,8 @@
 
 A frame-by-frame production storyboard and motion-graphics architecture for the official **Learnhour** SaaS launch video, created with the **NullMotion** skill.
 
+> **Draft claim check required before publication:** This storyboard predates the current launch audit. It is a creative plan, not proof of shipped behavior or accessibility. Playlist ingestion, metadata scraping, cloud synchronization, and responsive acceptance must not be shown or stated as available. Use verified current UI footage and owner-approved copy.
+
 ---
 
 ## Technical Specifications
@@ -26,7 +28,7 @@ A frame-by-frame production storyboard and motion-graphics architecture for the 
 - **Kinetic Typography**: 
   - Eyebrow: `⚠️ The Online Learning Reality`
   - Headline: **"Too many courses. Too little consistency."**
-  - Subtitle: *"92% of online courses and YouTube playlists are abandoned within two weeks."*
+  - Subtitle: *"Long courses are easier to finish with a steady daily habit."*
 - **Camera Movement**: Subtle 1.05x push-in on the abandoned course backlog.
 - **Voiceover**: *"We all have courses we promised ourselves we would finish. But finding the time and staying consistent is the real challenge."*
 - **NullMotion Draft Beat**: `['text', 'Too many courses.', { size: 44 }], ['text', 'Too little consistency.', { size: 48, weight: 900 }]`
@@ -45,15 +47,15 @@ A frame-by-frame production storyboard and motion-graphics architecture for the 
 
 ---
 
-### Scene 3 — Add Your Courses: Automatic YouTube Playlist Splitting
+### Scene 3 — Add Your Courses: Build a Daily Learning Plan
 - **Timecode**: `00:14 – 00:23` (9.0 Seconds)
-- **Visual Design**: Real Course Creator interface (`/courses/new`). Pasting a YouTube tutorial link and demonstrating the intelligent course planner that automatically parses durations and splits a 10h 45m tutorial into 11 manageable daily 1-hour sessions. Curated masterclasses are featured below.
+- **Visual Design**: Current Course Creator interface (`/courses/new`). Show a supported known preset or a manually entered course. For custom YouTube videos, show the learner confirming title and duration; do not depict playlist parsing or automatic metadata retrieval.
 - **Kinetic Typography**:
-  - Badge: `Intelligent Course Ingestion`
+  - Badge: `Build a plan that fits your learning habit`
   - Headline: **"Turn long courses into daily learning plans."**
 - **Camera Movement**: Gentle vertical pan down the course generation parameters.
-- **Voiceover**: *"Add your favourite courses and playlists, organize your learning, and turn hours of content into a manageable daily plan."*
-- **NullMotion Draft Beat**: `['window', 'Paste any YouTube playlist or tutorial link'], ['list', 'Auto-Splits 10h Course → 11 Daily 1-Hour Lessons']`
+- **Voiceover**: *"Add a supported video or course, confirm its details, and organize your learning into a manageable daily plan."*
+- **NullMotion Draft Beat**: `['window', 'Add a supported video or course'], ['list', 'A daily plan built around your learning goal']`
 
 ---
 
@@ -81,15 +83,15 @@ A frame-by-frame production storyboard and motion-graphics architecture for the 
 
 ---
 
-### Scene 6 — Your Learning, Your Way: Local-First & Multi-Device
+### Scene 6 — Your Learning, Your Way: Local-First
 - **Timecode**: `00:43 – 00:51` (8.0 Seconds)
-- **Visual Design**: Live Settings panel (`/settings`) highlighting local-first privacy, JSON backup exports, zero required accounts, and fluid responsive adaptability on mobile viewports.
+- **Visual Design**: Current Settings panel (`/settings`) highlighting local browser storage, JSON export, and guest use. Do not call the product fully private or show cross-device access. Use mobile footage only after responsive behavior is verified.
 - **Kinetic Typography**:
-  - Badge: `100% Local-First & Private`
+  - Badge: `Your learning records stay in this browser`
   - Headline: **"Your learning. Your progress. Your control."**
 - **Camera Movement**: Dynamic pan highlighting data export and timezone preferences.
-- **Voiceover**: *"With local-first learning and optional cloud synchronization, your learning journey stays organized and accessible."*
-- **NullMotion Draft Beat**: `['cards', '100% Local-First · Zero Account Lock-in'], ['phone', 'Responsive on Mobile & Desktop']`
+- **Voiceover**: *"Use Learnhour without an account, keep your learning records in this browser, and export a JSON copy when you need a backup."*
+- **NullMotion Draft Beat**: `['cards', 'Local browser storage · JSON export'], ['phone', 'Show only after mobile verification']`
 
 ---
 

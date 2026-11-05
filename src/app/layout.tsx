@@ -1,39 +1,31 @@
 import type { Metadata } from 'next';
-import { Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/context/AuthContext';
 import { LearningProvider } from '@/context/LearningContext';
 import { AppShell } from '@/components/layout/AppShell';
 
-const sansFont = Plus_Jakarta_Sans({
-  subsets: ['latin'],
-  variable: '--font-sans',
-  display: 'swap',
-});
-
-const monoFont = JetBrains_Mono({
-  subsets: ['latin'],
-  variable: '--font-mono',
-  display: 'swap',
-});
+const publicBaseUrl = (() => {
+  try {
+    const value = process.env.NEXT_PUBLIC_APP_URL?.trim();
+    if (!value) return undefined;
+    const parsed = new URL(value);
+    return parsed.protocol === 'https:' ? new URL(parsed.origin) : undefined;
+  } catch {
+    return undefined;
+  }
+})();
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://courseit.vercel.app'),
+  ...(publicBaseUrl ? { metadataBase: publicBaseUrl } : {}),
+  ...(publicBaseUrl ? { alternates: { canonical: '/' } } : {}),
   title: {
-    default: 'Courseit — Daily Course & Learning Progress Tracker',
-    template: '%s | Courseit',
+    default: 'Learnhour — A steady hour of learning',
+    template: '%s | Learnhour',
   },
-  description: 'Conquer long courses and YouTube lectures by studying 1 focused hour a day. Track daily targets, streaks, day-by-day plans, and interactive active recall quizzes.',
-  keywords: [
-    'course tracker',
-    'learning tracker',
-    'study habit',
-    '1 hour a day',
-    'youtube course planner',
-    'daily study goal',
-  ],
-  authors: [{ name: 'Courseit Team' }],
-  creator: 'Courseit',
+  description: 'Organize video courses into daily study plans, track focused sessions, and keep your learning progress in one place.',
+  keywords: ['course tracker', 'learning tracker', 'study habit', 'daily study plan', 'video course planner'],
+  authors: [{ name: 'Learnhour' }],
+  creator: 'Learnhour',
   icons: {
     icon: '/favicon.svg',
     shortcut: '/favicon.svg',
@@ -42,25 +34,23 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://courseit.vercel.app',
-    siteName: 'Courseit',
-    title: 'Courseit — Daily Course & Learning Progress Tracker',
-    description: 'Paste a long video. Get a 1-hour/day course. Track your daily habit and retain knowledge.',
+    ...(publicBaseUrl ? { url: publicBaseUrl.toString() } : {}),
+    siteName: 'Learnhour',
+    title: 'Learnhour — A steady hour of learning',
+    description: 'Organize video courses into daily study plans and track your learning progress.',
+    images: ['/opengraph-image'],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Courseit — Daily Course & Learning Progress Tracker',
-    description: 'Turn long technical tutorials into structured daily 1-hour study modules.',
+    title: 'Learnhour — A steady hour of learning',
+    description: 'Organize video courses into daily study plans and track your learning progress.',
+    images: ['/opengraph-image'],
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${sansFont.variable} ${monoFont.variable}`}>
+    <html lang="en">
       <body className="antialiased selection:bg-forest-100 selection:text-forest-800 font-sans">
         <AuthProvider>
           <LearningProvider>

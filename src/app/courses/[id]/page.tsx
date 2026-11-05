@@ -221,7 +221,7 @@ export default function CoursePlayerPage() {
   return (
     <div className="flex flex-col min-h-screen bg-cream-100">
       {/* Top Action Bar */}
-      <div className="sticky top-0 z-20 bg-cream-50/95 backdrop-blur-md border-b border-sand-border px-4 lg:px-8 py-3 flex items-center justify-between gap-4">
+      <div className="sticky top-0 z-20 bg-cream-50/95 backdrop-blur-md border-b border-sand-border px-4 lg:px-8 py-3 flex flex-col items-stretch sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
         <div className="flex items-center gap-3 min-w-0">
           <Link
             href="/courses"
@@ -234,7 +234,7 @@ export default function CoursePlayerPage() {
             <div className="flex items-center gap-1.5 text-[11px] text-charcoal-500 font-medium">
               <Link href="/courses" className="hover:text-charcoal-800">Courses</Link>
               <ChevronRight className="w-3 h-3 text-charcoal-400" />
-              <span className="truncate max-w-[200px] sm:max-w-xs">{course.title}</span>
+              <span className="truncate max-w-[180px] sm:max-w-xs">{course.title}</span>
             </div>
             <div className="flex items-center gap-2 mt-0.5">
               <h1 className="text-xs sm:text-sm font-bold text-charcoal-900 truncate">
@@ -247,7 +247,7 @@ export default function CoursePlayerPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5 shrink-0">
+        <div className="flex items-center justify-end gap-2.5 shrink-0">
           <button
             onClick={() => setActiveModal('dayplan')}
             className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-sand-border bg-white hover:bg-cream-100 text-charcoal-700 font-semibold text-xs transition-colors"
@@ -291,7 +291,7 @@ export default function CoursePlayerPage() {
                 <a
                   href={course.course_url}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-cream-100 text-xs font-semibold border border-white/15 transition-colors"
                 >
                   <span>Open source video on {course.provider}</span>
@@ -319,7 +319,7 @@ export default function CoursePlayerPage() {
                   <a
                     href={course.course_url}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                     className="mt-4 flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-forest-600 hover:bg-forest-700 text-white text-xs font-bold transition-all"
                   >
                     <span>Open Lesson on {course.provider}</span>
@@ -329,6 +329,12 @@ export default function CoursePlayerPage() {
               </div>
             )}
           </div>
+
+          {isEmbedAllowlisted && course.course_url && (
+            <p className="-mt-2 px-1 text-xs text-charcoal-500">
+              If playback is unavailable, <a href={course.course_url} target="_blank" rel="noopener noreferrer" className="font-semibold text-forest-700 underline underline-offset-2">open the source video</a>.
+            </p>
+          )}
 
           {/* Under-Video Focus Control & Curriculum Meta */}
           <div className="bg-white border border-sand-border rounded-3xl p-5 sm:p-6 shadow-xs flex flex-col gap-4">
@@ -377,7 +383,7 @@ export default function CoursePlayerPage() {
                   <a
                     href={course.course_url}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 text-forest-700 hover:underline font-semibold ml-2"
                   >
                     <span>Original Source</span>

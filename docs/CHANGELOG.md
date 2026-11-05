@@ -1,17 +1,19 @@
 # Changelog
 
-All notable changes to the Courseit project are documented in this file.
+All notable changes to the Learnhour project are documented in this file.
+
+> **Historical entries:** The notes below record earlier work and are not current release verification. In particular, they do not establish that Learnhour was deployed, that Supabase learning-data sync exists, or that responsive tests passed. See `TEST_REPORT.md` and `LAUNCH_READINESS.md` for current evidence.
 
 ---
 
-## [1.0.0] - 2026-11-04 (Production & Vercel Deployment Release)
+## [1.0.0] - 2026-11-04 (Feature build notes; not a verified production release)
 
 ### Added
 - **Production SEO & Discovery**: Added dynamic `robots.ts` and `sitemap.ts`, OpenGraph metadata tags, and branded SVG favicon (`public/favicon.svg`).
 - **Resilient Error Boundaries**: Added root `error.tsx` boundary with sanitized diagnostics and user-friendly "Try Again" / "Dashboard" recovery actions.
 - **Branded 404 Page**: Added `not-found.tsx` matching the editorial warm-cream design language.
-- **Supabase Cloud Client**: Added `@supabase/supabase-js` with graceful fallback when unconfigured via `src/lib/supabase/client.ts`.
-- **Automated Responsive Test Suite**: Created `scripts/test-responsive.mjs` running automated viewport checks across 360px, 390px, 768px, 1024px, 1440px, and 1920px.
+- **Supabase Auth client**: Added `@supabase/supabase-js`; it is optional Auth only. Learning-data synchronization is not implemented.
+- **Responsive test script**: Added `scripts/test-responsive.mjs` for checks at six widths. A current browser run has not completed; see `TEST_REPORT.md`.
 - **Vercel Deployment Configuration**: Added `vercel.json` and optimized `next.config.mjs` with production HTTP security headers (`nosniff`, `SAMEORIGIN`, `origin-when-cross-origin`).
 
 ### Changed

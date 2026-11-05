@@ -1,5 +1,7 @@
 # UI / UX Specification
 
+> **Status:** Design intent, not a claim of completed visual QA. See `UI_UX_AUDIT.md` and `UI_UX_TEST_REPORT.md` for screenshot findings and current verification status.
+
 ## Visual direction
 Calm, editorial, distraction-free learning dashboard directly matching the reference video:
 - **Background**: Warm off-white / cream (`#FAF8F5` / `#F5F2EB`).
@@ -13,13 +15,13 @@ Calm, editorial, distraction-free learning dashboard directly matching the refer
 
 ## App Navigation & Shell
 ### Left Sidebar (Desktop) / Drawer & Bottom Nav (Mobile)
-- **App Brand**: Graduation mortarboard icon + **"Courseit"** logo.
+- **App Brand**: Graduation mortarboard icon + **"Learnhour"** logo.
 - **Quick Action**: `+ New course` green pill button.
 - **Navigation Links**:
   - `Today` (Daily targets, streak, active sessions, quick stats)
   - `My courses` (Full course catalog, filters, progress overview)
   - `Sessions` (Study timer, manual session logger, learning history)
-  - `Settings` (Daily target minutes, timezone, local/cloud storage backup)
+  - `Settings` (Daily target minutes, timezone, local data export)
 - **Recents Section**: Fast-switching list of in-progress courses.
 - **User Profile Pill**: Name, avatar, and tier badge ("Free beta").
 

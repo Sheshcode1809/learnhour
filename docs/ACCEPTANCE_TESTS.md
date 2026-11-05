@@ -1,14 +1,17 @@
 # Acceptance Tests
 
+> **Current execution status:** The unchecked items below are acceptance criteria, not passed tests. Playlist ingestion and cloud-data synchronization are not available in the current build. See `TEST_REPORT.md` for checks actually executed.
+
 ## Course Management & Ingestion
-- [ ] User can paste a preset YouTube masterclass URL on `/courses/new` and auto-populate title, duration, lessons, and day-wise plan.
+- [ ] User can paste an exact supported preset video URL on `/courses/new` and populate its bundled title, duration, lesson, and day-plan data.
+- [ ] Playlist pages, unsupported domains, lookalike hosts, and non-HTTPS video URLs are rejected with actionable errors.
 - [ ] User pasting a custom YouTube URL is prompted with an explicit confirmation step for title and duration (no silent fallbacks to unrelated sample videos).
 - [ ] Invalid or unsupported video links show clear actionable error messages and cannot create courses with dummy videos.
 - [ ] User can manually create a course with title, provider, duration, and description.
 - [ ] Form validation prevents negative or empty durations.
 - [ ] Course list shows active courses with accurate progress bars and remaining study time.
 - [ ] Deleting every course persists an empty course library across page reloads without re-injecting sample courses.
-- [ ] Reset button in `/settings` explicitly restores demo sample data.
+- [ ] Production first-run and reset behavior do not inject demo courses or sessions.
 - [ ] User can edit course metadata and preserve custom lessons/progress unless explicitly requesting plan rebuild.
 - [ ] User can archive and delete a course with confirmation dialog.
 
@@ -50,6 +53,7 @@
 - [ ] All data persists in local storage across browser refreshes and restarts.
 - [ ] Data export generates a clean JSON backup file.
 - [ ] Clearly labeled guest/demo auth indicates local-first execution.
+- [ ] Supabase learning-data synchronization is not claimed; it is not implemented in this build.
 
 ## Responsive UI & Accessibility
 - [ ] Layout renders cleanly without horizontal scroll at 360px mobile width.

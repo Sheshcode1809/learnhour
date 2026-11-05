@@ -1,7 +1,18 @@
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://courseit.vercel.app';
+  const configuredUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
+  if (!configuredUrl) return [];
+
+  let baseUrl: string;
+  try {
+    const parsed = new URL(configuredUrl);
+    if (parsed.protocol !== 'https:') return [];
+    baseUrl = parsed.origin;
+  } catch {
+    return [];
+  }
+
   const lastModified = new Date();
 
   return [
@@ -11,24 +22,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'weekly',
       priority: 1.0,
     },
-    {
-      url: `${baseUrl}/landing`,
+    ...['about', 'contact'].map((path) => ({
+      url: `${baseUrl}/${path}`,
       lastModified,
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/auth/login`,
-      lastModified,
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/auth/signup`,
-      lastModified,
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
+      changeFrequency: 'monthly' as const,
+      priority: 0.4,
+    })),
   ];
 }
 

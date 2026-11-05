@@ -1,5 +1,7 @@
 # Antigravity Master Prompt — Build the Course Learning Tracker
 
+> **Use with care:** This is an earlier build prompt and contains desired/future features. For maintenance or launch-readiness work, inspect the current code and `changes.md`, `PRODUCTION_AUDIT.md`, and `TEST_REPORT.md` first. Do not assume playlist ingestion or live cloud sync has shipped.
+
 ## Role
 Act as a senior product engineer, UX designer, and solution architect. Work methodically. Treat the supplied reference video and this documentation as product inputs. Build a polished, responsive, functional web application—not a static mockup.
 

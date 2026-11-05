@@ -14,6 +14,7 @@ import {
   isValidTimezone,
 } from '../lib/calculations/streaks';
 import { groupLessonsByDay, generateLessonsForCourse } from '../lib/calculations/dayPlanner';
+import { canSwitchTimerTarget, getElapsedTimerSeconds, pauseTimerState, resumeTimerState, startTimerState } from '../lib/calculations/timer';
 import {
   extractYouTubeVideoId,
   isAllowlistedEmbedUrl,
@@ -390,6 +391,14 @@ describe('YouTube URL Parser & Embed Security', () => {
     expect(extractYouTubeVideoId('not-a-valid-url')).toBeNull();
   });
 
+  it('rejects lookalike, non-HTTPS, playlist, and arbitrary-host URLs', () => {
+    expect(extractYouTubeVideoId('https://youtube.com.attacker.test/watch?v=kL2gQWjmLc0')).toBeNull();
+    expect(extractYouTubeVideoId('https://example.com/watch?v=kL2gQWjmLc0')).toBeNull();
+    expect(extractYouTubeVideoId('http://youtu.be/kL2gQWjmLc0')).toBeNull();
+    expect(extractYouTubeVideoId('https://www.youtube.com/playlist?list=PL1234567890')).toBeNull();
+    expect(parseYouTubeUrlOrPreset('fake-prefix-python-2026-suffix')).toBeNull();
+  });
+
   it('parses presets with rich metadata and non-presets honestly without forged titles', () => {
     // Preset
     const presetRes = parseYouTubeUrlOrPreset('https://www.youtube.com/watch?v=kL2gQWjmLc0');
@@ -413,5 +422,37 @@ describe('YouTube URL Parser & Embed Security', () => {
     expect(isAllowlistedEmbedUrl('https://youtube-nocookie.com/embed/kL2gQWjmLc0')).toBe(true);
     expect(isAllowlistedEmbedUrl('https://malicious-site.com/embed/kL2gQWjmLc0')).toBe(false);
     expect(isAllowlistedEmbedUrl('')).toBe(false);
+  });
+});
+
+describe('Timer state transitions', () => {
+  const idleTimer = {
+    is_running: false,
+    course_id: null,
+    lesson_id: null,
+    started_at: null,
+    accumulated_seconds: 0,
+    session_start_epoch: null,
+  };
+
+  it('counts running seconds, excludes paused time, and resumes accumulated time', () => {
+    const running = startTimerState(idleTimer, 'course-a', 'lesson-a', 1_000);
+    expect(getElapsedTimerSeconds(running, 6_000)).toBe(5);
+
+    const paused = pauseTimerState(running, 6_000);
+    expect(paused.accumulated_seconds).toBe(5);
+    expect(getElapsedTimerSeconds(paused, 100_000)).toBe(5);
+
+    const resumed = resumeTimerState(paused, 100_000);
+    expect(getElapsedTimerSeconds(resumed, 101_500)).toBe(6);
+  });
+
+  it('keeps repeated starts on the same lesson lossless and blocks switching after time accrues', () => {
+    const running = startTimerState(idleTimer, 'course-a', 'lesson-a', 1_000);
+    const restarted = startTimerState(running, 'course-a', 'lesson-a', 6_000);
+    expect(restarted.accumulated_seconds).toBe(5);
+    expect(restarted.session_start_epoch).toBe(1_000);
+    expect(canSwitchTimerTarget(restarted, 'course-b', 'lesson-b', 7_000)).toBe(false);
+    expect(canSwitchTimerTarget(restarted, 'course-a', 'lesson-a', 7_000)).toBe(true);
   });
 });

@@ -2,7 +2,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { ScenicBanner } from '@/components/courses/ScenicBanner';
 import {
@@ -23,12 +22,7 @@ import {
 } from 'lucide-react';
 
 export default function HomePage() {
-  const router = useRouter();
-  const { loginWithGoogle, isAuthenticated } = useAuth();
-
-  const handleGoogleCTA = async () => {
-    await loginWithGoogle();
-  };
+  const { isAuthenticated, authConfigured } = useAuth();
 
   return (
     <div className="min-h-screen bg-cream-100 text-charcoal-800 flex flex-col selection:bg-forest-100 selection:text-forest-800">
@@ -39,7 +33,7 @@ export default function HomePage() {
             <GraduationCap className="w-5 h-5" />
           </div>
           <div>
-            <span className="font-bold text-lg text-charcoal-900 tracking-tight">Courseit</span>
+            <span className="font-bold text-lg text-charcoal-900 tracking-tight">Learnhour</span>
             <span className="ml-1.5 text-[10px] font-bold bg-terracotta-100 text-terracotta-700 px-1.5 py-0.5 rounded-full">
               1h/day
             </span>
@@ -64,39 +58,13 @@ export default function HomePage() {
 
         {/* Right Auth Actions */}
         <div className="flex items-center gap-2.5">
-          {isAuthenticated ? (
-            <>
-              <Link
-                href="/dashboard"
-                className="text-xs font-semibold text-charcoal-700 hover:text-charcoal-900 px-3 py-2 rounded-xl hover:bg-cream-200 transition-colors"
-              >
-                Dashboard
-              </Link>
-              <Link
-                href="/auth/login"
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-forest-600 hover:bg-forest-700 active:bg-forest-800 text-white font-semibold text-xs shadow-sm transition-all"
-              >
-                <span>Login</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </>
-          ) : (
-            <>
-              <Link
-                href="/auth/signup"
-                className="text-xs font-semibold text-charcoal-700 hover:text-charcoal-900 px-3 py-2 rounded-xl hover:bg-cream-200 transition-colors"
-              >
-                Sign up
-              </Link>
-              <Link
-                href="/auth/login"
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-forest-600 hover:bg-forest-700 active:bg-forest-800 text-white font-semibold text-xs shadow-sm transition-all"
-              >
-                <span>Login</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </>
+          {authConfigured && !isAuthenticated && (
+            <Link href="/auth/login" className="text-xs font-semibold text-charcoal-700 hover:text-charcoal-900 px-3 py-2 rounded-xl hover:bg-cream-200 transition-colors">Sign in</Link>
           )}
+          <Link href="/dashboard" className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-forest-600 hover:bg-forest-700 text-white font-semibold text-xs shadow-sm transition-all">
+            <span>{isAuthenticated ? 'Continue learning' : 'Open Learnhour'}</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
       </header>
 
@@ -112,14 +80,13 @@ export default function HomePage() {
         <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-charcoal-900 tracking-tight max-w-4xl leading-[1.14]">
           Paste a long video.{' '}
           <span className="font-serif italic text-forest-600 font-normal inline-block whitespace-normal sm:whitespace-nowrap">
-            Get a 1-hour/day course.
+            Get a <span className="whitespace-nowrap">1-hour/day</span> course.
           </span>
         </h1>
 
         {/* Subtitle */}
         <p className="mt-4 text-sm sm:text-base md:text-lg text-charcoal-600 max-w-2xl leading-relaxed">
-          Courseit turns long 8-, 10-, and 12-hour YouTube lectures into structured daily study plans.
-          Track your daily 60-minute habit, keep your streak alive, and test your retention with interactive quizzes.
+          Organize a supported YouTube video into manageable study sessions. Confirm its title and duration, set a daily pace, and track lessons and focused time in your browser.
         </p>
 
         {/* Primary CTA Buttons */}
@@ -136,7 +103,7 @@ export default function HomePage() {
             href="/dashboard"
             className="w-full sm:w-auto flex items-center justify-center gap-2 py-3 px-6 rounded-2xl bg-white hover:bg-cream-200 text-charcoal-800 border border-sand-border font-bold text-sm shadow-2xs transition-all"
           >
-            <span>View Demo</span>
+            <span>Open your dashboard</span>
             <ChevronRight className="w-4 h-4" />
           </Link>
         </div>
@@ -152,16 +119,7 @@ export default function HomePage() {
           </Link>
         </div>
 
-        {/* Quick Google Sign In */}
-        <div className="mt-3 flex items-center gap-2 text-xs text-charcoal-500">
-          <span>Or sign in:</span>
-          <button
-            onClick={handleGoogleCTA}
-            className="font-bold text-forest-700 hover:text-forest-800 hover:underline flex items-center gap-1 transition-colors"
-          >
-            <span>Continue with Google →</span>
-          </button>
-        </div>
+        <p className="mt-3 text-xs text-charcoal-500">Your courses and study history stay in this browser; they do not sync between devices.</p>
 
         {/* Scenic Nature Illustration Banner */}
         <div className="w-full mt-8 relative max-w-5xl">
@@ -184,7 +142,7 @@ export default function HomePage() {
             Workflow
           </span>
           <h2 className="text-2xl sm:text-4xl font-extrabold text-charcoal-900 tracking-tight mt-3">
-            How Courseit Works
+            How Learnhour Works
           </h2>
           <p className="text-xs sm:text-sm text-charcoal-500 mt-2 max-w-lg">
             From an overwhelming 10-hour tutorial to consistent daily mastery in 3 simple steps.
@@ -197,16 +155,16 @@ export default function HomePage() {
                 <div className="w-10 h-10 rounded-2xl bg-forest-100 text-forest-700 flex items-center justify-center font-black text-sm mb-4">
                   01
                 </div>
-                <h3 className="text-base font-bold text-charcoal-900 mb-1.5">
-                  Paste Any Long Video
+            <h3 className="text-base font-bold text-charcoal-900 mb-1.5">
+                  Add a YouTube video
                 </h3>
                 <p className="text-xs text-charcoal-600 leading-relaxed">
-                  Paste any YouTube tutorial or pick a curated masterclass. Courseit structures the material into verified daily modules with timestamps and focus sessions.
+                  Add a supported YouTube video or choose a prepared course plan. For custom videos, confirm the title and duration before creating your study plan.
                 </p>
               </div>
               <div className="mt-6 pt-4 border-t border-sand-border/70 flex items-center gap-2 text-xs font-semibold text-forest-700">
                 <Video className="w-4 h-4" />
-                <span>Zero configuration needed</span>
+                <span>Set up a course in a few steps</span>
               </div>
             </div>
 
@@ -284,7 +242,7 @@ export default function HomePage() {
             </div>
             <h3 className="text-base font-bold text-charcoal-900 mb-2">Daily Streak Engine</h3>
             <p className="text-xs text-charcoal-600 leading-relaxed">
-              Calculates current and best learning streak based on verified 60-minute completed study days.
+              Calculates current and best streaks from your recorded study sessions and selected daily goal.
             </p>
           </div>
 
@@ -326,9 +284,9 @@ export default function HomePage() {
             <div className="w-10 h-10 rounded-2xl bg-sand-200 text-charcoal-700 flex items-center justify-center mb-4">
               <ShieldCheck className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-bold text-charcoal-900 mb-2">Offline Ready + Local First</h3>
+            <h3 className="text-base font-bold text-charcoal-900 mb-2">Browser-saved progress</h3>
             <p className="text-xs text-charcoal-600 leading-relaxed">
-              Local-first storage works immediately offline with zero setup, with exportable JSON backups.
+              Courses and study sessions are saved in this browser. Export your records from Settings when you need a copy.
             </p>
           </div>
         </div>
@@ -433,27 +391,20 @@ export default function HomePage() {
             Ready to conquer long courses?
           </h2>
           <p className="text-xs sm:text-sm text-charcoal-600 mt-2 max-w-md">
-            Join self-directed learners who study for 1 focused hour a day and actually complete their courses.
+            Start with a prepared course plan or add a supported video, then choose a daily pace that works for you.
           </p>
 
           <div className="mt-7 flex flex-col sm:flex-row items-center gap-3 w-full max-w-sm">
             <Link
-              href="/auth/signup"
+              href="/dashboard"
               className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-2xl bg-forest-600 hover:bg-forest-700 text-white font-bold text-sm shadow-sm"
             >
-              <span>Create Free Account</span>
+              <span>Open Learnhour</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
-          <div className="mt-4">
-            <button
-              onClick={handleGoogleCTA}
-              className="text-xs font-semibold text-charcoal-600 hover:text-charcoal-900 underline"
-            >
-              Or sign in with Google in one click
-            </button>
-          </div>
+          {authConfigured && <Link href="/auth/login" className="mt-4 text-xs font-semibold text-charcoal-600 hover:text-charcoal-900 underline">Or sign in to your account</Link>}
         </div>
       </section>
 
@@ -463,14 +414,16 @@ export default function HomePage() {
           <div className="w-6 h-6 rounded-lg bg-forest-600 text-white flex items-center justify-center">
             <GraduationCap className="w-3.5 h-3.5" />
           </div>
-          <span className="font-bold text-charcoal-800">Courseit</span>
+          <span className="font-bold text-charcoal-800">Learnhour</span>
           <span>— One focused hour a day.</span>
         </div>
 
         <div className="flex items-center gap-4 text-xs font-medium">
-          <Link href="/auth/login" className="hover:text-charcoal-900">Sign in</Link>
-          <Link href="/auth/signup" className="hover:text-charcoal-900">Sign up</Link>
-          <Link href="/dashboard" className="hover:text-charcoal-900">Dashboard</Link>
+          <Link href="/about" className="hover:text-charcoal-900">About</Link>
+          <Link href="/privacy" className="hover:text-charcoal-900">Privacy</Link>
+          <Link href="/terms" className="hover:text-charcoal-900">Terms</Link>
+          <Link href="/contact" className="hover:text-charcoal-900">Contact</Link>
+          <Link href="/dashboard" className="hover:text-charcoal-900">Open app</Link>
         </div>
       </footer>
     </div>

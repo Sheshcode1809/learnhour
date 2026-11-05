@@ -1,5 +1,7 @@
 # Product Requirements Document (PRD)
 
+> **Status:** This document records product intent and is not proof that each feature is shipped. Use `PRODUCTION_AUDIT.md` and `TEST_REPORT.md` for current status.
+
 ## 1. Product summary
 A personal learning tracker that turns long courses and video playlists into manageable daily study sessions, inspired directly by the reference video. The default habit is **60 minutes per day**.
 
@@ -16,9 +18,9 @@ Learners save long tutorials (8, 10, 12+ hours) and courses but struggle to trac
 
 ## 5. Core Features & User Journeys
 1. **Effortless Course Ingestion & Creation**:
-   - Paste a YouTube video or preset URL ("Paste a long video. Get a course.").
-   - Curated presets (e.g. 10-hour Python masterclass) auto-populate lessons, video timestamps, and descriptions.
-   - Custom YouTube URLs extract verified video IDs and allowlisted embed links, prompting the user for honest confirmation of course title and total duration (no silent fallbacks to unrelated sample videos or fake scraping).
+   - Add a supported YouTube video URL, an exact known preset, or a manual course.
+   - Exact known presets can provide bundled lesson details; playlist pages are rejected.
+   - For custom YouTube videos, the learner supplies title and duration; the app does not scrape metadata or silently substitute another video.
    - Or create custom/manual courses with title, provider, duration, and description.
    - Intelligent day-wise curriculum generator divides multi-hour courses into daily bite-sized (~60m) learning days (Day 1, Day 2, Day 3, etc.).
 2. **Interactive Course Learning Player**:

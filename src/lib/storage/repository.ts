@@ -11,7 +11,62 @@ const STORAGE_KEYS = {
   LAST_LESSON_PREFIX: 'courseit_last_lesson_',
 };
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isCourseRecord(value: unknown): value is Course {
+  if (!isRecord(value)) return false;
+  return typeof value.id === 'string' && typeof value.title === 'string' &&
+    typeof value.provider === 'string' && typeof value.course_url === 'string' &&
+    typeof value.embed_url === 'string' && typeof value.description === 'string' &&
+    Number.isFinite(value.total_minutes) && Number(value.total_minutes) > 0 &&
+    Number.isFinite(value.completed_minutes) && Number.isFinite(value.daily_pace_minutes) &&
+    ['active', 'completed', 'archived'].includes(String(value.status)) &&
+    Array.isArray(value.lessons) && value.lessons.every((lesson) =>
+      isRecord(lesson) && typeof lesson.id === 'string' && typeof lesson.title === 'string' &&
+      Number.isFinite(lesson.duration_minutes) && Number.isFinite(lesson.day_number) &&
+      typeof lesson.is_completed === 'boolean'
+    ) && typeof value.created_at === 'string' && typeof value.updated_at === 'string';
+}
+
+function isLearningSessionRecord(value: unknown): value is LearningSession {
+  if (!isRecord(value)) return false;
+  return typeof value.id === 'string' && typeof value.started_at === 'string' &&
+    Number.isFinite(Date.parse(value.started_at)) && typeof value.ended_at === 'string' &&
+    Number.isFinite(Date.parse(value.ended_at)) && Number.isFinite(value.duration_seconds) &&
+    Number(value.duration_seconds) > 0 && typeof value.created_at === 'string';
+}
+
+function isPreferencesRecord(value: unknown): value is UserPreferences {
+  return isRecord(value) && typeof value.user_id === 'string' && typeof value.name === 'string' &&
+    Number.isFinite(value.daily_goal_minutes) && Number(value.daily_goal_minutes) > 0 &&
+    typeof value.timezone === 'string' && typeof value.tier === 'string' &&
+    typeof value.created_at === 'string' && typeof value.updated_at === 'string';
+}
+
 class LocalCourseRepository {
+  private storageFailureMessage: string | null = null;
+
+  private reportStorageFailure(): void {
+    this.storageFailureMessage = 'Browser storage is unavailable or full. Changes may not persist; export your data if the app still allows it.';
+    if (this.isBrowser()) {
+      window.dispatchEvent(new CustomEvent('learnhour:storage-failure', { detail: this.storageFailureMessage }));
+    }
+  }
+
+  getStorageFailure(): string | null {
+    return this.storageFailureMessage;
+  }
+
+  private getInitialCourses(): Course[] {
+    return process.env.NODE_ENV === 'production' ? [] : INITIAL_COURSES;
+  }
+
+  private getInitialSessions(): LearningSession[] {
+    return process.env.NODE_ENV === 'production' ? [] : generateSeedSessions();
+  }
+
   private isBrowser(): boolean {
     return typeof window !== 'undefined';
   }
@@ -22,11 +77,15 @@ class LocalCourseRepository {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.PREFERENCES);
       if (data !== null) {
-        return JSON.parse(data);
+        const parsed: unknown = JSON.parse(data);
+        if (isPreferencesRecord(parsed)) return parsed;
+        this.reportStorageFailure();
+        return INITIAL_PREFERENCES;
       }
       this.savePreferences(INITIAL_PREFERENCES);
       return INITIAL_PREFERENCES;
     } catch {
+      this.reportStorageFailure();
       return INITIAL_PREFERENCES;
     }
   }
@@ -35,26 +94,31 @@ class LocalCourseRepository {
     if (!this.isBrowser()) return;
     try {
       localStorage.setItem(STORAGE_KEYS.PREFERENCES, JSON.stringify(prefs));
-    } catch (e) {
-      console.error('Failed to save preferences to localStorage', e);
+    } catch {
+      this.reportStorageFailure();
+      throw new Error('Unable to save preferences in this browser.');
     }
   }
 
   // --- COURSES ---
   getCourses(): Course[] {
-    if (!this.isBrowser()) return INITIAL_COURSES;
+    if (!this.isBrowser()) return this.getInitialCourses();
     try {
       const data = localStorage.getItem(STORAGE_KEYS.COURSES);
       // Distinguish intentionally saved empty array [] from uninitialized storage (null)
       if (data !== null) {
-        const parsed = JSON.parse(data);
-        if (Array.isArray(parsed)) return parsed;
+        const parsed: unknown = JSON.parse(data);
+        if (Array.isArray(parsed) && parsed.every(isCourseRecord)) return parsed;
+        this.reportStorageFailure();
+        return this.getInitialCourses();
       }
-      // First install: seed default masterclasses
-      this.saveCourses(INITIAL_COURSES);
-      return INITIAL_COURSES;
+      // Demo content is limited to development. Production starts with an empty account.
+      const initialCourses = this.getInitialCourses();
+      this.saveCourses(initialCourses);
+      return initialCourses;
     } catch {
-      return INITIAL_COURSES;
+      this.reportStorageFailure();
+      return this.getInitialCourses();
     }
   }
 
@@ -67,8 +131,9 @@ class LocalCourseRepository {
     if (!this.isBrowser()) return;
     try {
       localStorage.setItem(STORAGE_KEYS.COURSES, JSON.stringify(courses));
-    } catch (e) {
-      console.error('Failed to save courses to localStorage', e);
+    } catch {
+      this.reportStorageFailure();
+      throw new Error('Unable to save courses in this browser.');
     }
   }
 
@@ -104,7 +169,9 @@ class LocalCourseRepository {
     if (this.isBrowser()) {
       try {
         localStorage.removeItem(`${STORAGE_KEYS.LAST_LESSON_PREFIX}${id}`);
-      } catch {}
+      } catch {
+        this.reportStorageFailure();
+      }
     }
   }
 
@@ -162,7 +229,9 @@ class LocalCourseRepository {
     if (!this.isBrowser() || !courseId || !lessonId) return;
     try {
       localStorage.setItem(`${STORAGE_KEYS.LAST_LESSON_PREFIX}${courseId}`, lessonId);
-    } catch {}
+    } catch {
+      this.reportStorageFailure();
+    }
   }
 
   getLastSelectedLessonId(courseId: string): string | null {
@@ -170,24 +239,28 @@ class LocalCourseRepository {
     try {
       return localStorage.getItem(`${STORAGE_KEYS.LAST_LESSON_PREFIX}${courseId}`);
     } catch {
+      this.reportStorageFailure();
       return null;
     }
   }
 
   // --- SESSIONS ---
   getSessions(): LearningSession[] {
-    if (!this.isBrowser()) return generateSeedSessions();
+    if (!this.isBrowser()) return this.getInitialSessions();
     try {
       const data = localStorage.getItem(STORAGE_KEYS.SESSIONS);
       if (data !== null) {
-        const parsed = JSON.parse(data);
-        if (Array.isArray(parsed)) return parsed;
+        const parsed: unknown = JSON.parse(data);
+        if (Array.isArray(parsed) && parsed.every(isLearningSessionRecord)) return parsed;
+        this.reportStorageFailure();
+        return this.getInitialSessions();
       }
-      const initial = generateSeedSessions();
+      const initial = this.getInitialSessions();
       this.saveSessions(initial);
       return initial;
     } catch {
-      return generateSeedSessions();
+      this.reportStorageFailure();
+      return this.getInitialSessions();
     }
   }
 
@@ -195,8 +268,9 @@ class LocalCourseRepository {
     if (!this.isBrowser()) return;
     try {
       localStorage.setItem(STORAGE_KEYS.SESSIONS, JSON.stringify(sessions));
-    } catch (e) {
-      console.error('Failed to save sessions to localStorage', e);
+    } catch {
+      this.reportStorageFailure();
+      throw new Error('Unable to save study sessions in this browser.');
     }
   }
 
@@ -229,6 +303,11 @@ class LocalCourseRepository {
     }
 
     const sessions = this.getSessions();
+    const existingSession = sessions.find((saved) => saved.id === session.id);
+    if (existingSession) {
+      this.recalculateCoursesWithSessions(sessions);
+      return existingSession;
+    }
     const updatedSessions = [session, ...sessions];
     this.saveSessions(updatedSessions);
     this.recalculateCoursesWithSessions(updatedSessions);
@@ -273,8 +352,19 @@ class LocalCourseRepository {
     if (!this.isBrowser()) return defaultTimer;
     try {
       const data = localStorage.getItem(STORAGE_KEYS.ACTIVE_TIMER);
-      return data ? JSON.parse(data) : defaultTimer;
+      if (!data) return defaultTimer;
+      const parsed: unknown = JSON.parse(data);
+      if (
+        isRecord(parsed) && typeof parsed.is_running === 'boolean' &&
+        (parsed.course_id === null || typeof parsed.course_id === 'string') &&
+        (parsed.lesson_id === null || typeof parsed.lesson_id === 'string') &&
+        (parsed.started_at === null || Number.isFinite(parsed.started_at)) &&
+        Number.isFinite(parsed.accumulated_seconds) && Number(parsed.accumulated_seconds) >= 0
+      ) return parsed as unknown as ActiveTimerState;
+      this.reportStorageFailure();
+      return defaultTimer;
     } catch {
+      this.reportStorageFailure();
       return defaultTimer;
     }
   }
@@ -283,22 +373,31 @@ class LocalCourseRepository {
     if (!this.isBrowser()) return;
     try {
       localStorage.setItem(STORAGE_KEYS.ACTIVE_TIMER, JSON.stringify(state));
-    } catch (e) {
-      console.error('Failed to save active timer to localStorage', e);
+    } catch {
+      this.reportStorageFailure();
+      throw new Error('Unable to save the timer in this browser.');
     }
   }
 
   // --- LAST ACTIVE COURSE ---
   getLastActiveCourseId(): string {
-    if (!this.isBrowser()) return 'python-2026';
-    return localStorage.getItem(STORAGE_KEYS.ACTIVE_COURSE_ID) || 'python-2026';
+    if (!this.isBrowser()) return this.getInitialCourses()[0]?.id || '';
+    try {
+      return localStorage.getItem(STORAGE_KEYS.ACTIVE_COURSE_ID) || this.getCourses()[0]?.id || '';
+    } catch {
+      this.reportStorageFailure();
+      return this.getCourses()[0]?.id || '';
+    }
   }
 
   setLastActiveCourseId(courseId: string): void {
     if (!this.isBrowser() || !courseId) return;
     try {
       localStorage.setItem(STORAGE_KEYS.ACTIVE_COURSE_ID, courseId);
-    } catch {}
+    } catch {
+      this.reportStorageFailure();
+      throw new Error('Unable to clear data from this browser.');
+    }
   }
 
   // --- BACKUP & RESET ---
@@ -330,11 +429,13 @@ class LocalCourseRepository {
           localStorage.removeItem(key);
         }
       }
-    } catch {}
+    } catch {
+      this.reportStorageFailure();
+    }
 
     this.savePreferences(INITIAL_PREFERENCES);
-    this.saveCourses(INITIAL_COURSES);
-    this.saveSessions(generateSeedSessions());
+    this.saveCourses(this.getInitialCourses());
+    this.saveSessions(this.getInitialSessions());
   }
 }
 

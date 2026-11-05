@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sparkles, ArrowRight, Play, Check, AlertCircle, Video, CheckCircle2, X } from 'lucide-react';
 import { ScenicBanner } from './ScenicBanner';
-import { parseYouTubeUrlOrPreset, PRESET_COURSES } from '@/lib/youtube';
+import { extractYouTubeVideoId, parseYouTubeUrlOrPreset, PRESET_COURSES } from '@/lib/youtube';
 import { useLearning } from '@/context/LearningContext';
 
 export function QuickPasteHero({ onToggleManual }: { onToggleManual?: () => void }) {
@@ -45,30 +45,32 @@ export function QuickPasteHero({ onToggleManual }: { onToggleManual?: () => void
     if (parsed.isPreset) {
       setIsBuilding(true);
       const matchedPreset = PRESET_COURSES.find(
-        (p) => p.url.toLowerCase() === trimmed.toLowerCase() || trimmed.includes(p.key)
+        (preset) => preset.key === trimmed || extractYouTubeVideoId(preset.url) === parsed.videoId
       );
 
       if (matchedPreset) {
-        const newCourse = addCourse({
-          title: matchedPreset.title,
-          provider: matchedPreset.provider,
-          course_url: matchedPreset.url,
-          embed_url: parsed.embedUrl,
-          thumbnail_url: matchedPreset.thumbnail_url,
-          description: matchedPreset.description,
-          total_minutes: matchedPreset.total_minutes,
-          daily_pace_minutes: matchedPreset.daily_pace_minutes,
-          lessons: matchedPreset.lessons.map((l) => ({
-            ...l,
-            course_id: '',
-          })),
-        });
+        try {
+          const newCourse = addCourse({
+            title: matchedPreset.title,
+            provider: matchedPreset.provider,
+            course_url: matchedPreset.url,
+            embed_url: parsed.embedUrl,
+            thumbnail_url: matchedPreset.thumbnail_url,
+            description: matchedPreset.description,
+            total_minutes: matchedPreset.total_minutes,
+            daily_pace_minutes: matchedPreset.daily_pace_minutes,
+            lessons: matchedPreset.lessons.map((lesson) => ({ ...lesson, course_id: '' })),
+          });
 
-        setTimeout(() => {
-          router.push(`/courses/${newCourse.id}`);
-        }, 300);
-        return;
+          setTimeout(() => router.push(`/courses/${newCourse.id}`), 300);
+          return;
+        } catch {
+          setError('Could not save this course. Check the storage warning and try again.');
+          setIsBuilding(false);
+          return;
+        }
       }
+      setIsBuilding(false);
     }
 
     // 2. Custom YouTube video without server API: ask user to confirm title & duration honestly
@@ -112,7 +114,7 @@ export function QuickPasteHero({ onToggleManual }: { onToggleManual?: () => void
         router.push(`/courses/${newCourse.id}`);
       }, 300);
     } catch {
-      setError('Failed to build course. Please try again.');
+      setError('Could not save this course. Check the storage warning and try again.');
       setIsBuilding(false);
     }
   };
@@ -142,7 +144,7 @@ export function QuickPasteHero({ onToggleManual }: { onToggleManual?: () => void
             </h1>
 
             <p className="mt-2 text-xs sm:text-sm text-charcoal-600 max-w-md">
-              Paste any YouTube video or masterclass. We split it into 1-hour daily lessons so you finish steadily.
+              Add a supported YouTube video or choose a prepared plan. For custom videos, confirm the title and duration; Learnhour uses that duration to set a daily pace.
             </p>
 
             {/* If pending confirmation for custom YouTube video */}

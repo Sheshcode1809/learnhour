@@ -13,6 +13,7 @@ export function GlobalTimerBar() {
   const {
     activeTimer,
     elapsedSeconds,
+    timerNotice,
     startTimer,
     pauseTimer,
     resumeTimer,
@@ -25,15 +26,22 @@ export function GlobalTimerBar() {
 
   const [isFinishing, setIsFinishing] = useState(false);
   const [sessionNotes, setSessionNotes] = useState('');
+  const [finishError, setFinishError] = useState('');
 
   const activeCourse = courses.find((c) => c.id === activeTimer.course_id);
   const isTimerVisible = activeTimer.is_running || elapsedSeconds > 0;
 
   const handleFinishSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    finishTimer(sessionNotes);
-    setIsFinishing(false);
-    setSessionNotes('');
+    setFinishError('');
+    try {
+      finishTimer(sessionNotes);
+      setIsFinishing(false);
+      setSessionNotes('');
+    } catch {
+      setFinishError('Could not save this session. The timer is still available; check the storage warning and try again.');
+      return;
+    }
 
     // Trigger celebratory confetti if completing or exceeding daily goal!
     const goal = preferences.daily_goal_minutes || 60;
@@ -56,9 +64,14 @@ export function GlobalTimerBar() {
     return null;
   }
 
+  // The dashboard already contains inline timer actions; avoid covering its summary cards.
+  if (pathname === '/dashboard' && !isTimerVisible && !isFinishing) {
+    return null;
+  }
+
   if (!isTimerVisible && !isFinishing) {
     return (
-      <div className="fixed bottom-6 right-6 z-30 pointer-events-auto">
+      <div className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-30 pointer-events-auto">
         <button
           onClick={() => startTimer()}
           title="Start Study Timer"
@@ -74,7 +87,8 @@ export function GlobalTimerBar() {
 
   return (
     <>
-      <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:w-96 z-30 bg-charcoal-900 text-cream-100 rounded-2xl shadow-xl border border-charcoal-700 p-3.5 flex items-center justify-between gap-3 animate-in fade-in slide-in-from-bottom-3 duration-200">
+      <div className="fixed bottom-20 md:bottom-4 left-3 right-3 md:left-auto md:right-6 md:w-96 z-30 bg-charcoal-900 text-cream-100 rounded-2xl shadow-xl border border-charcoal-700 p-3 sm:p-3.5 flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-3 duration-200">
+        <div className="flex items-center justify-between gap-2 sm:gap-3">
         {/* Left: Info */}
         <div className="flex items-center gap-3 min-w-0">
           <div
@@ -122,6 +136,7 @@ export function GlobalTimerBar() {
             <button
               onClick={pauseTimer}
               title="Pause Timer"
+              aria-label="Pause timer"
               className="p-2 rounded-xl bg-charcoal-800 hover:bg-charcoal-700 text-cream-100 transition-colors"
             >
               <Pause className="w-4 h-4" />
@@ -130,6 +145,7 @@ export function GlobalTimerBar() {
             <button
               onClick={resumeTimer}
               title="Resume Timer"
+              aria-label="Resume timer"
               className="p-2 rounded-xl bg-forest-600 hover:bg-forest-500 text-white transition-colors"
             >
               <Play className="w-4 h-4 fill-current" />
@@ -139,6 +155,7 @@ export function GlobalTimerBar() {
           <button
             onClick={() => setIsFinishing(true)}
             title="Finish & Save Session"
+            aria-label="Finish and save session"
             className="p-2 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white transition-colors"
           >
             <Square className="w-4 h-4 fill-current" />
@@ -147,11 +164,14 @@ export function GlobalTimerBar() {
           <button
             onClick={resetTimer}
             title="Reset Timer"
+            aria-label="Reset timer"
             className="p-2 rounded-xl bg-charcoal-800 hover:bg-charcoal-700 text-cream-300 hover:text-white transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>
         </div>
+        </div>
+        {timerNotice && <p role="alert" className="text-[11px] leading-relaxed text-amber-200 border-t border-charcoal-700 pt-2">{timerNotice}</p>}
       </div>
 
       {/* Finish Session Notes Modal */}
@@ -171,7 +191,8 @@ export function GlobalTimerBar() {
                 </div>
               </div>
               <button
-                onClick={() => setIsFinishing(false)}
+                onClick={() => { setIsFinishing(false); setFinishError(''); }}
+                aria-label="Close save session dialog"
                 className="p-1 rounded-lg hover:bg-cream-200 text-charcoal-500"
               >
                 <X className="w-4 h-4" />
@@ -179,6 +200,7 @@ export function GlobalTimerBar() {
             </div>
 
             <form onSubmit={handleFinishSubmit} className="mt-4 flex flex-col gap-3">
+              {finishError && <p role="alert" className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-xs text-rose-800">{finishError}</p>}
               <div>
                 <label className="block text-xs font-semibold text-charcoal-700 mb-1">
                   Course
