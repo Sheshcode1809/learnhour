@@ -96,3 +96,4 @@ Pairing: **Plus Jakarta Sans / Inter** (UI Sans) + **Editorial Serif Accent** + 
    - Subtle vertical float `-translate-y-0.5` and border enhancement `border-stone-300`.
 4. **Reduced Motion**:
    - All animations automatically disable or degrade to instant state changes when `@media (prefers-reduced-motion: reduce)` is active.
+

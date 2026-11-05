@@ -84,3 +84,4 @@ However, an exhaustive audit against UI/UX Pro Max guidelines reveals several ar
 | **Micro-interactions** | 5/10 | **9/10** |
 | **Information Density** | 7/10 | **9/10** |
 | **Accessibility (WCAG AA)** | 8/10 | **9.5/10** |
+

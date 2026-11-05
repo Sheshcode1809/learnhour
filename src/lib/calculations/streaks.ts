@@ -80,12 +80,13 @@ export function getDayOffset(dateStr: string, offsetDays: number): string {
 export function groupSessionsByDate(
   sessions: LearningSession[],
   timeZone?: string,
-  excludeFuture: boolean = false
+  excludeFuture: boolean = false,
+  referenceNow?: Date
 ): Record<string, number> {
   const dailySeconds: Record<string, number> = {};
   const safeTz = getSafeTimezone(timeZone);
-  const now = new Date();
-  const todayStr = getTodayDateString(safeTz);
+  const now = referenceNow || new Date();
+  const todayStr = getLocalDateString(now.toISOString(), safeTz);
 
   for (const session of sessions || []) {
     if (!session.duration_seconds || session.duration_seconds <= 0) continue;
@@ -116,13 +117,15 @@ export function groupSessionsByDate(
 export function calculateStreaks(
   sessions: LearningSession[],
   dailyGoalMinutes: number,
-  timeZone?: string
+  timeZone?: string,
+  referenceNow?: Date
 ) {
   const goal = Math.max(1, dailyGoalMinutes || 60);
   const safeTz = getSafeTimezone(timeZone);
+  const now = referenceNow || new Date();
   // Exclude future-dated sessions from streak calculations
-  const dailyTotals = groupSessionsByDate(sessions, safeTz, true);
-  const todayStr = getTodayDateString(safeTz);
+  const dailyTotals = groupSessionsByDate(sessions, safeTz, true, now);
+  const todayStr = getLocalDateString(now.toISOString(), safeTz);
 
   const todayMinutes = dailyTotals[todayStr] || 0;
   const todayGoalMet = todayMinutes >= goal;
@@ -182,12 +185,14 @@ export function calculateStreaks(
 export function getWeeklyActivity(
   sessions: LearningSession[],
   dailyGoalMinutes: number,
-  timeZone?: string
+  timeZone?: string,
+  referenceNow?: Date
 ) {
   const goal = Math.max(1, dailyGoalMinutes || 60);
   const safeTz = getSafeTimezone(timeZone);
-  const dailyTotals = groupSessionsByDate(sessions, safeTz, false);
-  const todayStr = getTodayDateString(safeTz);
+  const now = referenceNow || new Date();
+  const dailyTotals = groupSessionsByDate(sessions, safeTz, false, now);
+  const todayStr = getLocalDateString(now.toISOString(), safeTz);
 
   const week = [];
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];

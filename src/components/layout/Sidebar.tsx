@@ -174,8 +174,8 @@ export function Sidebar() {
             </div>
           )}
           <div className="flex flex-col min-w-0">
-            <span className="text-xs font-semibold text-charcoal-800 truncate">{displayName}</span>
-            <span className="text-[10px] text-charcoal-500 font-medium truncate">{displayEmail}</span>
+            <span suppressHydrationWarning className="text-xs font-semibold text-charcoal-800 truncate">{displayName}</span>
+            <span suppressHydrationWarning className="text-[10px] text-charcoal-500 font-medium truncate">{displayEmail}</span>
           </div>
         </div>
 

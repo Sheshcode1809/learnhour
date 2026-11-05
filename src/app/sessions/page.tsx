@@ -187,7 +187,7 @@ export default function SessionsPage() {
             <h1 className="text-2xl sm:text-3xl font-extrabold text-charcoal-900 tracking-tight">
               Focus & Study Sessions
             </h1>
-            <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-cream-200/80 text-charcoal-700 border border-sand-border">
+            <span suppressHydrationWarning className="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-cream-200/80 text-charcoal-700 border border-sand-border">
               <Clock className="w-3 h-3 text-forest-700" />
               {preferences.timezone}
             </span>
@@ -348,7 +348,7 @@ export default function SessionsPage() {
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="border-b border-sand-border text-charcoal-400 uppercase tracking-wider text-[10px] font-bold">
-                    <th className="py-3 px-4">Date & Time ({preferences.timezone})</th>
+                    <th suppressHydrationWarning className="py-3 px-4">Date & Time ({preferences.timezone})</th>
                     <th className="py-3 px-4">Course</th>
                     <th className="py-3 px-4">Duration</th>
                     <th className="py-3 px-4">Notes</th>
@@ -358,7 +358,7 @@ export default function SessionsPage() {
                 <tbody className="divide-y divide-sand-border/60">
                   {filteredSessions.map((session) => (
                     <tr key={session.id} className="hover:bg-cream-50/70 transition-colors">
-                      <td className="py-3.5 px-4 text-charcoal-600 font-mono text-[11px] whitespace-nowrap">
+                      <td suppressHydrationWarning className="py-3.5 px-4 text-charcoal-600 font-mono text-[11px] whitespace-nowrap">
                         {formatDateTimeInTimezone(session.started_at, preferences.timezone)}
                       </td>
                       <td className="py-3.5 px-4 font-semibold text-charcoal-900">
@@ -420,7 +420,7 @@ export default function SessionsPage() {
                   </div>
 
                   <div className="flex items-center justify-between text-[11px] text-charcoal-500 pt-1 border-t border-sand-border/50">
-                    <span className="font-mono">
+                    <span suppressHydrationWarning className="font-mono">
                       {formatDateTimeInTimezone(session.started_at, preferences.timezone)}
                     </span>
                     <div className="flex items-center gap-1">

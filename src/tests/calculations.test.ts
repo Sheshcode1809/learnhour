@@ -8,6 +8,7 @@ import {
 import {
   calculateStreaks,
   getDayOffset,
+  getLocalDateString,
   getTodayDateString,
   groupSessionsByDate,
   isValidTimezone,
@@ -202,7 +203,8 @@ describe('Derived Course Completed Minutes (Single Source of Truth)', () => {
 
 describe('Streak & Timezone Calculations', () => {
   const testTz = 'UTC';
-  const baseDate = getTodayDateString(testTz);
+  const mockNow = new Date('2026-11-05T23:59:59Z');
+  const baseDate = getLocalDateString(mockNow.toISOString(), testTz);
 
   it('validates IANA timezones properly', () => {
     expect(isValidTimezone('America/New_York')).toBe(true);
@@ -234,7 +236,7 @@ describe('Streak & Timezone Calculations', () => {
 
     // If floored separately, 30s -> 0m + 0m = 0m
     // Summed first: 30s + 30s = 60s -> 1m
-    const dailyMap = groupSessionsByDate(sessions, 'UTC', false);
+    const dailyMap = groupSessionsByDate(sessions, 'UTC', false, mockNow);
     expect(dailyMap[baseDate]).toBe(1);
   });
 
@@ -250,7 +252,7 @@ describe('Streak & Timezone Calculations', () => {
       },
     ];
 
-    const dailyMap = groupSessionsByDate(sessions, 'UTC', true);
+    const dailyMap = groupSessionsByDate(sessions, 'UTC', true, mockNow);
     expect(dailyMap[futureDate]).toBeUndefined();
   });
 
@@ -280,7 +282,7 @@ describe('Streak & Timezone Calculations', () => {
     ];
 
     // Daily goal 60 min
-    const res = calculateStreaks(sessions, 60, testTz);
+    const res = calculateStreaks(sessions, 60, testTz, mockNow);
     expect(res.todayGoalMet).toBe(true);
     expect(res.currentStreak).toBe(3);
     expect(res.bestStreak).toBe(3);
@@ -304,7 +306,7 @@ describe('Streak & Timezone Calculations', () => {
       },
     ];
 
-    const res = calculateStreaks(sessions, 60, testTz);
+    const res = calculateStreaks(sessions, 60, testTz, mockNow);
     expect(res.todayGoalMet).toBe(false);
     expect(res.currentStreak).toBe(1); // counts yesterday
     expect(res.remainingMinutesToday).toBe(40);
@@ -321,7 +323,7 @@ describe('Streak & Timezone Calculations', () => {
       },
     ];
 
-    const res = calculateStreaks(sessions, 60, testTz);
+    const res = calculateStreaks(sessions, 60, testTz, mockNow);
     expect(res.currentStreak).toBe(0);
     expect(res.bestStreak).toBe(1);
   });

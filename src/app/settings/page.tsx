@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLearning } from '@/context/LearningContext';
 import { isValidTimezone } from '@/lib/calculations/streaks';
 import {
@@ -27,6 +27,12 @@ export default function SettingsPage() {
   const [timezoneError, setTimezoneError] = useState('');
   const [savedMessage, setSavedMessage] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+
+  useEffect(() => {
+    setName(preferences.name);
+    setDailyGoal(preferences.daily_goal_minutes.toString());
+    setTimezone(preferences.timezone);
+  }, [preferences.name, preferences.daily_goal_minutes, preferences.timezone]);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useLearning } from '@/context/LearningContext';
 import { calculateCourseProgress, formatDuration } from '@/lib/calculations/progress';
@@ -23,6 +23,11 @@ import {
 export default function DashboardPage() {
   const { courses, sessions, preferences, stats, lastActiveCourse, startTimer } = useLearning();
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const now = new Date();
   const dateFormatted = now.toLocaleDateString('en-US', {
@@ -53,16 +58,18 @@ export default function DashboardPage() {
     .sort((a, b) => new Date(b.started_at).getTime() - new Date(a.started_at).getTime())
     .slice(0, 3);
 
+  const learnerFirstName = mounted ? preferences.name.split(' ')[0] : 'Learner';
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Top Welcome Bar */}
       <div className="px-4 sm:px-6 lg:px-8 py-5 border-b border-sand-border bg-cream-50/80 backdrop-blur-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <div className="text-xs font-semibold uppercase tracking-wider text-charcoal-400">
-            {dateFormatted}
+          <div suppressHydrationWarning className="text-xs font-semibold uppercase tracking-wider text-charcoal-400">
+            {mounted ? dateFormatted : 'Today'}
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-charcoal-900 tracking-tight mt-0.5">
-            {getGreeting()}, {preferences.name.split(' ')[0]}
+          <h1 suppressHydrationWarning className="text-2xl sm:text-3xl font-black text-charcoal-900 tracking-tight mt-0.5">
+            {getGreeting()}, {learnerFirstName}
           </h1>
         </div>
         <div className="flex items-center gap-2.5">

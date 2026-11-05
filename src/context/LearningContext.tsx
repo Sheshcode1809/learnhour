@@ -6,6 +6,7 @@ import { repository } from '@/lib/storage/repository';
 import { calculateStreaks, getWeeklyActivity } from '@/lib/calculations/streaks';
 import { generateLessonsForCourse } from '@/lib/calculations/dayPlanner';
 import { PRESET_COURSES } from '@/lib/youtube';
+import { INITIAL_PREFERENCES } from '@/lib/storage/mockData';
 
 interface LearningContextType {
   courses: Course[];
@@ -79,8 +80,15 @@ const LearningContext = createContext<LearningContextType | undefined>(undefined
 export function LearningProvider({ children }: { children: React.ReactNode }) {
   const [courses, setCourses] = useState<Course[]>([]);
   const [sessions, setSessions] = useState<LearningSession[]>([]);
-  const [preferences, setPreferences] = useState<UserPreferences>(repository.getPreferences());
-  const [activeTimer, setActiveTimer] = useState<ActiveTimerState>(repository.getActiveTimer());
+  const [preferences, setPreferences] = useState<UserPreferences>(INITIAL_PREFERENCES);
+  const [activeTimer, setActiveTimer] = useState<ActiveTimerState>({
+    is_running: false,
+    started_at: null,
+    course_id: null,
+    lesson_id: null,
+    accumulated_seconds: 0,
+    session_start_epoch: null,
+  });
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
   const [lastActiveId, setLastActiveId] = useState<string>('python-2026');
   const [isLoading, setIsLoading] = useState<boolean>(true);
