@@ -155,3 +155,4 @@ To enable multi-device synchronization and PostgreSQL storage:
 ## 📄 License
 
 Distributed under the MIT License. See `LICENSE` for more information.
+
