@@ -58,7 +58,9 @@ export default function DashboardPage() {
     .sort((a, b) => new Date(b.started_at).getTime() - new Date(a.started_at).getTime())
     .slice(0, 3);
 
-  const learnerFirstName = mounted ? preferences.name.split(' ')[0] : 'Learner';
+  const learnerFirstName = mounted ? preferences.name.split(' ')[0] || 'Learner' : 'Learner';
+  const greeting = mounted ? getGreeting() : 'Welcome back';
+  const headingTitle = mounted ? `${greeting}, ${learnerFirstName}` : 'Welcome back, Learner';
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -69,7 +71,7 @@ export default function DashboardPage() {
             {mounted ? dateFormatted : 'Today'}
           </div>
           <h1 suppressHydrationWarning className="text-2xl sm:text-3xl font-black text-charcoal-900 tracking-tight mt-0.5">
-            {getGreeting()}, {learnerFirstName}
+            {headingTitle}
           </h1>
         </div>
         <div className="flex items-center gap-2.5">

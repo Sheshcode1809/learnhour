@@ -108,7 +108,7 @@ export function MobileHeader() {
           </nav>
 
           <div className="pt-2 border-t border-sand-border text-xs text-charcoal-500 flex items-center justify-between px-1">
-            <span className="font-semibold text-charcoal-800">{user?.name || 'Learner'}</span>
+            <span suppressHydrationWarning className="font-semibold text-charcoal-800">{user?.name || 'Learner'}</span>
             <Link
               href="/auth/login"
               onClick={() => setIsOpen(false)}

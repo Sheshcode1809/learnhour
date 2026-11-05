@@ -164,7 +164,7 @@ export function Sidebar() {
               className="w-8 h-8 rounded-full object-cover shrink-0 border border-sand-border"
             />
           ) : (
-            <div className="w-8 h-8 rounded-full bg-forest-700 text-white font-semibold text-xs flex items-center justify-center shrink-0">
+            <div suppressHydrationWarning className="w-8 h-8 rounded-full bg-forest-700 text-white font-semibold text-xs flex items-center justify-center shrink-0">
               {displayName
                 .split(' ')
                 .map((n) => n[0])

@@ -77,3 +77,4 @@ To adjust text, beat types, or colors:
 1. Open [`.agents/skills/nullmotion/public/references/drafts.json`](file:///s:/Projects/productivity%20project/.agents/skills/nullmotion/public/references/drafts.json).
 2. Modify any beat text or options (e.g. `size`, `y`, `stack`, `bg`).
 3. Refresh `http://127.0.0.1:4343` to see the live updates instantly.
+

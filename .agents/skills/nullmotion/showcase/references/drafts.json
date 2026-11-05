@@ -1,299 +1,411 @@
 {
- "aliases": {},
- "drafts": {
-  "69614b10fa87": {
-   "palette": {
-    "bg": "#070708",
-    "fg": "#f2f2f2",
-    "accent": "#43d3c9"
-   },
-   "sections": [
-    {
-     "name": "Hook",
-     "beats": [
-      [
-       "text",
-       "Global payments",
-       {
-        "size": 30,
-        "y": 0.47
-       }
-      ],
-      [
-       "text",
-       "a pain",
-       {
-        "size": 150,
-        "x": 0.58,
-        "y": 0.55
-       }
+  "aliases": {},
+  "drafts": {
+    "69614b10fa87": {
+      "palette": {
+        "bg": "#070708",
+        "fg": "#f2f2f2",
+        "accent": "#43d3c9"
+      },
+      "sections": [
+        {
+          "name": "Hook",
+          "beats": [
+            [
+              "text",
+              "Global payments",
+              {
+                "size": 30,
+                "y": 0.47
+              }
+            ],
+            [
+              "text",
+              "a pain",
+              {
+                "size": 150,
+                "x": 0.58,
+                "y": 0.55
+              }
+            ]
+          ]
+        },
+        {
+          "name": "Coin",
+          "beats": [
+            [
+              "burst"
+            ],
+            [
+              "shape"
+            ]
+          ]
+        },
+        {
+          "name": "Reveal",
+          "beats": [
+            [
+              "logo",
+              "Infinite",
+              {
+                "mark": "∞",
+                "markSize": 60,
+                "size": 40
+              }
+            ],
+            [
+              "hub",
+              "Global"
+            ]
+          ]
+        },
+        {
+          "name": "App",
+          "beats": [
+            [
+              "phone",
+              "Sign Up In Seconds",
+              {
+                "stack": true
+              }
+            ],
+            [
+              "phone",
+              "Send Funds Anywhere",
+              {
+                "stack": true
+              }
+            ]
+          ]
+        },
+        {
+          "name": "Products",
+          "beats": [
+            [
+              "shape",
+              "Dash"
+            ],
+            [
+              "shape",
+              "SDK"
+            ]
+          ]
+        },
+        {
+          "name": "Stablecoins",
+          "beats": [
+            [
+              "text",
+              "Powered by Stablecoins",
+              {
+                "size": 34,
+                "y": 0.2
+              }
+            ]
+          ]
+        },
+        {
+          "name": "End card",
+          "beats": [
+            [
+              "logo",
+              "Infinite",
+              {
+                "mark": "∞",
+                "markSize": 44,
+                "size": 30,
+                "sub": "INFINITE.DEV"
+              }
+            ]
+          ]
+        }
       ]
-     ]
     },
-    {
-     "name": "Coin",
-     "beats": [
-      [
-       "burst"
-      ],
-      [
-       "shape"
+    "227b019e7968": {
+      "palette": {
+        "bg": "#fbeef3",
+        "fg": "#2a0a19",
+        "accent": "#b3125d"
+      },
+      "sections": [
+        {
+          "name": "Hook",
+          "beats": [
+            [
+              "icons",
+              "",
+              {
+                "bg": "#8c0f4a"
+              }
+            ],
+            [
+              "window",
+              "Newsroom"
+            ]
+          ]
+        },
+        {
+          "name": "Problem",
+          "beats": [
+            [
+              "text",
+              "Try building their",
+              {
+                "size": 30
+              }
+            ],
+            [
+              "notify",
+              "broken tools"
+            ]
+          ]
+        },
+        {
+          "name": "Platform",
+          "beats": [
+            [
+              "burst"
+            ],
+            [
+              "text",
+              "publishing platform."
+            ]
+          ]
+        },
+        {
+          "name": "No code",
+          "beats": [
+            [
+              "phone",
+              "No coding"
+            ],
+            [
+              "cards",
+              "Choose your site"
+            ]
+          ]
+        },
+        {
+          "name": "Launch",
+          "beats": [
+            [
+              "text",
+              "Launch your platform",
+              {
+                "size": 42
+              }
+            ],
+            [
+              "text",
+              "Everything works together",
+              {
+                "size": 40
+              }
+            ]
+          ]
+        },
+        {
+          "name": "Analytics",
+          "beats": [
+            [
+              "window",
+              "Analytics"
+            ],
+            [
+              "chart",
+              "58.6K"
+            ]
+          ]
+        },
+        {
+          "name": "Generate",
+          "beats": [
+            [
+              "text",
+              "Can Generate",
+              {
+                "size": 44,
+                "y": 0.35
+              }
+            ],
+            [
+              "cards",
+              "Social post · AI images"
+            ]
+          ]
+        },
+        {
+          "name": "End card",
+          "beats": [
+            [
+              "shape",
+              "Build your audience.",
+              {
+                "bg": "#5c0930"
+              }
+            ],
+            [
+              "logo",
+              "Newsroom",
+              {
+                "bg": "#5c0930"
+              }
+            ]
+          ]
+        }
       ]
-     ]
     },
-    {
-     "name": "Reveal",
-     "beats": [
-      [
-       "logo",
-       "Infinite",
-       {
-        "mark": "∞",
-        "markSize": 60,
-        "size": 40
-       }
-      ],
-      [
-       "hub",
-       "Global"
-      ]
-     ]
-    },
-    {
-     "name": "App",
-     "beats": [
-      [
-       "phone",
-       "Sign Up In Seconds",
-       {
-        "stack": true
-       }
-      ],
-      [
-       "phone",
-       "Send Funds Anywhere",
-       {
-        "stack": true
-       }
-      ]
-     ]
-    },
-    {
-     "name": "Products",
-     "beats": [
-      [
-       "shape",
-       "Dash"
-      ],
-      [
-       "shape",
-       "SDK"
-      ]
-     ]
-    },
-    {
-     "name": "Stablecoins",
-     "beats": [
-      [
-       "text",
-       "Powered by Stablecoins",
-       {
-        "size": 34,
-        "y": 0.2
-       }
-      ]
-     ]
-    },
-    {
-     "name": "End card",
-     "beats": [
-      [
-       "logo",
-       "Infinite",
-       {
-        "mark": "∞",
-        "markSize": 44,
-        "size": 30,
-        "sub": "INFINITE.DEV"
-       }
-      ]
-     ]
-    }
-   ]
-  },
-  "227b019e7968": {
-   "palette": {
-    "bg": "#fbeef3",
-    "fg": "#2a0a19",
-    "accent": "#b3125d"
-   },
-   "sections": [
-    {
-     "name": "Hook",
-     "beats": [
-      [
-       "icons",
-       "",
-       {
-        "bg": "#8c0f4a"
-       }
-      ],
-      [
-       "window",
-       "Newsroom"
-      ]
-     ]
-    },
-    {
-     "name": "Problem",
-     "beats": [
-      [
-       "text",
-       "Try building their",
-       {
-        "size": 30
-       }
-      ],
-      [
-       "notify",
-       "broken tools"
-      ]
-     ]
-    },
-    {
-     "name": "Platform",
-     "beats": [
-      [
-       "burst"
-      ],
-      [
-       "text",
-       "publishing platform."
-      ]
-     ]
-    },
-    {
-     "name": "No code",
-     "beats": [
-      [
-       "phone",
-       "No coding"
-      ],
-      [
-       "cards",
-       "Choose your site"
-      ]
-     ]
-    },
-    {
-     "name": "Launch",
-     "beats": [
-      [
-       "text",
-       "Launch your platform",
-       {
-        "size": 42
-       }
-      ],
-      [
-       "text",
-       "Everything works together",
-       {
-        "size": 40
-       }
-      ]
-     ]
-    },
-    {
-     "name": "Analytics",
-     "beats": [
-      [
-       "window",
-       "Analytics"
-      ],
-      [
-       "chart",
-       "58.6K"
-      ]
-     ]
-    },
-    {
-     "name": "Generate",
-     "beats": [
-      [
-       "text",
-       "Can Generate",
-       {
-        "size": 44,
-        "y": 0.35
-       }
-      ],
-      [
-       "cards",
-       "Social post · AI images"
-      ]
-     ]
-    },
-    {
-     "name": "End card",
-     "beats": [
-      [
-       "shape",
-       "Build your audience.",
-       {
-        "bg": "#5c0930"
-       }
-      ],
-      [
-       "logo",
-       "Newsroom",
-       {
-        "bg": "#5c0930"
-       }
-      ]
-     ]
-    }
-   ]
-  },
-  "5db95a3a7c73": {
-   "palette": {
-    "bg": "#7fd3ea",
-    "fg": "#ffffff",
-    "accent": "#1f2a33"
-   },
-   "sections": [
-    {
-     "name": "Search",
-     "beats": [
-      [
-       "input",
-       "Rajzmotion Motion Exploration",
-       {
+    "5db95a3a7c73": {
+      "palette": {
         "bg": "#7fd3ea",
-        "fg": "#1f2a33"
-       }
+        "fg": "#ffffff",
+        "accent": "#1f2a33"
+      },
+      "sections": [
+        {
+          "name": "Search",
+          "beats": [
+            [
+              "input",
+              "Rajzmotion Motion Exploration",
+              {
+                "bg": "#7fd3ea",
+                "fg": "#1f2a33"
+              }
+            ]
+          ]
+        },
+        {
+          "name": "Profile",
+          "beats": [
+            [
+              "phone",
+              "@rajzmotion"
+            ]
+          ]
+        },
+        {
+          "name": "Follow",
+          "beats": [
+            [
+              "phone",
+              "Motion Designer"
+            ]
+          ]
+        }
       ]
-     ]
     },
-    {
-     "name": "Profile",
-     "beats": [
-      [
-       "phone",
-       "@rajzmotion"
+    "learnhour-app": {
+      "palette": {
+        "bg": "#0F172A",
+        "fg": "#FAF8F5",
+        "accent": "#2D5A27"
+      },
+      "sections": [
+        {
+          "name": "Landing Page",
+          "beats": [
+            [
+              "text",
+              "92% of online courses",
+              {
+                "size": 40
+              }
+            ],
+            [
+              "text",
+              "are never finished",
+              {
+                "size": 48,
+                "weight": 700
+              }
+            ]
+          ]
+        },
+        {
+          "name": "Dashboard",
+          "beats": [
+            [
+              "logo",
+              "Learnhour",
+              {
+                "mark": "⏱️",
+                "markSize": 60,
+                "size": 44,
+                "sub": "1 Hour Every Day"
+              }
+            ],
+            [
+              "cards",
+              "Continue Learning Hero · Habit Meter"
+            ]
+          ]
+        },
+        {
+          "name": "Course Library",
+          "beats": [
+            [
+              "cards",
+              "Masterclasses & Curated Playlists"
+            ],
+            [
+              "list",
+              "Python 2026 | Full Stack Dev | AI & Machine Learning"
+            ]
+          ]
+        },
+        {
+          "name": "YouTube Ingestion",
+          "beats": [
+            [
+              "phone",
+              "Paste any YouTube link",
+              {
+                "stack": true
+              }
+            ],
+            [
+              "window",
+              "Auto-Split into 1-Hour Days"
+            ]
+          ]
+        },
+        {
+          "name": "Cinema Player",
+          "beats": [
+            [
+              "window",
+              "16:9 Cinema Player & Syllabus"
+            ],
+            [
+              "list",
+              "Active Recall Quizzes | Smart Notes | Flashcards | Day Plan"
+            ]
+          ]
+        },
+        {
+          "name": "Focus Stopwatch",
+          "beats": [
+            [
+              "shape",
+              "Keep The Daily Streak Alive",
+              {
+                "bg": "#2D5A27"
+              }
+            ],
+            [
+              "logo",
+              "Learnhour",
+              {
+                "mark": "⏱️",
+                "markSize": 70,
+                "size": 52,
+                "sub": "Free & Local-First"
+              }
+            ]
+          ]
+        }
       ]
-     ]
-    },
-    {
-     "name": "Follow",
-     "beats": [
-      [
-       "phone",
-       "Motion Designer"
-      ]
-     ]
     }
-   ]
   }
- }
 }
