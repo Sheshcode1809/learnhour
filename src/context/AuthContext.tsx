@@ -126,36 +126,54 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loginWithGoogle = async () => {
     setIsLoading(true);
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://learninhour.vercel.app';
+    const callbackUrl = `${origin}/auth/callback`;
+
+    // 1. Attempt Supabase Google OAuth
     try {
       const supabase = getSupabaseClient();
       if (supabase) {
-        const { error } = await supabase.auth.signInWithOAuth({
+        const { data, error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
           options: {
-            redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/dashboard` : undefined,
+            redirectTo: callbackUrl,
+            queryParams: {
+              access_type: 'offline',
+              prompt: 'select_account',
+            },
           },
         });
-        if (!error) {
+        if (!error && data?.url) {
+          window.location.href = data.url;
           return;
         }
-        console.warn('Supabase OAuth error or unconfigured, proceeding with seamless Google sign in', error);
+        if (error) {
+          console.warn('Supabase OAuth notice:', error.message);
+        }
       }
     } catch (e) {
-      console.warn('OAuth attempt:', e);
+      console.warn('Supabase OAuth attempt:', e);
     }
 
-    // Seamless Google sign in
-    await new Promise((resolve) => setTimeout(resolve, 400));
-    const googleUser: AuthUser = {
-      id: `google-${Date.now()}`,
-      name: 'Google Learner',
-      email: 'learner@gmail.com',
-      avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80',
-      provider: 'google',
-    };
-    setUser(googleUser);
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(googleUser));
-    setIsLoading(false);
+    // 2. Direct Google Accounts OAuth 2.0 (if custom client ID is set)
+    const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    if (googleClientId) {
+      const googleOAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(
+        googleClientId
+      )}&redirect_uri=${encodeURIComponent(
+        callbackUrl
+      )}&response_type=token&scope=${encodeURIComponent(
+        'openid email profile'
+      )}&prompt=select_account`;
+      window.location.href = googleOAuthUrl;
+      return;
+    }
+
+    // 3. Guaranteed Google Account redirection to Google Sign-in / Account Chooser
+    const googleSignInUrl = `https://accounts.google.com/AccountChooser?service=lso&continue=${encodeURIComponent(
+      callbackUrl
+    )}&prompt=select_account`;
+    window.location.href = googleSignInUrl;
   };
 
   const logout = async () => {

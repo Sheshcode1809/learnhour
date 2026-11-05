@@ -28,7 +28,6 @@ export default function HomePage() {
 
   const handleGoogleCTA = async () => {
     await loginWithGoogle();
-    router.push('/dashboard');
   };
 
   return (

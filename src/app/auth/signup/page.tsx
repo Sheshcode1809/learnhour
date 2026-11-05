@@ -48,9 +48,8 @@ export default function SignupPage() {
 
   const handleGoogleSignUp = async () => {
     try {
-      await loginWithGoogle();
       updatePreferences({ daily_goal_minutes: dailyGoal });
-      router.push('/dashboard');
+      await loginWithGoogle();
     } catch {
       setError('Google Sign-In failed. Please try again.');
     }

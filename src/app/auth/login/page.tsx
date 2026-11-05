@@ -37,7 +37,6 @@ export default function LoginPage() {
   const handleGoogleSignIn = async () => {
     try {
       await loginWithGoogle();
-      router.push('/dashboard');
     } catch {
       setError('Google Sign-In failed. Please try again.');
     }
