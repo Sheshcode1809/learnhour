@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { ScenicBanner } from '@/components/courses/ScenicBanner';
@@ -19,10 +19,26 @@ import {
   ShieldCheck,
   ChevronRight,
   Video,
+  X,
 } from 'lucide-react';
 
 export default function HomePage() {
   const { isAuthenticated, authConfigured } = useAuth();
+  const [showDemoVideo, setShowDemoVideo] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowDemoVideo(false);
+    };
+    if (showDemoVideo) {
+      window.addEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [showDemoVideo]);
 
   return (
     <div className="min-h-screen bg-cream-100 text-charcoal-800 flex flex-col selection:bg-forest-100 selection:text-forest-800">
@@ -125,13 +141,16 @@ export default function HomePage() {
             <span>Try Quick Course Builder</span>
           </Link>
 
-          <Link
-            href="/courses"
-            className="w-full sm:w-auto flex items-center justify-center gap-2 py-3 px-6 rounded-2xl bg-white hover:bg-cream-200 text-charcoal-800 border border-sand-border font-bold text-sm shadow-2xs transition-all"
+          <button
+            type="button"
+            onClick={() => setShowDemoVideo(true)}
+            className="w-full sm:w-auto flex items-center justify-center gap-2 py-3 px-6 rounded-2xl bg-white hover:bg-cream-200 text-charcoal-800 border border-sand-border font-bold text-sm shadow-2xs transition-all group"
           >
-            <span>View My Courses</span>
-            <ChevronRight className="w-4 h-4" />
-          </Link>
+            <div className="w-5 h-5 rounded-full bg-forest-100 group-hover:bg-forest-200 flex items-center justify-center text-forest-700 transition-colors">
+              <Play className="w-2.5 h-2.5 fill-current ml-0.5" />
+            </div>
+            <span>Demo Video</span>
+          </button>
         </div>
 
         {/* Featured Course Action in First Viewport */}
@@ -428,12 +447,14 @@ export default function HomePage() {
               <span>Create Free Account</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link
-              href="/courses"
-              className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-2xl bg-white hover:bg-cream-200 text-charcoal-800 border border-sand-border font-bold text-sm shadow-sm"
+            <button
+              type="button"
+              onClick={() => setShowDemoVideo(true)}
+              className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-2xl bg-white hover:bg-cream-200 text-charcoal-800 border border-sand-border font-bold text-sm shadow-sm group"
             >
-              <span>View My Courses</span>
-            </Link>
+              <Play className="w-4 h-4 fill-forest-600 text-forest-600" />
+              <span>Demo Video</span>
+            </button>
           </div>
 
           <Link href="/auth/login" className="mt-4 text-xs font-semibold text-charcoal-600 hover:text-charcoal-900 underline">
@@ -462,6 +483,85 @@ export default function HomePage() {
           <Link href="/contact" className="hover:text-charcoal-900">Contact</Link>
         </div>
       </footer>
+
+      {/* Demo Video Modal */}
+      {showDemoVideo && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Learnhour Product Launch Demo Video"
+          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200"
+          onClick={() => setShowDemoVideo(false)}
+        >
+          <div
+            className="relative w-full max-w-4xl bg-charcoal-900 border border-white/15 rounded-3xl overflow-hidden shadow-2xl flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-5 py-3.5 bg-charcoal-950/80 border-b border-white/10 text-white">
+              <div className="flex items-center gap-2.5">
+                <div className="w-6 h-6 rounded-lg bg-forest-600 flex items-center justify-center text-white">
+                  <GraduationCap className="w-3.5 h-3.5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold tracking-tight text-white">
+                    Learnhour Launch Preview
+                  </h3>
+                  <p className="text-[11px] text-charcoal-400">
+                    20-second product overview · One hour every day
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowDemoVideo(false)}
+                aria-label="Close demo video"
+                className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-charcoal-300 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Video Player */}
+            <div className="w-full bg-black relative aspect-video flex items-center justify-center">
+              <video
+                src="/demo.mp4"
+                poster="/demo-thumbnail.jpg"
+                controls
+                autoPlay
+                playsInline
+                className="w-full h-full object-contain"
+              >
+                Your browser does not support the video tag.
+              </video>
+            </div>
+
+            {/* Modal Footer CTA */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-5 py-4 bg-charcoal-950/90 border-t border-white/10">
+              <p className="text-xs text-charcoal-300">
+                Stop collecting courses. <span className="text-white font-semibold">Start completing them.</span>
+              </p>
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <Link
+                  href="/courses/new"
+                  onClick={() => setShowDemoVideo(false)}
+                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-forest-600 hover:bg-forest-700 text-white text-xs font-bold transition-all shadow-sm"
+                >
+                  <Play className="w-3.5 h-3.5 fill-current" />
+                  <span>Try Quick Course Builder</span>
+                </Link>
+                <Link
+                  href="/courses"
+                  onClick={() => setShowDemoVideo(false)}
+                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold transition-all"
+                >
+                  <span>My courses →</span>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
