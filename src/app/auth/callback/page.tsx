@@ -27,8 +27,8 @@ export default function AuthCallbackPage() {
           return;
         }
 
-        setStatusMessage('Account verified. Opening your dashboard…');
-        router.replace('/dashboard');
+        setStatusMessage('Account verified. Opening your courses…');
+        router.replace('/courses');
       } catch {
         if (active) router.replace('/auth/login?error=callback-failed');
       }

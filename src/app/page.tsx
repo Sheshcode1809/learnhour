@@ -61,10 +61,10 @@ export default function HomePage() {
           {isAuthenticated ? (
             <>
               <Link
-                href="/dashboard"
+                href="/courses"
                 className="text-xs font-semibold text-charcoal-700 hover:text-charcoal-900 px-3 py-2 rounded-xl hover:bg-cream-200 transition-colors"
               >
-                Dashboard
+                My courses
               </Link>
               <Link
                 href="/auth/login"
@@ -126,10 +126,10 @@ export default function HomePage() {
           </Link>
 
           <Link
-            href="/dashboard"
+            href="/courses"
             className="w-full sm:w-auto flex items-center justify-center gap-2 py-3 px-6 rounded-2xl bg-white hover:bg-cream-200 text-charcoal-800 border border-sand-border font-bold text-sm shadow-2xs transition-all"
           >
-            <span>Open your dashboard</span>
+            <span>View My Courses</span>
             <ChevronRight className="w-4 h-4" />
           </Link>
         </div>
@@ -429,10 +429,10 @@ export default function HomePage() {
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
-              href="/dashboard"
+              href="/courses"
               className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-2xl bg-white hover:bg-cream-200 text-charcoal-800 border border-sand-border font-bold text-sm shadow-sm"
             >
-              <span>View Demo</span>
+              <span>View My Courses</span>
             </Link>
           </div>
 
@@ -455,7 +455,7 @@ export default function HomePage() {
         <div className="flex flex-wrap items-center gap-4 text-xs font-medium">
           <Link href="/auth/login" className="font-semibold text-forest-700 hover:text-forest-800">Login</Link>
           <Link href="/auth/signup" className="font-semibold text-forest-700 hover:text-forest-800">Sign up</Link>
-          <Link href="/dashboard" className="hover:text-charcoal-900">Dashboard</Link>
+          <Link href="/courses" className="hover:text-charcoal-900">My courses</Link>
           <Link href="/about" className="hover:text-charcoal-900">About</Link>
           <Link href="/privacy" className="hover:text-charcoal-900">Privacy</Link>
           <Link href="/terms" className="hover:text-charcoal-900">Terms</Link>

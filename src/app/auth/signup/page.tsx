@@ -30,7 +30,7 @@ export default function SignupPage() {
       const result = await signupWithEmail(name, email, password);
       if (result.authenticated) {
         updatePreferences({ name: name.trim(), daily_goal_minutes: dailyGoal });
-        router.replace('/dashboard');
+        router.replace('/courses');
       } else {
         setNotice(result.message || 'Check your email to confirm your account, then sign in.');
       }

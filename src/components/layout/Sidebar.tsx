@@ -6,12 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   GraduationCap,
   Plus,
-  Calendar,
   BookOpen,
-  Timer,
-  Settings,
-  Flame,
-  CheckCircle2,
   Globe,
   LogOut,
 } from 'lucide-react';
@@ -21,7 +16,7 @@ import { useAuth } from '@/context/AuthContext';
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { courses, stats } = useLearning();
+  const { courses } = useLearning();
   const { user, logout } = useAuth();
 
   const handleLogout = async () => {
@@ -30,13 +25,10 @@ export function Sidebar() {
   };
 
   const navItems = [
-    { label: 'Today', href: '/dashboard', icon: Calendar },
     { label: 'My courses', href: '/courses', icon: BookOpen, badge: courses.length },
-    { label: 'Sessions', href: '/sessions', icon: Timer },
-    { label: 'Settings', href: '/settings', icon: Settings },
   ];
 
-  const recentCourses = courses.slice(0, 4);
+  const recentCourses = courses.slice(0, 5);
   const displayName = user?.name || (user ? 'Learner' : 'Learnhour');
   const displayEmail = user?.email || (user ? '' : 'Sign in');
 
@@ -44,7 +36,7 @@ export function Sidebar() {
     <aside className="hidden lg:flex w-64 flex-col justify-between border-r border-sand-border bg-cream-50 h-screen sticky top-0 px-4 py-5 select-none overflow-y-auto">
       <div className="flex flex-col gap-6">
         {/* Brand / Logo */}
-        <Link href="/dashboard" className="flex items-center gap-2.5 px-2 group">
+        <Link href="/courses" className="flex items-center gap-2.5 px-2 group">
           <div className="w-9 h-9 rounded-xl bg-forest-600 flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-transform">
             <GraduationCap className="w-5 h-5" />
           </div>
@@ -68,11 +60,11 @@ export function Sidebar() {
           <span>New course</span>
         </Link>
 
-        {/* Primary Navigation */}
+        {/* Primary Navigation — ONLY My Courses tab */}
         <nav className="flex flex-col gap-1">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
+            const isActive = pathname.startsWith(item.href);
 
             return (
               <Link
@@ -97,26 +89,6 @@ export function Sidebar() {
             );
           })}
         </nav>
-
-        {/* Streak quick pill in sidebar */}
-        <div className="bg-sand-100 border border-sand-border rounded-xl p-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-terracotta-100 text-terracotta-600 flex items-center justify-center">
-              <Flame className="w-4 h-4 fill-terracotta-500 stroke-terracotta-600" />
-            </div>
-            <div>
-              <div className="text-xs font-semibold text-charcoal-800">
-                {stats.currentStreak} Day Streak
-              </div>
-              <div className="text-[10px] text-charcoal-500">
-                {stats.todayGoalMet ? 'Goal achieved today!' : `${stats.remainingMinutesToday}m left today`}
-              </div>
-            </div>
-          </div>
-          {stats.todayGoalMet && (
-            <CheckCircle2 className="w-4 h-4 text-forest-600" />
-          )}
-        </div>
 
         {/* RECENTS Section */}
         {recentCourses.length > 0 && (

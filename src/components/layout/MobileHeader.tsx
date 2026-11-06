@@ -7,12 +7,8 @@ import {
   GraduationCap,
   Menu,
   X,
-  Calendar,
   BookOpen,
-  Timer,
-  Settings,
   Plus,
-  Flame,
   Globe,
   LogOut,
 } from 'lucide-react';
@@ -22,39 +18,30 @@ import { useAuth } from '@/context/AuthContext';
 export function MobileHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
-  const { courses, stats } = useLearning();
+  const { courses } = useLearning();
   const { user } = useAuth();
 
   const navItems = [
-    { label: 'Today', href: '/dashboard', icon: Calendar },
     { label: 'My courses', href: '/courses', icon: BookOpen, badge: courses.length },
-    { label: 'Sessions', href: '/sessions', icon: Timer },
-    { label: 'Settings', href: '/settings', icon: Settings },
   ];
 
   return (
     <header className="lg:hidden sticky top-0 z-40 bg-cream-50/95 backdrop-blur border-b border-sand-border px-4 py-3">
       <div className="flex items-center justify-between">
-        <Link href="/dashboard" className="flex items-center gap-2">
+        <Link href="/courses" className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-forest-600 flex items-center justify-center text-white">
             <GraduationCap className="w-4 h-4" />
           </div>
           <span className="font-bold text-charcoal-800 text-base">Learnhour</span>
         </Link>
 
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 bg-terracotta-50 text-terracotta-600 border border-terracotta-100 px-2 py-1 rounded-full text-xs font-semibold">
-            <Flame className="w-3.5 h-3.5 fill-terracotta-500" />
-            <span>{stats.currentStreak}d</span>
-          </div>
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            aria-label="Toggle menu"
-            className="p-1.5 rounded-lg border border-sand-border text-charcoal-700 bg-cream-100 hover:bg-cream-200"
-          >
-            {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
-        </div>
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          aria-label="Toggle menu"
+          className="p-1.5 rounded-lg border border-sand-border text-charcoal-700 bg-cream-100 hover:bg-cream-200"
+        >
+          {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
       </div>
 
       {/* Drawer */}
@@ -72,7 +59,7 @@ export function MobileHeader() {
           <nav className="flex flex-col gap-1">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
+              const isActive = pathname.startsWith(item.href);
               return (
                 <Link
                   key={item.href}

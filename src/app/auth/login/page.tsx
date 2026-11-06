@@ -29,7 +29,7 @@ export default function LoginPage() {
     setShowResendConfirmation(false);
     try {
       await loginWithEmail(email, password);
-      router.replace('/dashboard');
+      router.replace('/courses');
     } catch (cause) {
       if (cause instanceof AuthActionError && cause.code === 'email_not_confirmed') {
         setShowResendConfirmation(true);

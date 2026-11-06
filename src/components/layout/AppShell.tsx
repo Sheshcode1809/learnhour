@@ -4,7 +4,6 @@ import React from 'react';
 import { usePathname } from 'next/navigation';
 import { Sidebar } from './Sidebar';
 import { MobileHeader } from './MobileHeader';
-import { GlobalTimerBar } from './GlobalTimerBar';
 import { useLearning } from '@/context/LearningContext';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -32,12 +31,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <MobileHeader />
 
         {/* Main Content Area */}
-        <main className="flex-1 flex flex-col min-w-0 max-w-full overflow-x-hidden pb-44 md:pb-28 lg:pb-12">
+        <main className="flex-1 flex flex-col min-w-0 max-w-full overflow-x-hidden pb-12">
           {children}
         </main>
-
-        {/* Persistent Study Timer Widget */}
-        <GlobalTimerBar />
       </div>
     </div>
   );
